@@ -2698,16 +2698,9 @@ const App = (() => {
     var payload = Object.assign({}, params, {_token: session ? session.token : '', _user: session ? session.email : ''});
     try {
       const result = await Utils.callGAS(fnName, payload);
-      if (result && result.authError) {
-        Utils.toast('Session expired. Please log in again.', 'danger');
-        Auth.logout();
-        throw new Error('AUTH_ERROR');
-      }
       return result;
     } catch (err) {
-      if (err.message !== 'AUTH_ERROR') {
-        console.error('[API]', fnName, err);
-      }
+      console.error('[API]', fnName, err);
       throw err;
     }
   }
