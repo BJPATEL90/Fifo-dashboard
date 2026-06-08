@@ -1,0 +1,4042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>
+  // =====================================================================
+  // REQUIRED: Paste your Apps Script Web App URL below.
+  // Deploy Backend.gs as Web App → Execute as: Me → Who can access: Anyone
+  // Then copy the /exec URL and paste it here.
+  // =====================================================================
+  var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbw-fERhLivpvxNTWF9lk5bgqqIFvkxmrg13dXdcjLtwqOv8llRXwYw8hOuANRWkPc06Uw/exec';
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIFO Control Tower — Warehouse Dashboard</title>
+<meta name="description" content="FIFO Violation Monitoring, Prevention & User Compliance Dashboard">
+<style>
+/* ================================================
+   FIFO DASHBOARD — main.css
+   Base styles, CSS variables, reset, typography
+   Optimized for warehouse laptops
+   ================================================ */
+
+:root {
+  /* Brand Colors */
+  --clr-bg:         #f0f2f5;
+  --clr-surface:    #ffffff;
+  --clr-surface2:   #f6f8fa;
+  --clr-border:     #d8dde6;
+  --clr-border2:    #d0d7de;
+
+  /* Text */
+  --clr-text:       #1a1d23;
+  --clr-text-muted: #5a6270;
+  --clr-text-dim:   #9099a6;
+
+  /* Accent */
+  --clr-accent:     #e86c1a;
+  --clr-accent-dim: rgba(232,108,26,0.12);
+  --clr-accent2:    #58a6ff;
+  --clr-accent2-dim:rgba(88,166,255,0.12);
+
+  /* Status */
+  --clr-ok:         #1a7f37;
+  --clr-ok-dim:     rgba(63,185,80,0.12);
+  --clr-warn:       #d29922;
+  --clr-warn-dim:   rgba(210,153,34,0.12);
+  --clr-danger:     #d1242f;
+  --clr-danger-dim: rgba(248,81,73,0.12);
+  --clr-info:       #0969da;
+  --clr-info-dim:   rgba(88,166,255,0.12);
+  --clr-purple:     #8250df;
+  --clr-purple-dim: rgba(188,140,255,0.12);
+
+  /* Severity */
+  --clr-minor:      #9a6700;
+  --clr-major:      #bc4c00;
+  --clr-critical:   #cf222e;
+  --clr-partial:    #0550ae;
+  --clr-compliant:  #1a7f37;
+
+  /* Layout */
+  --sidebar-w:      220px;
+  --header-h:       52px;
+  --radius-sm:      4px;
+  --radius:         6px;
+  --radius-lg:      10px;
+
+  /* Typography */
+  --font-mono:      'Courier New', Courier, monospace;
+  --font-base:      'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  /* Transitions */
+  --t-fast:         120ms ease;
+  --t-base:         200ms ease;
+
+  /* Shadows */
+  --shadow-sm:      0 1px 3px rgba(0,0,0,0.4);
+  --shadow:         0 2px 8px rgba(0,0,0,0.5);
+  --shadow-lg:      0 4px 20px rgba(0,0,0,0.6);
+}
+
+/* ---- RESET ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 14px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-base);
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a { color: var(--clr-accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+img, svg { display: block; max-width: 100%; }
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* ---- SCROLLBARS ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--clr-bg); }
+::-webkit-scrollbar-thumb { background: var(--clr-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--clr-text-dim); }
+
+/* ---- TYPOGRAPHY ---- */
+h1 { font-size: 1.5rem;  font-weight: 700; line-height: 1.2; }
+h2 { font-size: 1.2rem;  font-weight: 600; line-height: 1.3; }
+h3 { font-size: 1rem;    font-weight: 600; line-height: 1.4; }
+h4 { font-size: 0.875rem;font-weight: 600; line-height: 1.4; }
+
+p  { font-size: 0.875rem; color: var(--clr-text-muted); }
+
+.mono { font-family: var(--font-mono); font-size: 0.8rem; }
+.text-muted  { color: var(--clr-text-muted); }
+.text-dim    { color: var(--clr-text-dim); }
+.text-accent { color: var(--clr-accent); }
+.text-ok     { color: var(--clr-ok); }
+.text-warn   { color: var(--clr-warn); }
+.text-danger { color: var(--clr-danger); }
+.text-info   { color: var(--clr-info); }
+
+.text-right  { text-align: right; }
+.text-center { text-align: center; }
+
+/* ---- UTILITY ---- */
+.hidden    { display: none !important; }
+.invisible { visibility: hidden; }
+.flex      { display: flex; }
+.flex-col  { display: flex; flex-direction: column; }
+.gap-1     { gap: 4px; }
+.gap-2     { gap: 8px; }
+.gap-3     { gap: 12px; }
+.gap-4     { gap: 16px; }
+.items-center  { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center  { justify-content: center; }
+.flex-wrap { flex-wrap: wrap; }
+.grow      { flex: 1; }
+.w-full    { width: 100%; }
+.truncate  { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.no-select { user-select: none; }
+
+/* ---- BADGES ---- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.badge-ok       { background: var(--clr-ok-dim);     color: var(--clr-ok);     border: 1px solid rgba(63,185,80,0.3); }
+.badge-warn     { background: var(--clr-warn-dim);   color: var(--clr-warn);   border: 1px solid rgba(210,153,34,0.3); }
+.badge-danger   { background: var(--clr-danger-dim); color: var(--clr-danger); border: 1px solid rgba(248,81,73,0.3); }
+.badge-info     { background: var(--clr-info-dim);   color: var(--clr-info);   border: 1px solid rgba(88,166,255,0.3); }
+.badge-accent   { background: var(--clr-accent-dim); color: var(--clr-accent); border: 1px solid rgba(240,136,62,0.3); }
+.badge-purple   { background: var(--clr-purple-dim); color: var(--clr-purple); border: 1px solid rgba(188,140,255,0.3); }
+.badge-neutral  { background: rgba(139,148,158,0.12); color: var(--clr-text-muted); border: 1px solid rgba(139,148,158,0.2); }
+
+/* ---- SEVERITY ---- */
+.sev-minor    { color: var(--clr-minor);    }
+.sev-major    { color: var(--clr-major);    }
+.sev-critical { color: var(--clr-critical); }
+.sev-partial  { color: var(--clr-partial);  }
+.sev-ok       { color: var(--clr-compliant);}
+
+.badge-minor    { background: rgba(210,153,34,0.12);  color: var(--clr-minor);    border:1px solid rgba(210,153,34,0.3);  }
+.badge-major    { background: rgba(240,136,62,0.12);  color: var(--clr-major);    border:1px solid rgba(240,136,62,0.3);  }
+.badge-critical { background: rgba(248,81,73,0.12);   color: var(--clr-critical); border:1px solid rgba(248,81,73,0.3);   }
+.badge-partial  { background: rgba(88,166,255,0.12);  color: var(--clr-partial);  border:1px solid rgba(88,166,255,0.3);  }
+.badge-compliant{ background: rgba(63,185,80,0.12);   color: var(--clr-compliant);border:1px solid rgba(63,185,80,0.3);   }
+
+/* ---- BUTTONS ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: background var(--t-fast), opacity var(--t-fast);
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--clr-accent);
+  color: #ffffff;
+  border-color: var(--clr-accent);
+}
+.btn-primary:hover:not(:disabled) { background: #e07a30; border-color: #e07a30; }
+
+.btn-secondary {
+  background: var(--clr-surface2);
+  color: var(--clr-text);
+  border-color: var(--clr-border);
+}
+.btn-secondary:hover:not(:disabled) { background: var(--clr-border); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--clr-text-muted);
+  border-color: var(--clr-border);
+}
+.btn-ghost:hover:not(:disabled) { background: var(--clr-surface2); color: var(--clr-text); }
+
+.btn-danger {
+  background: var(--clr-danger-dim);
+  color: var(--clr-danger);
+  border-color: rgba(248,81,73,0.3);
+}
+.btn-danger:hover:not(:disabled) { background: rgba(248,81,73,0.22); }
+
+.btn-sm { padding: 4px 10px; font-size: 0.75rem; }
+.btn-lg { padding: 9px 20px; font-size: 0.9rem; }
+.btn-icon { padding: 6px; }
+
+/* ---- INPUTS ---- */
+.input-wrap { display: flex; flex-direction: column; gap: 4px; }
+.label-text { font-size: 0.78rem; font-weight: 500; color: var(--clr-text-muted); }
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  color: var(--clr-text);
+  padding: 7px 11px;
+  transition: border-color var(--t-fast);
+  outline: none;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--clr-accent2);
+}
+input::placeholder { color: var(--clr-text-dim); }
+select option { background: var(--clr-surface2); color: var(--clr-text); }
+
+/* ---- CARD ---- */
+.card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ---- LOADING ---- */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--clr-border);
+  border-top-color: var(--clr-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+.spinner-sm { width: 14px; height: 14px; }
+.spinner-lg { width: 32px; height: 32px; border-width: 3px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  border-radius: inherit;
+}
+
+/* ---- TOAST ---- */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.82rem;
+  min-width: 260px;
+  max-width: 380px;
+  pointer-events: auto;
+  animation: slideUp 0.2s ease;
+  transition: opacity 0.3s ease;
+}
+.toast-ok     { border-left: 3px solid var(--clr-ok); }
+.toast-warn   { border-left: 3px solid var(--clr-warn); }
+.toast-danger { border-left: 3px solid var(--clr-danger); }
+.toast-info   { border-left: 3px solid var(--clr-info); }
+.toast.fade-out { opacity: 0; }
+
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ---- MODAL ---- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 720px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  animation: modalIn 0.18s ease;
+}
+.modal-sm  { max-width: 440px; }
+.modal-lg  { max-width: 960px; }
+.modal-xl  { max-width: 1200px; }
+@keyframes modalIn {
+  from { transform: scale(0.96); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--clr-border);
+  flex-shrink: 0;
+}
+.modal-body {
+  padding: 18px;
+  overflow-y: auto;
+  flex: 1;
+}
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--clr-border);
+  flex-shrink: 0;
+}
+.modal-close {
+  color: var(--clr-text-muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+}
+.modal-close:hover { color: var(--clr-text); background: var(--clr-surface2); }
+
+/* ---- PROGRESS BAR ---- */
+.progress-bar {
+  height: 6px;
+  background: var(--clr-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+.progress-fill-ok      { background: var(--clr-ok); }
+.progress-fill-warn    { background: var(--clr-warn); }
+.progress-fill-danger  { background: var(--clr-danger); }
+.progress-fill-accent  { background: var(--clr-accent); }
+.progress-fill-info    { background: var(--clr-info); }
+
+/* ---- DIVIDER ---- */
+.divider {
+  border: none;
+  border-top: 1px solid var(--clr-border);
+  margin: 12px 0;
+}
+
+/* ---- EMPTY STATE ---- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: var(--clr-text-muted);
+  gap: 8px;
+  text-align: center;
+}
+.empty-state .empty-icon {
+  font-size: 2.5rem;
+  opacity: 0.4;
+  margin-bottom: 8px;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 1024px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+}
+
+@media (max-width: 768px) {
+  html { font-size: 13px; }
+  .modal { max-height: 95vh; }
+}
+
+/* ================================================
+   FIFO DASHBOARD — dashboard.css
+   Layout, sidebar, header, KPIs, tables, tabs
+   ================================================ */
+
+/* ---- LOGIN PAGE ---- */
+#login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
+  padding: 20px;
+}
+.login-box {
+  background: #ffffff;
+  border: 1px solid #d0d7de;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow-lg);
+}
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.login-logo .logo-icon {
+  width: 36px; height: 36px;
+  background: var(--clr-accent-dim);
+  border: 1px solid rgba(240,136,62,0.4);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+.login-logo .logo-text {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.login-logo .logo-sub {
+  font-size: 0.7rem;
+  color: var(--clr-text-muted);
+  font-weight: 400;
+}
+.login-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.login-subtitle {
+  font-size: 0.8rem;
+  color: var(--clr-text-muted);
+  margin-bottom: 24px;
+}
+.login-form { display: flex; flex-direction: column; gap: 14px; }
+.login-error {
+  background: var(--clr-danger-dim);
+  border: 1px solid rgba(248,81,73,0.3);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  color: var(--clr-danger);
+}
+
+/* ---- APP SHELL ---- */
+#app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---- SIDEBAR ---- */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--clr-surface);
+  border-right: 1px solid var(--clr-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform var(--t-base);
+  z-index: 200;
+  flex-shrink: 0;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--clr-border2);
+}
+.sidebar-brand .brand-icon {
+  width: 30px; height: 30px;
+  background: var(--clr-accent-dim);
+  border: 1px solid rgba(240,136,62,0.35);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.sidebar-brand .brand-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--clr-text);
+}
+.sidebar-brand .brand-sub {
+  font-size: 0.62rem;
+  color: var(--clr-text-muted);
+  font-weight: 400;
+}
+
+.sidebar-nav { flex: 1; padding: 8px 0; }
+.nav-section { margin-bottom: 4px; }
+.nav-section-title {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  padding: 8px 14px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  color: var(--clr-text-muted);
+  border-radius: 0;
+  transition: background var(--t-fast), color var(--t-fast);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  white-space: nowrap;
+  user-select: none;
+}
+.nav-item:hover { background: #f0f2f5; color: #1a1d23 !important; }
+.nav-item.active {
+  background: var(--clr-accent-dim);
+  color: var(--clr-accent);
+  border-left-color: var(--clr-accent);
+  font-weight: 600;
+}
+.nav-item .nav-icon { font-size: 0.95rem; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-item .nav-badge {
+  margin-left: auto;
+  background: var(--clr-danger);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  padding: 10px 14px;
+  border-top: 1px solid var(--clr-border2);
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.user-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--clr-accent2-dim);
+  border: 1px solid rgba(88,166,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--clr-accent2);
+  flex-shrink: 0;
+}
+.user-info .user-name { font-weight: 600; font-size: 0.78rem; color: var(--clr-text); }
+.user-info .user-role { font-size: 0.68rem; color: #5a6270; }
+
+/* ---- MAIN CONTENT ---- */
+.main-content {
+  flex: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---- TOPBAR ---- */
+.topbar {
+  height: var(--header-h);
+  min-height: var(--header-h);
+  background: #ffffff;
+  border-bottom: 1px solid var(--clr-border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  gap: 12px;
+  z-index: 100;
+}
+.topbar-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  flex: 1;
+}
+.topbar-title .topbar-sub {
+  font-size: 0.72rem;
+  color: var(--clr-text-muted);
+  font-weight: 400;
+  margin-left: 8px;
+}
+.mobile-menu-btn {
+  display: none;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  color: var(--clr-text-muted);
+  font-size: 1.1rem;
+}
+
+.last-updated {
+  font-size: 0.72rem;
+  color: var(--clr-text-dim);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sync-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--clr-ok);
+}
+.sync-dot.stale { background: var(--clr-warn); }
+
+/* ---- PAGE CONTAINER ---- */
+.page-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+}
+
+/* ---- KPI GRID ---- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.kpi-card {
+  background: #ffffff;
+  border: 1px solid #d0d7de;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.kpi-card.ok::before    { background: var(--clr-ok); }
+.kpi-card.warn::before  { background: var(--clr-warn); }
+.kpi-card.danger::before{ background: var(--clr-danger); }
+.kpi-card.info::before  { background: var(--clr-info); }
+.kpi-card.accent::before{ background: var(--clr-accent); }
+.kpi-card.purple::before{ background: var(--clr-purple); }
+
+.kpi-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.kpi-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-sub {
+  font-size: 0.72rem;
+  color: var(--clr-text-muted);
+}
+.kpi-delta {
+  font-size: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.kpi-delta.up   { color: var(--clr-danger); }
+.kpi-delta.down { color: var(--clr-ok); }
+
+/* ---- SECTION HEADER ---- */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.section-actions { display: flex; align-items: center; gap: 8px; }
+
+/* ---- TABLE ---- */
+.table-wrap {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--clr-border);
+  flex-wrap: wrap;
+}
+.table-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  padding: 0 10px;
+  flex: 1;
+  max-width: 300px;
+}
+.table-search-wrap input {
+  background: none;
+  border: none;
+  padding: 6px 0;
+  color: var(--clr-text);
+  width: 100%;
+}
+.table-search-wrap .search-icon { color: var(--clr-text-dim); font-size: 0.9rem; }
+.table-count {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+  white-space: nowrap;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.data-table thead {
+  background: var(--clr-surface2);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.data-table th {
+  padding: 9px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--clr-border);
+  white-space: nowrap;
+  user-select: none;
+}
+.data-table th.sortable { cursor: pointer; }
+.data-table th.sortable:hover { color: var(--clr-text); }
+.data-table th .sort-icon { margin-left: 4px; opacity: 0.4; }
+.data-table th.sort-asc .sort-icon,
+.data-table th.sort-desc .sort-icon { opacity: 1; color: var(--clr-accent); }
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--clr-border2);
+  transition: background var(--t-fast);
+}
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table tbody tr:hover { background: var(--clr-surface2); }
+.data-table tbody tr.clickable { cursor: pointer; }
+
+.data-table td {
+  padding: 8px 12px;
+  vertical-align: middle;
+}
+.data-table .td-mono { font-family: var(--font-mono); font-size: 0.75rem; }
+.data-table .td-right { text-align: right; }
+.data-table .td-center { text-align: center; }
+
+.table-scroll-x { overflow-x: auto; }
+
+/* Violation row coloring */
+.row-critical { background: rgba(248,81,73,0.04) !important; }
+.row-major    { background: rgba(240,136,62,0.04) !important; }
+.row-minor    { background: rgba(210,153,34,0.04) !important; }
+.row-compliant{ background: rgba(63,185,80,0.03) !important; }
+
+/* ---- PAGINATION ---- */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+  flex-wrap: wrap;
+}
+.pagination-info {
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+  flex: 1;
+}
+.page-btn {
+  padding: 4px 9px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text-muted);
+  transition: all var(--t-fast);
+}
+.page-btn:hover:not(:disabled) { background: var(--clr-border); color: var(--clr-text); }
+.page-btn.active { background: var(--clr-accent-dim); border-color: rgba(240,136,62,0.4); color: var(--clr-accent); font-weight: 600; }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---- TABS ---- */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--clr-border);
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 9px 16px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--clr-text-muted);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color var(--t-fast), border-color var(--t-fast);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.tab-btn:hover { color: var(--clr-text); }
+.tab-btn.active {
+  color: var(--clr-accent);
+  border-bottom-color: var(--clr-accent);
+  font-weight: 600;
+}
+.tab-badge {
+  background: var(--clr-danger);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---- FACILITY CARDS ---- */
+.facility-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.facility-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+}
+.facility-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.facility-compliance {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.facility-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 10px;
+}
+.facility-stat {
+  font-size: 0.75rem;
+}
+.facility-stat .fs-label { color: var(--clr-text-muted); }
+.facility-stat .fs-value { font-weight: 600; font-size: 0.85rem; }
+
+/* ---- EXPIRY BUCKETS ---- */
+.expiry-buckets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+.expiry-bucket {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: center;
+}
+.expiry-bucket.urgent   { border-color: rgba(248,81,73,0.4); background: var(--clr-danger-dim); }
+.expiry-bucket.warning  { border-color: rgba(210,153,34,0.4); background: var(--clr-warn-dim); }
+.expiry-bucket.caution  { border-color: rgba(240,136,62,0.3); background: var(--clr-accent-dim); }
+.expiry-bucket.ok       { border-color: rgba(63,185,80,0.3); background: var(--clr-ok-dim); }
+.bucket-label { font-size: 0.68rem; color: var(--clr-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.bucket-qty   { font-size: 1.4rem; font-weight: 700; margin: 6px 0 2px; }
+.bucket-value { font-size: 0.75rem; color: var(--clr-text-muted); }
+.bucket-skus  { font-size: 0.7rem; color: var(--clr-text-dim); }
+
+/* ---- USER RANK ROWS ---- */
+.user-rank-list { display: flex; flex-direction: column; gap: 4px; }
+.user-rank-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--clr-surface2);
+  border-radius: var(--radius);
+  border: 1px solid var(--clr-border2);
+  font-size: 0.8rem;
+}
+.rank-num {
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: var(--clr-text-dim);
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.rank-name { font-weight: 600; flex: 1; truncate: true; }
+.rank-value { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rank-bar-wrap { flex: 1; max-width: 100px; }
+
+/* ---- COMPLIANCE METER ---- */
+.compliance-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.compliance-pct {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* ---- OFFENDER CHIP ---- */
+.offender-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+.offender-normal   { background: var(--clr-ok-dim);     color: var(--clr-ok);     border:1px solid rgba(63,185,80,0.3); }
+.offender-repeat   { background: var(--clr-warn-dim);   color: var(--clr-warn);   border:1px solid rgba(210,153,34,0.3); }
+.offender-high     { background: var(--clr-danger-dim); color: var(--clr-danger); border:1px solid rgba(248,81,73,0.3); }
+.offender-critical { background: rgba(248,81,73,0.25);  color: #ff9492;           border:1px solid rgba(248,81,73,0.5); font-size:0.65rem; }
+.offender-champion { background: rgba(188,140,255,0.12);color: var(--clr-purple); border:1px solid rgba(188,140,255,0.3); }
+
+/* ---- UPLOAD ZONE ---- */
+.upload-zone {
+  border: 2px dashed var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  text-align: center;
+  transition: border-color var(--t-base), background var(--t-base);
+  cursor: pointer;
+}
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: var(--clr-accent2);
+  background: var(--clr-accent2-dim);
+}
+.upload-icon { font-size: 2rem; margin-bottom: 10px; opacity: 0.5; }
+.upload-text { font-size: 0.85rem; color: var(--clr-text-muted); }
+.upload-hint { font-size: 0.75rem; color: var(--clr-text-dim); margin-top: 4px; }
+#file-input { display: none; }
+
+/* ---- DRILLDOWN ---- */
+.drilldown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.drilldown-cell {
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  padding: 10px;
+}
+.dc-label { font-size: 0.68rem; color: var(--clr-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+.dc-value { font-size: 0.9rem; font-weight: 600; }
+.dc-value.mono { font-family: var(--font-mono); font-size: 0.8rem; }
+
+/* ---- RISK LEVEL ---- */
+.risk-high   { color: var(--clr-danger); }
+.risk-medium { color: var(--clr-warn); }
+.risk-low    { color: var(--clr-ok); }
+.risk-badge-high   { background: var(--clr-danger-dim); color: var(--clr-danger); border:1px solid rgba(248,81,73,0.3); }
+.risk-badge-medium { background: var(--clr-warn-dim);   color: var(--clr-warn);   border:1px solid rgba(210,153,34,0.3); }
+.risk-badge-low    { background: var(--clr-ok-dim);     color: var(--clr-ok);     border:1px solid rgba(63,185,80,0.3); }
+
+/* ---- CHARTS ---- */
+.chart-container {
+  position: relative;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  overflow: hidden;
+}
+.chart-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+canvas { max-width: 100%; }
+
+/* ---- SETTINGS ---- */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--clr-border2);
+}
+.setting-info { flex: 1; }
+.setting-name { font-size: 0.85rem; font-weight: 600; }
+.setting-desc { font-size: 0.75rem; color: var(--clr-text-muted); margin-top: 2px; }
+.setting-control { flex-shrink: 0; width: 100px; }
+
+/* ---- AUDIT LOG ---- */
+.audit-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--clr-border2);
+  font-size: 0.78rem;
+}
+.audit-time { color: var(--clr-text-dim); font-family: var(--font-mono); font-size: 0.72rem; white-space: nowrap; }
+.audit-event { color: var(--clr-text); flex: 1; }
+.audit-user { color: var(--clr-text-muted); font-size: 0.72rem; }
+
+/* ---- 2-col layout ---- */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+@media (max-width: 900px) {
+  .two-col, .three-col { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
+@media (max-width: 640px) {
+  .mobile-menu-btn { display: flex; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .table-toolbar { padding: 8px 10px; }
+  .data-table th, .data-table td { padding: 7px 8px; }
+}
+
+/* Sidebar — white background, dark text */
+.sidebar .nav-item { color: #3d4451 !important; }
+.sidebar .nav-item:hover { color: #1a1d23 !important; background: #f0f2f5 !important; }
+.sidebar .nav-item.active { color: #e86c1a !important; background: rgba(232,108,26,0.1) !important; font-weight: 600; }
+.sidebar .nav-section-title { color: #8b949e !important; font-size: 0.72rem !important; letter-spacing: 0.06em; font-weight: 600; text-transform: uppercase; }
+.sidebar .brand-text { color: #1a1d23 !important; }
+.sidebar .brand-sub { color: #5a6270 !important; }
+.sidebar .user-name { color: #1a1d23 !important; }
+.sidebar .user-role { color: #5a6270 !important; font-size: 0.72rem !important; }
+.sidebar .user-avatar { background: #e86c1a !important; color: #ffffff !important; }
+
+</style>
+
+</head>
+<body>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-icon">📦</div>
+      <div>
+        <div class="logo-text">FIFO Control Tower</div>
+        <div class="logo-sub">Warehouse Operations Dashboard</div>
+      </div>
+    </div>
+    <div class="login-title">Who are you?</div>
+    <div class="login-subtitle">Enter your name and email so your actions can be tracked in the audit log.</div>
+    <form class="login-form" id="login-form" onsubmit="return false;">
+      <div class="input-wrap">
+        <label class="label-text" for="login-name">Your Name</label>
+        <input type="text" id="login-name" placeholder="e.g. Ravi Kumar" autocomplete="name" required>
+      </div>
+      <div class="input-wrap">
+        <label class="label-text" for="login-email">Your Email</label>
+        <input type="email" id="login-email" placeholder="you@company.com" autocomplete="email" required>
+      </div>
+      <div id="login-error" class="login-error hidden"></div>
+      <button type="submit" class="btn btn-primary btn-lg w-full" id="login-btn" onclick="Auth.login()">
+        <span id="login-btn-text">Enter Dashboard</span>
+        <span id="login-spinner" class="spinner spinner-sm hidden"></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== APP SHELL ===== -->
+<div id="app-shell" class="hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">📦</div>
+      <div>
+        <div class="brand-text">FIFO Tower</div>
+        <div class="brand-sub">Control Dashboard</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <div class="nav-item active" data-page="home" onclick="App.navigate('home')">
+          <span class="nav-icon">🏠</span> Home
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Analysis</div>
+        <div class="nav-item" data-page="violations" onclick="App.navigate('violations')">
+          <span class="nav-icon">⚠️</span> Violations
+          <span class="nav-badge hidden" id="nav-badge-violations">0</span>
+        </div>
+        <div class="nav-item" data-page="prevention" onclick="App.navigate('prevention')">
+          <span class="nav-icon">🛡️</span> Prevention
+        </div>
+        <div class="nav-item" data-page="compliance" onclick="App.navigate('compliance')">
+          <span class="nav-icon">👤</span> User Compliance
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Operations</div>
+        <div class="nav-item" data-page="gatepass" onclick="App.navigate('gatepass')">
+          <span class="nav-icon">📤</span> Upload Gatepass
+        </div>
+        <div class="nav-item" data-page="inventory" onclick="App.navigate('inventory')">
+          <span class="nav-icon">🗂️</span> Inventory Import
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">System</div>
+        <div class="nav-item" data-page="settings" onclick="App.navigate('settings')" id="nav-settings">
+          <span class="nav-icon">⚙️</span> Settings
+        </div>
+        <div class="nav-item" data-page="audit" onclick="App.navigate('audit')" id="nav-audit">
+          <span class="nav-icon">📋</span> Audit Log
+        </div>
+        <div class="nav-item" onclick="Auth.logout()">
+          <span class="nav-icon">🚪</span> Sign Out
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="user-avatar" id="user-avatar">U</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name-display">User</div>
+          <div class="user-role" id="user-role-display">Operator</div>
+        </div>
+      </div>
+      <div class="text-dim" style="font-size:0.65rem;">v1.0.0 · Google Apps Script</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <button class="btn btn-icon mobile-menu-btn" onclick="App.toggleSidebar()">☰</button>
+      <div class="topbar-title" id="topbar-title">
+        Home
+        <span class="topbar-sub" id="topbar-sub"></span>
+      </div>
+      <div class="last-updated" id="last-updated-indicator">
+        <span class="sync-dot" id="sync-dot"></span>
+        <span id="last-updated-text">Loading…</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="App.refreshData()" id="refresh-btn" title="Refresh Data">
+        🔄
+      </button>
+    </div>
+
+    <!-- PAGE CONTAINER -->
+    <div class="page-container" id="page-container">
+
+      <!-- ==================== HOME PAGE ==================== -->
+      <div id="page-home" class="page hidden">
+        <div class="kpi-grid" id="kpi-grid">
+          <!-- Populated by dashboard.js -->
+          <div class="kpi-card" style="grid-column:1/-1; text-align:center; padding:32px;">
+            <div class="spinner spinner-lg" style="margin:0 auto 10px;"></div>
+            <div class="text-muted">Loading dashboard…</div>
+          </div>
+        </div>
+
+        <!-- Facility Compliance -->
+        <div class="section-header">
+          <div class="section-title">🏭 Facility Compliance</div>
+          <div class="section-actions">
+            <button class="btn btn-ghost btn-sm" onclick="Dashboard.exportFacilitySummary()">Export</button>
+          </div>
+        </div>
+        <div class="facility-grid" id="facility-grid" style="margin-bottom:18px;">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Two columns: Top violators + Champions -->
+        <div class="two-col" style="margin-bottom:18px;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">⚠️ Top Violators (30 days)</div>
+              <a href="#" onclick="App.navigate('compliance'); return false;" style="font-size:0.75rem;">View All</a>
+            </div>
+            <div class="user-rank-list" id="top-violators-list">
+              <div class="text-muted text-center" style="padding:20px;">Loading…</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🏆 FIFO Champions</div>
+              <a href="#" onclick="App.navigate('compliance'); return false;" style="font-size:0.75rem;">View All</a>
+            </div>
+            <div class="user-rank-list" id="champions-list">
+              <div class="text-muted text-center" style="padding:20px;">Loading…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expiry Exposure -->
+        <div class="section-header">
+          <div class="section-title">⏰ Expiry Exposure</div>
+        </div>
+        <div class="expiry-buckets" id="expiry-buckets" style="margin-bottom:18px;">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Recent Violations -->
+        <div class="section-header">
+          <div class="section-title">🔴 Recent Violations</div>
+          <div class="section-actions">
+            <button class="btn btn-ghost btn-sm" onclick="App.navigate('violations')">View All →</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-scroll-x">
+            <table class="data-table" id="recent-violations-table">
+              <thead>
+                <tr>
+                  <th>GP Code</th><th>Date</th><th>User</th><th>Facility</th>
+                  <th>SKU Code</th><th>Item Name</th><th>Severity</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="recent-violations-body">
+                <tr><td colspan="8" class="text-center text-muted" style="padding:24px;">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- END HOME PAGE -->
+
+      <!-- ==================== VIOLATIONS PAGE ==================== -->
+      <div id="page-violations" class="page hidden">
+        <div class="tab-bar">
+          <button class="tab-btn active" data-vtab="all" onclick="Violations.switchTab('all')">All Records</button>
+          <button class="tab-btn" data-vtab="violations" onclick="Violations.switchTab('violations')">⚠️ Violations</button>
+          <button class="tab-btn" data-vtab="partial" onclick="Violations.switchTab('partial')">🔵 Partial FIFO</button>
+          <button class="tab-btn" data-vtab="compliant" onclick="Violations.switchTab('compliant')">✅ Compliant</button>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <div class="table-search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="violations-search" placeholder="Search GP, SKU, user…" oninput="Violations.onSearch(this.value)">
+            </div>
+            <select id="violations-facility" class="btn btn-ghost btn-sm" onchange="Violations.applyFilters()" style="width:auto; border:1px solid var(--clr-border); padding:5px 10px;">
+              <option value="">All Facilities</option>
+              <option value="SL Ambient">SL Ambient</option>
+              <option value="SL Mother Hub">SL Mother Hub</option>
+            </select>
+            <select id="violations-severity" class="btn btn-ghost btn-sm" onchange="Violations.applyFilters()" style="width:auto; border:1px solid var(--clr-border); padding:5px 10px;">
+              <option value="">All Severity</option>
+              <option value="CRITICAL">Critical</option>
+              <option value="MAJOR">Major</option>
+              <option value="MINOR">Minor</option>
+            </select>
+            <input type="date" id="violations-date-from" class="btn btn-ghost btn-sm" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+            <input type="date" id="violations-date-to" class="btn btn-ghost btn-sm" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+            <div class="table-count" id="violations-count">—</div>
+            <div style="display:flex;gap:6px;margin-left:auto;">
+              <button class="btn btn-ghost btn-sm" onclick="Exports.violationsCSV()">CSV</button>
+              <button class="btn btn-ghost btn-sm" onclick="Exports.violationsExcel()">Excel</button>
+              <button class="btn btn-ghost btn-sm" onclick="Exports.violationsPDF()">PDF</button>
+            </div>
+          </div>
+          <div class="table-scroll-x">
+            <table class="data-table" id="violations-table">
+              <thead>
+                <tr>
+                  <th class="sortable" onclick="Violations.sort('date')">Date <span class="sort-icon">↕</span></th>
+                  <th class="sortable" onclick="Violations.sort('gp')">GP Code <span class="sort-icon">↕</span></th>
+                  <th>User</th>
+                  <th>To Party</th>
+                  <th>SKU Code</th>
+                  <th>Item Name</th>
+                  <th class="sortable" onclick="Violations.sort('qty')">Qty <span class="sort-icon">↕</span></th>
+                  <th>Older Batches</th>
+                  <th class="sortable" onclick="Violations.sort('skipped')">Skipped Qty <span class="sort-icon">↕</span></th>
+                  <th class="sortable" onclick="Violations.sort('severity')">Severity <span class="sort-icon">↕</span></th>
+                  <th>Status</th>
+                  <th>GP Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="violations-body">
+                <tr><td colspan="13" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination" id="violations-pagination"></div>
+        </div>
+      </div>
+      <!-- END VIOLATIONS PAGE -->
+
+      <!-- ==================== PREVENTION PAGE ==================== -->
+      <div id="page-prevention" class="page hidden">
+        <div class="section-header" style="margin-bottom:14px;">
+          <div class="section-title">🛡️ At-Risk Inventory — Sort by Oldest First</div>
+          <div class="section-actions">
+            <button class="btn btn-ghost btn-sm" onclick="Exports.preventionCSV()">Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Expiry Buckets -->
+        <div class="section-header"><div class="section-title">⏰ Expiry Exposure Buckets</div></div>
+        <div class="expiry-buckets" id="prevention-expiry-buckets" style="margin-bottom:18px;"></div>
+
+        <!-- Risk Table -->
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <div class="table-search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="prevention-search" placeholder="Search SKU, batch…" oninput="Prevention.onSearch(this.value)">
+            </div>
+            <select id="prevention-facility" onchange="Prevention.applyFilters()" class="btn btn-ghost btn-sm" style="width:auto;border:1px solid var(--clr-border);padding:5px 10px;">
+              <option value="">All Facilities</option>
+              <option value="SL Ambient">SL Ambient</option>
+              <option value="SL Mother Hub">SL Mother Hub</option>
+            </select>
+            <select id="prevention-risk" onchange="Prevention.applyFilters()" class="btn btn-ghost btn-sm" style="width:auto;border:1px solid var(--clr-border);padding:5px 10px;">
+              <option value="">All Risk Levels</option>
+              <option value="HIGH">High Risk</option>
+              <option value="MEDIUM">Medium Risk</option>
+              <option value="LOW">Low Risk</option>
+            </select>
+            <div class="table-count" id="prevention-count">—</div>
+          </div>
+          <div class="table-scroll-x">
+            <table class="data-table" id="prevention-table">
+              <thead>
+                <tr>
+                  <th>FIFO Rank</th>
+                  <th class="sortable" onclick="Prevention.sort('sku')">SKU Code <span class="sort-icon">↕</span></th>
+                  <th>Item Name</th>
+                  <th>Oldest Batch</th>
+                  <th class="sortable" onclick="Prevention.sort('expiry')">Expiry Date <span class="sort-icon">↕</span></th>
+                  <th class="sortable" onclick="Prevention.sort('days')">Days to Expiry <span class="sort-icon">↕</span></th>
+                  <th>Mfg Date</th>
+                  <th>Shelves</th>
+                  <th class="sortable" onclick="Prevention.sort('qty')">Total Qty <span class="sort-icon">↕</span></th>
+                  <th>MRP ₹</th>
+                  <th>Inv Value ₹</th>
+                  <th>Risk Level</th>
+                </tr>
+              </thead>
+              <tbody id="prevention-body">
+                <tr><td colspan="12" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination" id="prevention-pagination"></div>
+        </div>
+      </div>
+      <!-- END PREVENTION PAGE -->
+
+      <!-- ==================== FINANCIAL PAGE ==================== -->
+
+      <div id="page-compliance" class="page hidden">
+        <div class="tab-bar">
+          <button class="tab-btn active" data-ctab="overview" onclick="Compliance.switchTab('overview')">📊 Overview</button>
+          <button class="tab-btn" data-ctab="offenders" onclick="Compliance.switchTab('offenders')">🔴 Repeat Offenders</button>
+          <button class="tab-btn" data-ctab="champions" onclick="Compliance.switchTab('champions')">🏆 Champions</button>
+          <button class="tab-btn" data-ctab="detail" onclick="Compliance.switchTab('detail')">📋 All Users</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="ctab-overview" class="tab-panel active">
+          <div class="three-col" style="margin-bottom:18px;">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:10px;">Top Violators</div>
+              <div id="cu-top-violators"></div>
+            </div>
+            <div class="card">
+              <div class="card-title" style="margin-bottom:10px;">Highest Loss Opportunity</div>
+              <div id="cu-top-loss"></div>
+            </div>
+            <div class="card">
+              <div class="card-title" style="margin-bottom:10px;">Lowest Compliance %</div>
+              <div id="cu-lowest-compliance"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Repeat Offenders Tab -->
+        <div id="ctab-offenders" class="tab-panel">
+          <div class="table-wrap">
+            <div class="table-toolbar">
+              <div class="table-search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="offenders-search" placeholder="Search user…" oninput="Compliance.searchOffenders(this.value)">
+              </div>
+              <div class="table-count" id="offenders-count">—</div>
+              <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="Exports.offendersCSV()">Export</button>
+            </div>
+            <div class="table-scroll-x">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>User</th><th>Facility</th><th>30d Violations</th>
+                    <th>Total Violations</th><th>Compliance %</th>
+                    <th>Skipped Qty</th><th>Loss ₹</th>
+                    <th>Level</th><th>Last Violation</th>
+                  </tr>
+                </thead>
+                <tbody id="offenders-body">
+                  <tr><td colspan="9" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" id="offenders-pagination"></div>
+          </div>
+        </div>
+
+        <!-- Champions Tab -->
+        <div id="ctab-champions" class="tab-panel">
+          <div class="table-wrap">
+            <div class="table-scroll-x">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th><th>User</th><th>Facility</th>
+                    <th>Total GPs</th><th>Violations</th>
+                    <th>Compliance %</th><th>Skipped Qty</th><th>Loss ₹</th>
+                  </tr>
+                </thead>
+                <tbody id="champions-body">
+                  <tr><td colspan="8" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Users Tab -->
+        <div id="ctab-detail" class="tab-panel">
+          <div class="table-wrap">
+            <div class="table-toolbar">
+              <div class="table-search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="allusers-search" placeholder="Search user…" oninput="Compliance.searchAllUsers(this.value)">
+              </div>
+              <select id="allusers-facility" onchange="Compliance.applyAllUsersFilter()" class="btn btn-ghost btn-sm" style="width:auto;border:1px solid var(--clr-border);padding:5px 10px;">
+                <option value="">All Facilities</option>
+                <option value="SL Ambient">SL Ambient</option>
+                <option value="SL Mother Hub">SL Mother Hub</option>
+              </select>
+              <div class="table-count" id="allusers-count">—</div>
+              <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="Exports.complianceCSV()">Export</button>
+            </div>
+            <div class="table-scroll-x">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>User</th><th>Facility</th><th>Total GPs</th>
+                    <th>Violations</th><th>Partial FIFO</th><th>Compliant</th>
+                    <th>Compliance %</th><th>Skipped Qty</th>
+                    <th>Loss ₹</th><th>Last Violation</th><th>Level</th>
+                  </tr>
+                </thead>
+                <tbody id="allusers-body">
+                  <tr><td colspan="11" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" id="allusers-pagination"></div>
+          </div>
+        </div>
+      </div>
+      <!-- END COMPLIANCE PAGE -->
+
+      <!-- ==================== GATEPASS UPLOAD PAGE ==================== -->
+      <div id="page-gatepass" class="page hidden">
+        <div class="card" style="max-width:660px; margin:0 auto;">
+          <h2 style="margin-bottom:6px;">Upload Gatepass File</h2>
+          <p style="margin-bottom:20px;">Upload a CSV or XLSX file. Only records from SL Ambient or SL Mother Hub will be processed. B2B to-party records are automatically excluded.</p>
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="Gatepass.onDragOver(event)" ondrop="Gatepass.onDrop(event)" ondragleave="Gatepass.onDragLeave(event)">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Click to select file or drag & drop here</div>
+            <div class="upload-hint">Supported: CSV, XLSX (max 20MB)</div>
+          </div>
+          <input type="file" id="file-input" accept=".csv,.xlsx,.xls" onchange="Gatepass.onFileSelect(event)">
+
+          <div id="gatepass-file-info" class="hidden" style="margin-top:14px;">
+            <div class="card" style="background:var(--clr-surface2);margin-bottom:14px;">
+              <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem;">
+                <span style="font-size:1.3rem;">📄</span>
+                <div>
+                  <div id="gp-file-name" style="font-weight:600;"></div>
+                  <div id="gp-file-size" class="text-muted" style="font-size:0.75rem;"></div>
+                </div>
+                <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="Gatepass.clearFile()">✕</button>
+              </div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <label class="label-text">Date Override (optional)</label>
+              <input type="date" id="gp-date-override" style="width:auto;margin-top:4px;">
+              <div class="text-muted" style="font-size:0.72rem;margin-top:3px;">Leave blank to use date from file data</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <button class="btn btn-primary btn-lg" id="gp-upload-btn" onclick="Gatepass.upload(false)">
+                <span id="gp-upload-text">➕ Add to Existing</span>
+                <span id="gp-upload-spinner" class="spinner spinner-sm hidden"></span>
+              </button>
+              <button class="btn btn-lg" style="background:#d1242f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;" id="gp-replace-btn" onclick="Gatepass.upload(true)">
+                <span id="gp-replace-text">🗑️ Flush &amp; Replace All</span>
+                <span id="gp-replace-spinner" class="spinner spinner-sm hidden"></span>
+              </button>
+            </div>
+            <div class="text-muted" style="font-size:0.72rem;margin-top:6px;">
+              <strong>Add to Existing</strong> — appends rows. &nbsp;|&nbsp;
+              <strong>Flush &amp; Replace All</strong> — deletes ALL previous data then imports fresh.
+            </div>
+          </div>
+
+          <div id="gatepass-progress" class="hidden" style="margin-top:14px;">
+            <div style="font-size:0.82rem;margin-bottom:6px;color:var(--clr-text-muted);" id="gp-progress-text">Processing…</div>
+            <div class="progress-bar"><div class="progress-fill progress-fill-accent" id="gp-progress-fill" style="width:0%"></div></div>
+          </div>
+
+          <div id="gatepass-result" class="hidden" style="margin-top:14px;"></div>
+        </div>
+
+        <!-- Upload History -->
+        <div style="max-width:660px;margin:18px auto 0;">
+          <div class="section-header"><div class="section-title">📋 Recent Uploads</div></div>
+          <div class="table-wrap">
+            <div class="table-scroll-x">
+              <table class="data-table">
+                <thead><tr><th>Date</th><th>File</th><th>Rows</th><th>Violations Found</th><th>Uploaded By</th><th>Status</th></tr></thead>
+                <tbody id="gp-history-body"><tr><td colspan="6" class="text-center text-muted" style="padding:20px;">No uploads yet</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- END GATEPASS PAGE -->
+
+      <!-- ==================== INVENTORY PAGE ==================== -->
+      <div id="page-inventory" class="page hidden">
+
+        <!-- STATUS CARDS -->
+        <div class="card" style="max-width:720px;margin:0 auto 18px;">
+          <h2 style="margin-bottom:14px;">📦 Inventory Snapshot</h2>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:0.82rem;margin-bottom:0;">
+            <div class="card" style="background:var(--clr-surface2);text-align:center;padding:12px;">
+              <div class="text-muted" style="font-size:0.7rem;margin-bottom:4px;">Last Import</div>
+              <div id="inv-last-import" style="font-weight:700;font-size:0.85rem;">—</div>
+            </div>
+            <div class="card" style="background:var(--clr-surface2);text-align:center;padding:12px;">
+              <div class="text-muted" style="font-size:0.7rem;margin-bottom:4px;">Total Records</div>
+              <div id="inv-record-count" style="font-weight:700;font-size:0.85rem;">—</div>
+            </div>
+            <div class="card" style="background:var(--clr-surface2);text-align:center;padding:12px;">
+              <div class="text-muted" style="font-size:0.7rem;margin-bottom:4px;">SL Ambient</div>
+              <div id="inv-ambient-count" style="font-weight:700;font-size:0.85rem;">—</div>
+            </div>
+            <div class="card" style="background:var(--clr-surface2);text-align:center;padding:12px;">
+              <div class="text-muted" style="font-size:0.7rem;margin-bottom:4px;">SL Mother Hub</div>
+              <div id="inv-hub-count" style="font-weight:700;font-size:0.85rem;">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILE UPLOAD -->
+        <div class="card" style="max-width:720px;margin:0 auto 18px;">
+          <h3 style="margin-bottom:6px;">📤 Upload Inventory File</h3>
+          <p class="text-muted" style="font-size:0.8rem;margin-bottom:16px;">
+            Upload your inventory CSV or Excel file. This replaces the current snapshot entirely.
+            Accepted columns (flexible naming): SKU Code, Item Name, Batch Code, Quantity, MRP, Expiry Date, Manufacturing Date, Facility, Shelf.
+          </p>
+
+          <!-- Drop zone -->
+          <div class="upload-zone" id="inv-upload-zone"
+               ondragover="Inventory.onDragOver(event)"
+               ondragleave="Inventory.onDragLeave(event)"
+               ondrop="Inventory.onDrop(event)"
+               onclick="document.getElementById('inv-file-input').click()">
+            <div class="upload-icon">📂</div>
+            <div class="upload-text">Drop inventory file here or <span class="upload-link">browse</span></div>
+            <div class="upload-hint">CSV, XLSX, XLS — max 20MB</div>
+            <input type="file" id="inv-file-input" accept=".csv,.xlsx,.xls" style="display:none;" onchange="Inventory.onFileSelect(event)">
+          </div>
+
+          <!-- File info -->
+          <div id="inv-file-info" class="file-info hidden" style="margin-top:12px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:1.4rem;">📄</span>
+              <div style="flex:1;">
+                <div style="font-weight:600;" id="inv-file-name">—</div>
+                <div class="text-muted" style="font-size:0.75rem;" id="inv-file-size">—</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="Inventory.clearFile()">✕ Remove</button>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div id="inv-progress" class="hidden" style="margin-top:14px;">
+            <div class="progress-bar" style="height:6px;margin-bottom:6px;">
+              <div class="progress-fill" id="inv-progress-fill" style="width:0%;transition:width 0.3s;"></div>
+            </div>
+            <div class="text-muted" style="font-size:0.75rem;" id="inv-progress-text">Processing…</div>
+          </div>
+
+          <!-- Result -->
+          <div id="inv-result" class="hidden" style="margin-top:14px;"></div>
+
+          <!-- Upload button -->
+          <button class="btn btn-primary btn-lg w-full" style="margin-top:14px;" onclick="Inventory.upload()" id="inv-upload-btn">
+            <span id="inv-upload-text">📤 Upload Inventory File</span>
+            <span id="inv-upload-spinner" class="spinner spinner-sm hidden"></span>
+          </button>
+        </div>
+
+        <!-- IMPORT HISTORY -->
+        <div style="max-width:720px;margin:0 auto;">
+          <div class="section-header"><div class="section-title">📋 Import History</div></div>
+          <div class="table-wrap">
+            <div class="table-scroll-x">
+              <table class="data-table">
+                <thead><tr><th>Date &amp; Time</th><th>Description</th><th>Details</th><th>Uploaded By</th></tr></thead>
+                <tbody id="inv-history-body"><tr><td colspan="4" class="text-center text-muted" style="padding:20px;">No imports yet</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- END INVENTORY PAGE -->
+
+      <!-- ==================== SETTINGS PAGE ==================== -->
+      <div id="page-settings" class="page hidden">
+        <div style="max-width:720px;">
+          <div class="card" style="margin-bottom:14px;">
+            <h3 style="margin-bottom:14px;">⚙️ FIFO Engine Settings</h3>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-name">Minimum Inventory Threshold</div>
+                <div class="setting-desc">Older batches below this quantity are ignored in violation checks</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" id="s-min-threshold" min="0" value="50">
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-name">Repeat Offender Threshold (30 days)</div>
+                <div class="setting-desc">Number of violations in 30 days to flag as Repeat Offender</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" id="s-repeat-threshold" min="1" value="5">
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:14px;">
+            <h3 style="margin-bottom:14px;">🔴 Severity Thresholds (Skipped Qty)</h3>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-name">Minor Violation Range</div>
+                <div class="setting-desc">Skipped qty that triggers Minor severity</div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input type="number" id="s-minor-min" value="50" style="width:70px;">
+                <span class="text-muted">to</span>
+                <input type="number" id="s-minor-max" value="499" style="width:70px;">
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-name">Major Violation Range</div>
+                <div class="setting-desc">Skipped qty that triggers Major severity</div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input type="number" id="s-major-min" value="500" style="width:70px;">
+                <span class="text-muted">to</span>
+                <input type="number" id="s-major-max" value="999" style="width:70px;">
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-name">Critical Violation Minimum</div>
+                <div class="setting-desc">Skipped qty at or above this is Critical</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" id="s-critical-min" value="1000">
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:14px;">
+            <h3 style="margin-bottom:14px;">🏆 Champion Thresholds</h3>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-name">Minimum GPs for Champion</div>
+                <div class="setting-desc">User must have at least this many GPs to qualify</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" id="s-champion-gp-min" value="50">
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-name">Minimum Compliance % for Champion</div>
+                <div class="setting-desc">User must be at or above this compliance rate</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" id="s-champion-compliance-min" value="98" min="0" max="100">
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary" onclick="Settings.save()">
+              <span id="settings-save-text">Save Settings</span>
+              <span id="settings-spinner" class="spinner spinner-sm hidden"></span>
+            </button>
+            <button class="btn btn-ghost" onclick="Settings.load()">Reset to Saved</button>
+          </div>
+        </div>
+      </div>
+      <!-- END SETTINGS PAGE -->
+
+      <!-- ==================== AUDIT LOG PAGE ==================== -->
+      <div id="page-audit" class="page hidden">
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <div class="table-search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="audit-search" placeholder="Search events…" oninput="Audit.onSearch(this.value)">
+            </div>
+            <select id="audit-type" onchange="Audit.applyFilters()" class="btn btn-ghost btn-sm" style="width:auto;border:1px solid var(--clr-border);padding:5px 10px;">
+              <option value="">All Events</option>
+              <option value="INVENTORY_IMPORT">Inventory Import</option>
+              <option value="GATEPASS_UPLOAD">Gatepass Upload</option>
+              <option value="SETTINGS_CHANGE">Settings Change</option>
+              <option value="LOGIN">Login</option>
+              <option value="ERROR">Error</option>
+            </select>
+            <div class="table-count" id="audit-count">—</div>
+          </div>
+          <div class="table-scroll-x">
+            <table class="data-table">
+              <thead>
+                <tr><th>Timestamp</th><th>Event Type</th><th>User</th><th>Description</th><th>Status</th></tr>
+              </thead>
+              <tbody id="audit-body">
+                <tr><td colspan="5" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination" id="audit-pagination"></div>
+        </div>
+      </div>
+      <!-- END AUDIT LOG PAGE -->
+
+    </div><!-- end page-container -->
+  </div><!-- end main-content -->
+</div><!-- end app-shell -->
+
+<!-- ==================== DRILLDOWN MODAL ==================== -->
+<div id="drilldown-modal" class="modal-backdrop hidden">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="drilldown-title">Violation Detail</h3>
+      <button class="modal-close" onclick="App.closeModal('drilldown-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="drilldown-grid" id="drilldown-grid"></div>
+      <hr class="divider">
+      <div class="section-title" style="margin-bottom:10px;">📦 Skipped Batches Detail</div>
+      <div class="table-scroll-x">
+        <table class="data-table" id="drilldown-batches-table">
+          <thead>
+            <tr><th>FIFO Rank</th><th>Batch Code</th><th>Vendor Batch</th><th>Mfg Date</th><th>Expiry</th><th>Shelf</th><th>Qty</th><th>MRP ₹</th></tr>
+          </thead>
+          <tbody id="drilldown-batches-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="App.closeModal('drilldown-modal')">Close</button>
+      <button class="btn btn-secondary btn-sm" onclick="Exports.drilldownPDF()">Export PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST CONTAINER ==================== -->
+<div id="toast-container"></div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+/* === utils.js === */
+/* ================================================
+   utils.js — Shared helpers
+   ================================================ */
+
+const Utils = (() => {
+
+  // ---- NUMBER FORMATTERS ----
+  function fmtNum(n, decimals) {
+    decimals = (decimals !== undefined) ? decimals : 0;
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return Number(n).toLocaleString('en-IN', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  }
+
+  function fmtCurrency(n, decimals) {
+    decimals = (decimals !== undefined) ? decimals : 0;
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    const v = Number(n);
+    if (v >= 10000000) return '₹' + (v / 10000000).toFixed(2) + 'Cr';
+    if (v >= 100000)   return '₹' + (v / 100000).toFixed(2) + 'L';
+    if (v >= 1000)     return '₹' + (v / 1000).toFixed(1) + 'K';
+    return '₹' + fmtNum(v, decimals);
+  }
+
+  function fmtPct(n, decimals) {
+    decimals = (decimals !== undefined) ? decimals : 1;
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return Number(n).toFixed(decimals) + '%';
+  }
+
+  function fmtQty(n) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    const v = Number(n);
+    if (v >= 1000000) return (v / 1000000).toFixed(1) + 'M';
+    if (v >= 1000)    return (v / 1000).toFixed(1) + 'K';
+    return fmtNum(v);
+  }
+
+  // ---- DATE FORMATTERS ----
+  function fmtDate(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    if (isNaN(d)) return val;
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function fmtDateTime(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    if (isNaN(d)) return val;
+    return d.toLocaleString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  function daysFromNow(val) {
+    if (!val) return null;
+    const d = new Date(val);
+    if (isNaN(d)) return null;
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    d.setHours(0,0,0,0);
+    return Math.round((d - now) / 86400000);
+  }
+
+  function todayISO() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  // ---- DEBOUNCE ----
+  function debounce(fn, ms) {
+    ms = (ms !== undefined) ? ms : 300;
+    let timer;
+    return function() {
+      var args = Array.prototype.slice.call(arguments);
+      clearTimeout(timer);
+      timer = setTimeout(function() { fn.apply(this, args); }, ms);
+    };
+  }
+
+  // ---- SEVERITY ----
+  function getSeverityBadge(sev) {
+    const map = {
+      'CRITICAL': '<span class="badge badge-critical">Critical</span>',
+      'MAJOR':    '<span class="badge badge-major">Major</span>',
+      'MINOR':    '<span class="badge badge-minor">Minor</span>',
+    };
+    return map[sev] || '<span class="badge badge-neutral">' + (sev || '—') + '</span>';
+  }
+
+  function getStatusBadge(status) {
+    var s = (status || '').toUpperCase();
+    if (s === 'FIFO VIOLATION')        return '<span class="badge badge-critical">⚠ Violation</span>';
+    if (s === 'PARTIAL FIFO POSSIBLE') return '<span class="badge badge-partial">◑ Partial</span>';
+    if (s === 'COMPLIANT')             return '<span class="badge badge-compliant">✓ Compliant</span>';
+    // Legacy values
+    if (s === 'VIOLATION')             return '<span class="badge badge-critical">⚠ Violation</span>';
+    if (s === 'PARTIAL FIFO')          return '<span class="badge badge-partial">◑ Partial</span>';
+    return '<span class="badge badge-neutral">' + (status || '—') + '</span>';
+  }
+
+  function getOffenderBadge(level) {
+    const map = {
+      'CHAMPION':  '<span class="offender-level offender-champion">🏆 Champion</span>',
+      'NORMAL':    '<span class="offender-level offender-normal">Normal</span>',
+      'REPEAT':    '<span class="offender-level offender-repeat">⚠ Repeat</span>',
+      'HIGH':      '<span class="offender-level offender-high">🔴 High Risk</span>',
+      'CRITICAL':  '<span class="offender-level offender-critical">🚨 Critical</span>',
+    };
+    return map[level] || '<span class="offender-level offender-normal">' + (level || '—') + '</span>';
+  }
+
+  function getRiskBadge(risk) {
+    const map = {
+      'HIGH':   '<span class="badge risk-badge-high">High</span>',
+      'MEDIUM': '<span class="badge risk-badge-medium">Medium</span>',
+      'LOW':    '<span class="badge risk-badge-low">Low</span>',
+    };
+    return map[risk] || '<span class="badge badge-neutral">' + (risk || '—') + '</span>';
+  }
+
+  function getComplianceColor(pct) {
+    if (pct >= 98) return 'var(--clr-ok)';
+    if (pct >= 90) return 'var(--clr-warn)';
+    return 'var(--clr-danger)';
+  }
+
+  function getDaysColor(days) {
+    if (days === null) return 'var(--clr-text-muted)';
+    if (days <= 30)  return 'var(--clr-danger)';
+    if (days <= 60)  return 'var(--clr-warn)';
+    if (days <= 90)  return 'var(--clr-accent)';
+    return 'var(--clr-ok)';
+  }
+
+  // ---- PAGINATION BUILDER ----
+  function buildPagination(containerId, currentPage, totalPages, onPageChange) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+    let html = ("<div class=\"pagination-info\">Page " + (currentPage) + " of " + (totalPages) + "</div>");
+
+    html += ("<button class=\"page-btn\" " + (currentPage===1?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(1)\">«</button>");
+    html += ("<button class=\"page-btn\" " + (currentPage===1?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(" + (currentPage-1) + ")\">‹</button>");
+
+    const pages = getPaginationRange(currentPage, totalPages);
+    pages.forEach(p => {
+      if (p === '...') {
+        html += ("<span class=\"page-btn\" style=\"cursor:default;border:none;\">…</span>");
+      } else {
+        html += ("<button class=\"page-btn " + (p===currentPage?'active':'') + "\" onclick=\"(" + (onPageChange) + ")(" + (p) + ")\">" + (p) + "</button>");
+      }
+    });
+
+    html += ("<button class=\"page-btn\" " + (currentPage===totalPages?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(" + (currentPage+1) + ")\">›</button>");
+    html += ("<button class=\"page-btn\" " + (currentPage===totalPages?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(" + (totalPages) + ")\">»</button>");
+
+    el.innerHTML = html;
+  }
+
+  function getPaginationRange(current, total) {
+    if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+    if (current <= 4) return [1,2,3,4,5,'...',total];
+    if (current >= total - 3) return [1,'...',total-4,total-3,total-2,total-1,total];
+    return [1,'...',current-1,current,current+1,'...',total];
+  }
+
+  // ---- DOM HELPERS ----
+  function show(id) { const el = document.getElementById(id); if (el) el.classList.remove('hidden'); }
+  function hide(id) { const el = document.getElementById(id); if (el) el.classList.add('hidden'); }
+  function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+  function setHTML(id, val) { const el = document.getElementById(id); if (el) el.innerHTML = val; }
+
+  // ---- TOAST ----
+  function toast(msg, type, duration) {
+    type = (type !== undefined) ? type : 'info';
+    duration = (duration !== undefined) ? duration : 3500;
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const icons = { ok: '✅', warn: '⚠️', danger: '❌', info: 'ℹ️' };
+    const t = document.createElement('div');
+    t.className = ("toast toast-" + (type));
+    t.innerHTML = ("<span>" + (icons[type] || 'ℹ️') + "</span><span style=\"flex:1\">" + (msg) + "</span>");
+    container.appendChild(t);
+
+    setTimeout(() => {
+      t.classList.add('fade-out');
+      setTimeout(() => t.remove(), 320);
+    }, duration);
+  }
+
+  // ---- SORT HELPERS ----
+  function sortBy(arr, key, dir) {
+    dir = (dir !== undefined) ? dir : 'asc';
+    return arr.slice().sort((a, b) => {
+      const av = a[key], bv = b[key];
+      if (av === null || av === undefined) return 1;
+      if (bv === null || bv === undefined) return -1;
+      const cmp = typeof av === 'string' ? av.localeCompare(bv) : av - bv;
+      return dir === 'asc' ? cmp : -cmp;
+    });
+  }
+
+  // ---- GOOGLE APPS SCRIPT CALL (fetch-based for GitHub Pages) ----
+  function callGAS(fnName, params) {
+    params = (params !== undefined) ? params : {};
+    return new Promise(function(resolve, reject) {
+      // If still running inside Apps Script, use native bridge
+      if (typeof google !== 'undefined' && google.script) {
+        google.script.run
+          .withSuccessHandler(function(result) { resolve(result); })
+          .withFailureHandler(function(err) { reject(err); })
+          [fnName](params);
+        return;
+      }
+      // GitHub Pages / external hosting: call via fetch POST
+      var gasUrl = (typeof GAS_BACKEND_URL !== 'undefined') ? GAS_BACKEND_URL : '';
+      if (!gasUrl) {
+        reject(new Error('GAS_BACKEND_URL not configured. Open index.html and set the GAS_BACKEND_URL variable.'));
+        return;
+      }
+      var body = JSON.stringify({ action: fnName, params: params, token: params._token || '' });
+      fetch(gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: body
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) { resolve(data); })
+      .catch(function(err) { reject(err); });
+    });
+  }
+
+  // ---- FILE SIZE ----
+  function fmtFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+
+  // ---- ESCAPE HTML ----
+  function escHTML(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  return {
+    fmtNum, fmtCurrency, fmtPct, fmtQty,
+    fmtDate, fmtDateTime, daysFromNow, todayISO,
+    debounce,
+    getSeverityBadge, getStatusBadge, getOffenderBadge, getRiskBadge,
+    getComplianceColor, getDaysColor,
+    buildPagination,
+    show, hide, setText, setHTML,
+    toast,
+    sortBy,
+    callGAS,
+    fmtFileSize, escHTML
+  };
+})();
+
+
+/* === auth.js === */
+/* ================================================
+   auth.js — Passwordless Identity Capture
+   No authentication. Just capture name + email
+   for audit tracking. Anyone can use the dashboard.
+   ================================================ */
+
+const Auth = (() => {
+
+  const SESSION_KEY = 'fifo_user';
+
+  // ---- LOGIN (just capture identity, no password check) ----
+  function login() {
+    const nameEl  = document.getElementById('login-name');
+    const emailEl = document.getElementById('login-email');
+    const errEl   = document.getElementById('login-error');
+
+    const name  = (nameEl  ? nameEl.value  : '').trim();
+    const email = (emailEl ? emailEl.value : '').trim().toLowerCase();
+
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
+
+    if (!name) {
+      errEl.textContent = 'Please enter your name.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    if (!email || email.indexOf('@') < 0) {
+      errEl.textContent = 'Please enter a valid email address.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
+    // Save to sessionStorage
+    var user = {
+      name     : name,
+      email    : email,
+      role     : 'operator',
+      loginAt  : Date.now()
+    };
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+
+    // Log to audit (fire and forget)
+    Utils.callGAS('logAuditEvent', {
+      type        : 'LOGIN',
+      description : name + ' opened the dashboard',
+      user        : email,
+      facility    : ''
+    }).catch(function() {});
+
+    onLoginSuccess(user);
+  }
+
+  function onLoginSuccess(user) {
+    var initials = (user.name || 'U').split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
+    Utils.setText('user-avatar', initials);
+    Utils.setText('user-name-display', user.name);
+    Utils.setText('user-role-display', user.email);
+
+    // Everyone sees everything
+    Utils.show('nav-settings');
+    Utils.show('nav-audit');
+
+    Utils.hide('login-page');
+    Utils.show('app-shell');
+
+    App.navigate('home');
+  }
+
+  // ---- LOGOUT ----
+  function logout() {
+    var s = getSession();
+    if (s) {
+      Utils.callGAS('logAuditEvent', {
+        type        : 'LOGOUT',
+        description : s.name + ' left the dashboard',
+        user        : s.email,
+        facility    : ''
+      }).catch(function() {});
+    }
+    sessionStorage.removeItem(SESSION_KEY);
+    location.reload();
+  }
+
+  // ---- SESSION ----
+  function getSession() {
+    try {
+      var raw = sessionStorage.getItem(SESSION_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function isLoggedIn() {
+    var s = getSession();
+    if (!s) return false;
+    // Auto-expire after 12 hours
+    if (Date.now() - s.loginAt > 12 * 3600 * 1000) {
+      sessionStorage.removeItem(SESSION_KEY);
+      return false;
+    }
+    return true;
+  }
+
+  // Everyone is admin — no restrictions
+  function isAdmin() { return true; }
+
+  function currentUser() { return getSession(); }
+
+  function getAuthHeader() {
+    var s = getSession();
+    return s ? (s.email + '|' + s.name) : 'anonymous';
+  }
+
+  // ---- INIT ----
+  function init() {
+    if (isLoggedIn()) {
+      onLoginSuccess(getSession());
+    }
+    // Pre-fill if returning user
+    var s = getSession();
+    if (s) {
+      var nameEl = document.getElementById('login-name');
+      var emailEl = document.getElementById('login-email');
+      if (nameEl)  nameEl.value  = s.name  || '';
+      if (emailEl) emailEl.value = s.email || '';
+    }
+  }
+
+  return { login, logout, getSession, isLoggedIn, isAdmin, currentUser, getAuthHeader, init };
+})();
+
+// Check session on page load
+document.addEventListener('DOMContentLoaded', function() { Auth.init(); });
+
+
+/* === charts.js === */
+/* ================================================
+   charts.js — Lightweight Canvas Charts
+   No external dependencies. Bar + Donut only.
+   ================================================ */
+
+const Charts = (() => {
+
+  // Helper to get CSS variable value
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  // ---- BAR CHART ----
+  function renderBarChart(canvasId, options) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const { labels = [], values = [], color = '#f0883e', prefix = '', suffix = '' } = options;
+
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const W = Math.floor(rect.width - 28) || 400;
+    const H = options.height || 180;
+
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    const bg      = cssVar('--clr-surface') || '#161b22';
+    const textClr = cssVar('--clr-text-muted') || '#8b949e';
+    const border  = cssVar('--clr-border') || '#30363d';
+
+    ctx.clearRect(0, 0, W, H);
+
+    if (!labels.length || !values.length) {
+      ctx.fillStyle = textClr;
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('No data available', W/2, H/2);
+      return;
+    }
+
+    const max    = Math.max.apply(null, values.concat([1]));
+    const pad    = { top: 10, right: 10, bottom: 30, left: 50 };
+    const chartW = W - pad.left - pad.right;
+    const chartH = H - pad.top - pad.bottom;
+
+    const barW   = Math.max(4, chartW / labels.length * 0.6);
+    const gap    = chartW / labels.length;
+
+    // Grid lines
+    ctx.strokeStyle = border;
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = pad.top + chartH - (i / 4) * chartH;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(pad.left + chartW, y);
+      ctx.stroke();
+
+      const val = (max * i / 4);
+      ctx.fillStyle = textClr;
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(prefix + fmtAxisVal(val), pad.left - 4, y + 3);
+    }
+
+    // Bars
+    labels.forEach((lbl, i) => {
+      const val = values[i] || 0;
+      const barH = (val / max) * chartH;
+      const x = pad.left + i * gap + (gap - barW) / 2;
+      const y = pad.top + chartH - barH;
+
+      // Bar
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      ctx.roundRect(x, y, barW, barH, [3, 3, 0, 0]);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Label
+      ctx.fillStyle = textClr;
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'center';
+      const maxLblW = gap - 2;
+      let lblText = lbl;
+      if (ctx.measureText(lblText).width > maxLblW) {
+        lblText = lbl.slice(0, 8) + '…';
+      }
+      ctx.fillText(lblText, x + barW / 2, H - pad.bottom + 14);
+    });
+  }
+
+  // ---- DONUT CHART ----
+  function renderDonutChart(canvasId, options) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const { labels = [], values = [], colors = [] } = options;
+
+    const dpr = window.devicePixelRatio || 1;
+    const H = options.height || 180;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const W = Math.floor(rect.width - 28) || 300;
+
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    const textClr = cssVar('--clr-text-muted') || '#8b949e';
+
+    ctx.clearRect(0, 0, W, H);
+
+    const total = values.reduce((s, v) => s + (v || 0), 0);
+    if (!total) {
+      ctx.fillStyle = textClr;
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('No data', W/2, H/2);
+      return;
+    }
+
+    const cx = H / 2;
+    const cy = H / 2;
+    const r  = H / 2 - 10;
+    const ir = r * 0.58;
+    let angle = -Math.PI / 2;
+
+    // Slices
+    values.forEach((val, i) => {
+      if (!val) return;
+      const sweep = (val / total) * 2 * Math.PI;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, angle, angle + sweep);
+      ctx.closePath();
+      ctx.fillStyle = colors[i] || '#8b949e';
+      ctx.globalAlpha = 0.9;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      angle += sweep;
+    });
+
+    // Donut hole
+    ctx.beginPath();
+    ctx.arc(cx, cy, ir, 0, 2 * Math.PI);
+    ctx.fillStyle = cssVar('--clr-surface') || '#161b22';
+    ctx.fill();
+
+    // Center text
+    ctx.fillStyle = cssVar('--clr-text') || '#e6edf3';
+    ctx.font = 'bold 13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(fmtAxisVal(total), cx, cy);
+
+    // Legend (right side)
+    const legendX = H + 10;
+    let legendY   = 20;
+    const lineH   = 22;
+
+    labels.forEach((lbl, i) => {
+      if (values[i] === 0) return;
+      ctx.fillStyle = colors[i] || '#8b949e';
+      ctx.fillRect(legendX, legendY - 6, 10, 10);
+
+      ctx.fillStyle = textClr;
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      const pct = ((values[i] / total) * 100).toFixed(0) + '%';
+      ctx.fillText(lbl + '  ' + pct, legendX + 14, legendY);
+      legendY += lineH;
+    });
+  }
+
+  function fmtAxisVal(n) {
+    if (n >= 10000000) return (n/10000000).toFixed(1) + 'Cr';
+    if (n >= 100000)   return (n/100000).toFixed(1) + 'L';
+    if (n >= 1000)     return (n/1000).toFixed(0) + 'K';
+    return Math.round(n).toLocaleString('en-IN');
+  }
+
+  return { renderBarChart, renderDonutChart };
+})();
+
+
+/* === app.js === */
+/* ================================================
+   app.js — Application bootstrap, routing, API layer
+   ================================================ */
+
+const App = (() => {
+
+  const PAGE_TITLES = {
+    home:       ['Home', 'FIFO Control Tower'],
+    violations: ['Violations', 'Detected FIFO Issues'],
+    prevention: ['Prevention Dashboard', 'At-Risk Inventory'],
+
+    compliance: ['User Compliance', 'Performance Analytics'],
+    gatepass:   ['Upload Gatepass', 'Import Dispatch Data'],
+    inventory:  ['Inventory Import', 'Manage Inventory Snapshot'],
+    settings:   ['Settings', 'System Configuration'],
+    audit:      ['Audit Log', 'System Activity'],
+  };
+
+  let _currentPage = null;
+  let _refreshTimer = null;
+  let _lastRefresh  = null;
+
+  // ---- NAVIGATE ----
+  function navigate(page) {
+    if (!Auth.isLoggedIn()) { Auth.logout(); return; }
+
+    // Restrict admin pages
+    if ((page === 'settings' || page === 'audit') && !Auth.isAdmin()) {
+      Utils.toast('Access denied — Admin only.', 'danger');
+      return;
+    }
+
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+
+    // Show target page
+    const target = document.getElementById('page-' + page);
+    if (target) target.classList.remove('hidden');
+
+    // Update nav items
+    document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+      el.classList.toggle('active', el.dataset.page === page);
+    });
+
+    // Update topbar
+    const [title, sub] = PAGE_TITLES[page] || ['Dashboard', ''];
+    Utils.setText('topbar-title', title);
+    const subEl = document.getElementById('topbar-sub');
+    if (subEl) subEl.textContent = sub;
+
+    _currentPage = page;
+
+    // Load page data
+    loadPage(page);
+
+    // Close sidebar on mobile
+    if (window.innerWidth <= 1024) {
+      document.getElementById('sidebar').classList.remove('open');
+    }
+  }
+
+  function loadPage(page) {
+    switch (page) {
+      case 'home':       Dashboard.load();   break;
+      case 'violations': Violations.load();  break;
+      case 'prevention': Prevention.load();  break;
+
+      case 'compliance': Compliance.load();  break;
+      case 'gatepass':   Gatepass.load();    break;
+      case 'inventory':  Inventory.load();   break;
+      case 'settings':   Settings.load();    break;
+      case 'audit':      Audit.load();       break;
+    }
+  }
+
+  // ---- REFRESH ----
+  async function refreshData() {
+    Utils.toast('Refreshing data…', 'info', 1500);
+    const btn = document.getElementById('refresh-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '⌛'; }
+
+    try {
+      await Utils.callGAS('invalidateCache', {});
+      _lastRefresh = new Date();
+      updateSyncIndicator();
+      if (_currentPage) loadPage(_currentPage);
+      Utils.toast('Data refreshed.', 'ok');
+    } catch (e) {
+      Utils.toast('Refresh failed.', 'danger');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '🔄'; }
+    }
+  }
+
+  function updateSyncIndicator() {
+    const el = document.getElementById('last-updated-text');
+    const dot = document.getElementById('sync-dot');
+    if (!el) return;
+    if (_lastRefresh) {
+      el.textContent = 'Updated ' + _lastRefresh.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      if (dot) dot.classList.remove('stale');
+    } else {
+      el.textContent = 'Not synced';
+      if (dot) dot.classList.add('stale');
+    }
+  }
+
+  // ---- MODAL ----
+  function openModal(id) {
+    const m = document.getElementById(id);
+    if (m) m.classList.remove('hidden');
+  }
+
+  function closeModal(id) {
+    const m = document.getElementById(id);
+    if (m) m.classList.add('hidden');
+  }
+
+  // Click outside modal to close
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('modal-backdrop')) {
+      e.target.classList.add('hidden');
+    }
+  });
+
+  // Escape key to close modals
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-backdrop:not(.hidden)').forEach(m => m.classList.add('hidden'));
+    }
+  });
+
+  // ---- SIDEBAR TOGGLE ----
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+
+  // ---- API WRAPPER ----
+  // Central call with auth token injection
+  async function api(fnName, params) {
+    params = (params !== undefined) ? params : {};
+    const session = Auth.getSession();
+    var payload = Object.assign({}, params, {_token: session ? session.token : '', _user: session ? session.email : ''});
+    try {
+      const result = await Utils.callGAS(fnName, payload);
+      if (result && result.authError) {
+        Utils.toast('Session expired. Please log in again.', 'danger');
+        Auth.logout();
+        throw new Error('AUTH_ERROR');
+      }
+      return result;
+    } catch (err) {
+      if (err.message !== 'AUTH_ERROR') {
+        console.error('[API]', fnName, err);
+      }
+      throw err;
+    }
+  }
+
+  // ---- INIT ----
+  function init() {
+    updateSyncIndicator();
+  }
+
+  return { navigate, refreshData, openModal, closeModal, toggleSidebar, api, init };
+})();
+
+// ==================== GATEPASS UPLOAD MODULE ====================
+const Gatepass = (() => {
+  let _selectedFile = null;
+
+  function load() {
+    loadHistory();
+  }
+
+  function onDragOver(e) {
+    e.preventDefault();
+    document.getElementById('upload-zone').classList.add('drag-over');
+  }
+  function onDragLeave(e) {
+    document.getElementById('upload-zone').classList.remove('drag-over');
+  }
+  function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('upload-zone').classList.remove('drag-over');
+    const files = e.dataTransfer.files;
+    if (files.length) processFile(files[0]);
+  }
+  function onFileSelect(e) {
+    if (e.target.files.length) processFile(e.target.files[0]);
+  }
+
+  function processFile(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['csv','xlsx','xls'].includes(ext)) {
+      Utils.toast('Invalid file type. Please use CSV or XLSX.', 'danger');
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      Utils.toast('File too large. Maximum 20MB.', 'danger');
+      return;
+    }
+    _selectedFile = file;
+    Utils.setText('gp-file-name', file.name);
+    Utils.setText('gp-file-size', Utils.fmtFileSize(file.size) + ' · ' + ext.toUpperCase());
+    Utils.show('gatepass-file-info');
+    Utils.hide('gatepass-result');
+  }
+
+  function clearFile() {
+    _selectedFile = null;
+    document.getElementById('file-input').value = '';
+    Utils.hide('gatepass-file-info');
+    Utils.hide('gatepass-result');
+  }
+
+  async function upload(replaceAll) {
+    if (!_selectedFile) { Utils.toast('No file selected.', 'warn'); return; }
+
+    const btn = document.getElementById('gp-upload-btn');
+    btn.disabled = true;
+    Utils.setText('gp-upload-text', 'Processing…');
+    Utils.show('gp-upload-spinner');
+    Utils.show('gatepass-progress');
+    Utils.hide('gatepass-result');
+
+    setProgress(5, 'Reading file…');
+
+    try {
+      const base64 = await readFileBase64(_selectedFile);
+      setProgress(20, 'Uploading to server…');
+
+      const ext = _selectedFile.name.split('.').pop().toLowerCase();
+      const dateOverride = document.getElementById('gp-date-override').value;
+
+      var session = Auth.getSession();
+      const result = await App.api('uploadGatepass', {
+        fileData   : base64,
+        fileName   : _selectedFile.name,
+        fileType   : ext,
+        dateOverride: dateOverride || null,
+        uploadedBy : session ? session.email : 'unknown',
+        replaceAll : replaceAll === true
+      });
+
+      setProgress(100, 'Done!');
+
+      if (result && result.success) {
+        showResult(result);
+        Utils.toast(("Gatepass processed: " + (result.totalRows) + " rows, " + (result.violationCount) + " violations."), 'ok');
+        loadHistory();
+        // Update nav badge
+        const badge = document.getElementById('nav-badge-violations');
+        if (badge && result.violationCount > 0) {
+          badge.textContent = result.violationCount;
+          badge.classList.remove('hidden');
+        }
+      } else {
+        Utils.toast((result && result.error) || 'Upload failed.', 'danger');
+        Utils.hide('gatepass-progress');
+      }
+    } catch (err) {
+      Utils.toast('Upload error: ' + (err.message || err), 'danger');
+      Utils.hide('gatepass-progress');
+      console.error('[Gatepass] Upload error:', err);
+    } finally {
+      btn.disabled = false;
+      Utils.setText('gp-upload-text', 'Process Gatepass File');
+      Utils.hide('gp-upload-spinner');
+    }
+  }
+
+  function setProgress(pct, label) {
+    const fill = document.getElementById('gp-progress-fill');
+    if (fill) fill.style.width = pct + '%';
+    Utils.setText('gp-progress-text', label);
+  }
+
+  function showResult(r) {
+    const el = document.getElementById('gatepass-result');
+    el.classList.remove('hidden');
+    el.innerHTML = ("\n      <div class=\"card\" style=\"background:var(--clr-ok-dim);border-color:rgba(63,185,80,0.3);\">\n        <div style=\"font-weight:700;color:var(--clr-ok);margin-bottom:8px;\">✅ Upload Complete</div>\n        <div style=\"display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:0.82rem;\">\n          <div><div class=\"text-muted\">Total Rows</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.totalRows)) + "</div></div>\n          <div><div class=\"text-muted\">Processed</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.processedRows)) + "</div></div>\n          <div><div class=\"text-muted\">Skipped</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.skippedRows)) + "</div></div>\n          <div><div class=\"text-muted\">Violations</div><div style=\"font-weight:700;color:var(--clr-danger);\">" + (Utils.fmtNum(r.violationCount)) + "</div></div>\n          <div><div class=\"text-muted\">Partial FIFO</div><div style=\"font-weight:700;color:var(--clr-info);\">" + (Utils.fmtNum(r.partialCount)) + "</div></div>\n          <div><div class=\"text-muted\">Compliant</div><div style=\"font-weight:700;color:var(--clr-ok);\">" + (Utils.fmtNum(r.compliantCount)) + "</div></div>\n        </div>\n      </div>");
+  }
+
+  async function loadHistory() {
+    try {
+      const result = await App.api('getGatepassHistory', { limit: 10 });
+      const tbody = document.getElementById('gp-history-body');
+      if (!tbody) return;
+
+      if (!result || !result.success || !result.data || result.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:20px;">No uploads yet</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = result.data.map(r => ("\n        <tr>\n          <td class=\"td-mono\">" + (Utils.fmtDateTime(r.uploadedAt)) + "</td>\n          <td>" + (Utils.escHTML(r.fileName)) + "</td>\n          <td>" + (Utils.fmtNum(r.totalRows)) + "</td>\n          <td style=\"color:var(--clr-danger);\">" + (Utils.fmtNum(r.violationCount)) + "</td>\n          <td class=\"text-muted\">" + (Utils.escHTML(r.uploadedBy)) + "</td>\n          <td><span class=\"badge badge-ok\">Success</span></td>\n        </tr>")).join('');
+    } catch(e) {
+      console.error('[Gatepass] History error:', e);
+    }
+  }
+
+  function readFileBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  return { load, onDragOver, onDragLeave, onDrop, onFileSelect, clearFile, upload };
+})();
+
+// ==================== INVENTORY MODULE ====================
+const Inventory = (() => {
+  var _selectedFile = null;
+
+  async function load() {
+    try {
+      const result = await App.api('getInventoryStatus', {});
+      if (result && result.success) {
+        Utils.setText('inv-last-import', Utils.fmtDateTime(result.lastImport) || 'Never');
+        Utils.setText('inv-record-count', Utils.fmtNum(result.totalRecords));
+        Utils.setText('inv-ambient-count', Utils.fmtNum(result.ambientCount));
+        Utils.setText('inv-hub-count', Utils.fmtNum(result.hubCount));
+        loadHistory(result.history || []);
+      }
+    } catch(e) { console.error('[Inventory] Load error:', e); }
+  }
+
+  function loadHistory(history) {
+    const tbody = document.getElementById('inv-history-body');
+    if (!tbody) return;
+    if (!history || !history.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted" style="padding:20px;">No imports yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = history.map(function(r) {
+      return '<tr>' +
+        '<td class="td-mono">' + Utils.fmtDateTime(r.timestamp) + '</td>' +
+        '<td style="font-size:0.8rem;">' + Utils.escHTML(r.description || '') + '</td>' +
+        '<td class="text-muted" style="font-size:0.75rem;">' + Utils.escHTML(r.metadata || '') + '</td>' +
+        '<td>—</td>' +
+        '<td class="text-muted">' + Utils.escHTML(r.user || '') + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function onDragOver(e) {
+    e.preventDefault();
+    var z = document.getElementById('inv-upload-zone');
+    if (z) z.classList.add('drag-over');
+  }
+  function onDragLeave(e) {
+    var z = document.getElementById('inv-upload-zone');
+    if (z) z.classList.remove('drag-over');
+  }
+  function onDrop(e) {
+    e.preventDefault();
+    var z = document.getElementById('inv-upload-zone');
+    if (z) z.classList.remove('drag-over');
+    if (e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]);
+  }
+  function onFileSelect(e) {
+    if (e.target.files.length) processFile(e.target.files[0]);
+  }
+
+  function processFile(file) {
+    var ext = file.name.split('.').pop().toLowerCase();
+    if (!['csv','xlsx','xls'].includes(ext)) {
+      Utils.toast('Invalid file type. Please use CSV or XLSX.', 'danger'); return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      Utils.toast('File too large. Maximum 20MB.', 'danger'); return;
+    }
+    _selectedFile = file;
+    Utils.setText('inv-file-name', file.name);
+    Utils.setText('inv-file-size', Utils.fmtFileSize(file.size) + ' - ' + ext.toUpperCase());
+    Utils.show('inv-file-info');
+    Utils.hide('inv-result');
+  }
+
+  function clearFile() {
+    _selectedFile = null;
+    var fi = document.getElementById('inv-file-input');
+    if (fi) fi.value = '';
+    Utils.hide('inv-file-info');
+    Utils.hide('inv-result');
+  }
+
+  function setProgress(pct, label) {
+    var fill = document.getElementById('inv-progress-fill');
+    if (fill) fill.style.width = pct + '%';
+    Utils.setText('inv-progress-text', label);
+  }
+
+  async function upload(replaceAll) {
+    if (!_selectedFile) { Utils.toast('No file selected.', 'warn'); return; }
+    var btn = document.getElementById('inv-upload-btn');
+    btn.disabled = true;
+    Utils.setText('inv-upload-text', 'Processing...');
+    Utils.show('inv-upload-spinner');
+    Utils.show('inv-progress');
+    Utils.hide('inv-result');
+    setProgress(5, 'Reading file...');
+
+    try {
+      var base64 = await readFileBase64(_selectedFile);
+      setProgress(30, 'Uploading to server...');
+      var session = Auth.getSession();
+      var result = await App.api('uploadInventory', {
+        fileData   : base64,
+        fileName   : _selectedFile.name,
+        fileType   : _selectedFile.name.split('.').pop().toLowerCase(),
+        uploadedBy : session ? session.email : 'unknown'
+      });
+      setProgress(100, 'Done!');
+
+      var el = document.getElementById('inv-result');
+      if (result && result.success) {
+        if (el) {
+          el.classList.remove('hidden');
+          el.innerHTML = '<div class="card" style="background:var(--clr-ok-dim);border-color:rgba(63,185,80,0.3);">' +
+            '<div style="font-weight:700;color:var(--clr-ok);margin-bottom:8px;">Inventory Imported</div>' +
+            '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:0.82rem;">' +
+            '<div><div class="text-muted">Total Rows</div><div style="font-weight:700;">' + Utils.fmtNum(result.totalRows) + '</div></div>' +
+            '<div><div class="text-muted">Imported</div><div style="font-weight:700;color:var(--clr-ok);">' + Utils.fmtNum(result.importedRows) + '</div></div>' +
+            '<div><div class="text-muted">Skipped</div><div style="font-weight:700;">' + Utils.fmtNum(result.skippedRows) + '</div></div>' +
+            '</div></div>';
+        }
+        Utils.toast('Inventory imported: ' + Utils.fmtNum(result.importedRows) + ' records.', 'ok');
+        load();
+      } else {
+        var msg = (result && result.message) || 'Upload failed.';
+        Utils.toast(msg, 'danger');
+        if (el) {
+          el.classList.remove('hidden');
+          el.innerHTML = '<div class="card" style="color:var(--clr-danger);">Error: ' + Utils.escHTML(msg) + '</div>';
+        }
+      }
+    } catch(err) {
+      Utils.toast('Upload error: ' + (err.message || err), 'danger');
+      console.error('[Inventory] Upload error:', err);
+    } finally {
+      btn.disabled = false;
+      Utils.setText('inv-upload-text', 'Upload Inventory File');
+      Utils.hide('inv-upload-spinner');
+    }
+  }
+
+  function readFileBase64(file) {
+    return new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function(e) { resolve(e.target.result.split(',')[1]); };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  return { load, onDragOver, onDragLeave, onDrop, onFileSelect, clearFile, upload };
+})();
+
+// ==================== SETTINGS MODULE ====================
+const Settings = (() => {
+  async function load() {
+    try {
+      const result = await App.api('getSettings', {});
+      if (result && result.success) {
+        const s = result.settings;
+        setValue('s-min-threshold',          (s.minInventoryThreshold != null ? s.minInventoryThreshold : 50));
+        setValue('s-repeat-threshold',       (s.repeatOffenderThreshold != null ? s.repeatOffenderThreshold : 5));
+        setValue('s-minor-min',              (s.minorMin != null ? s.minorMin : 50));
+        setValue('s-minor-max',              (s.minorMax != null ? s.minorMax : 499));
+        setValue('s-major-min',              (s.majorMin != null ? s.majorMin : 500));
+        setValue('s-major-max',              (s.majorMax != null ? s.majorMax : 999));
+        setValue('s-critical-min',           (s.criticalMin != null ? s.criticalMin : 1000));
+        setValue('s-champion-gp-min',        (s.championGpMin != null ? s.championGpMin : 50));
+        setValue('s-champion-compliance-min',(s.championComplianceMin != null ? s.championComplianceMin : 98));
+      }
+    } catch(e) {
+      console.error('[Settings] Load error:', e);
+    }
+  }
+
+  async function save() {
+    const btn = document.querySelector('[onclick="Settings.save()"]');
+    if (btn) btn.disabled = true;
+    Utils.setText('settings-save-text', 'Saving…');
+    Utils.show('settings-spinner');
+
+    const settings = {
+      minInventoryThreshold:    getNum('s-min-threshold'),
+      repeatOffenderThreshold:  getNum('s-repeat-threshold'),
+      minorMin:                 getNum('s-minor-min'),
+      minorMax:                 getNum('s-minor-max'),
+      majorMin:                 getNum('s-major-min'),
+      majorMax:                 getNum('s-major-max'),
+      criticalMin:              getNum('s-critical-min'),
+      championGpMin:            getNum('s-champion-gp-min'),
+      championComplianceMin:    getNum('s-champion-compliance-min'),
+    };
+
+    try {
+      const result = await App.api('saveSettings', { settings });
+      if (result && result.success) {
+        Utils.toast('Settings saved and cache cleared.', 'ok');
+      } else {
+        Utils.toast((result && result.error) || 'Save failed.', 'danger');
+      }
+    } catch(e) {
+      Utils.toast('Save error: ' + (e.message || e), 'danger');
+    } finally {
+      if (btn) btn.disabled = false;
+      Utils.setText('settings-save-text', 'Save Settings');
+      Utils.hide('settings-spinner');
+    }
+  }
+
+  function setValue(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
+  function getNum(id) { const el = document.getElementById(id); return el ? Number(el.value) : 0; }
+
+  return { load, save };
+})();
+
+// ==================== AUDIT MODULE ====================
+const Audit = (() => {
+  let _page = 1;
+  const PAGE_SIZE = 50;
+  let _filters = {};
+
+  async function load() {
+    _page = 1;
+    await fetchData();
+  }
+
+  async function fetchData() {
+    const tbody = document.getElementById('audit-body');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding:24px;"><div class="spinner" style="margin:0 auto;"></div></td></tr>';
+
+    try {
+      const result = await App.api('getAuditLog', Object.assign({page: _page, pageSize: PAGE_SIZE}, _filters));
+
+      if (!result || !result.success) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted" style="padding:24px;">Failed to load audit log.</td></tr>';
+        return;
+      }
+
+      const data = result.data || [];
+      Utils.setText('audit-count', Utils.fmtNum(result.total) + ' events');
+
+      if (!data.length) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted" style="padding:24px;">No audit events found.</td></tr>';
+        return;
+      }
+
+      if (tbody) {
+        tbody.innerHTML = data.map(r => ("\n          <tr>\n            <td class=\"td-mono\">" + (Utils.fmtDateTime(r.timestamp)) + "</td>\n            <td><span class=\"badge badge-info\">" + (Utils.escHTML(r.eventType)) + "</span></td>\n            <td class=\"text-muted\">" + (Utils.escHTML(r.user || '—')) + "</td>\n            <td>" + (Utils.escHTML(r.description || '')) + "</td>\n            <td><span class=\"badge " + (r.status==='ERROR'?'badge-danger':'badge-ok') + "\">" + (r.status||'OK') + "</span></td>\n          </tr>")).join('');
+      }
+
+      Utils.buildPagination('audit-pagination', _page, Math.ceil(result.total / PAGE_SIZE),
+        ("function(p){Audit._setPage(p)}"));
+    } catch(e) {
+      console.error('[Audit] Load error:', e);
+    }
+  }
+
+  function _setPage(p) { _page = p; fetchData(); }
+
+  function onSearch(val) {
+    _filters.search = val;
+    _page = 1;
+    fetchData();
+  }
+
+  function applyFilters() {
+    _filters.eventType = document.getElementById('audit-type').value;
+    _page = 1;
+    fetchData();
+  }
+
+  return { load, onSearch, applyFilters, _setPage };
+})();
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => App.init());
+
+
+/* === dashboard.js === */
+/* ================================================
+   dashboard.js — Home Page KPIs & Summaries
+   ================================================ */
+
+const Dashboard = (() => {
+
+  let _summaryCache = null;
+
+  async function load() {
+    renderKPILoading();
+    try {
+      const result = await App.api('getDashboardSummary', {});
+      if (!result || !result.success) {
+        renderKPIError();
+        return;
+      }
+      _summaryCache = result.data;
+      renderKPIs(result.data);
+      renderFacilityGrid(result.data.facilityCompliance || []);
+      renderTopViolators(result.data.topViolators || []);
+      renderChampions(result.data.champions || []);
+      renderExpiryBuckets(result.data.expiryExposure || {});
+      renderRecentViolations(result.data.recentViolations || []);
+
+      // Update nav badge
+      const badge = document.getElementById('nav-badge-violations');
+      if (badge) {
+        const vc = result.data.fifoViolations || 0;
+        if (vc > 0) {
+          badge.textContent = vc > 999 ? '999+' : vc;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+
+      // Update sync indicator
+      document.getElementById('last-updated-text').textContent =
+        'Updated ' + new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+      document.getElementById('sync-dot').classList.remove('stale');
+
+    } catch(e) {
+      renderKPIError();
+      console.error('[Dashboard] Load error:', e);
+    }
+  }
+
+  // ---- KPI CARDS ----
+  function renderKPILoading() {
+    const grid = document.getElementById('kpi-grid');
+    if (!grid) return;
+    grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:32px;\">\n        <div class=\"spinner spinner-lg\" style=\"margin:0 auto 10px;\"></div>\n        <div class=\"text-muted\">Loading dashboard…</div>\n      </div>");
+  }
+
+  function renderKPIError() {
+    const grid = document.getElementById('kpi-grid');
+    if (grid) grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:24px;\">\n        <div style=\"color:var(--clr-danger);margin-bottom:6px;\">⚠️ Failed to load dashboard data</div>\n        <button class=\"btn btn-ghost btn-sm\" onclick=\"Dashboard.load()\">Retry</button>\n      </div>");
+  }
+
+  function renderKPIs(data) {
+    const grid = document.getElementById('kpi-grid');
+    if (!grid) return;
+
+    const compliance = data.fifoCompliancePct || 0;
+    const compColor = compliance >= 98 ? 'ok' : compliance >= 90 ? 'warn' : 'danger';
+
+    const kpis = [
+      {
+        label: 'Total Gatepasses', icon: '📋',
+        value: Utils.fmtNum(data.totalGatepasses),
+        sub: 'All processed records',
+        type: 'info'
+      },
+      {
+        label: 'FIFO Violations', icon: '⚠️',
+        value: Utils.fmtNum(data.fifoViolations),
+        sub: Utils.fmtNum(data.criticalViolations) + ' critical',
+        type: 'danger'
+      },
+      {
+        label: 'Partial FIFO Cases', icon: '◑',
+        value: Utils.fmtNum(data.partialFifoCases),
+        sub: 'Partial compliance',
+        type: 'warn'
+      },
+      {
+        label: 'FIFO Compliance', icon: '📊',
+        value: Utils.fmtPct(compliance),
+        sub: 'Overall rate',
+        type: compColor
+      },
+      {
+        label: 'Skipped Inventory', icon: '📦',
+        value: Utils.fmtQty(data.totalSkippedQty),
+        sub: 'Units bypassed',
+        type: 'warn'
+      },
+      {
+        label: 'Loss Opportunity', icon: '💸',
+        value: Utils.fmtCurrency(data.totalLossOpportunity),
+        sub: 'Skipped qty × MRP',
+        type: 'danger'
+      },
+      {
+        label: 'High Risk Inv Value', icon: '⏰',
+        value: Utils.fmtCurrency(data.highRiskInventoryValue),
+        sub: 'Expiring ≤30 days',
+        type: 'danger'
+      },
+      {
+        label: 'Expiry Exposure', icon: '📅',
+        value: Utils.fmtCurrency(data.expiryExposureValue),
+        sub: 'Total at-risk value',
+        type: 'accent'
+      },
+      {
+        label: 'Repeat Offenders', icon: '🔴',
+        value: Utils.fmtNum(data.repeatOffenders),
+        sub: '5+ violations / 30d',
+        type: 'danger'
+      },
+      {
+        label: 'FIFO Champions', icon: '🏆',
+        value: Utils.fmtNum(data.fifoChampions),
+        sub: '≥50 GPs, >98% compliant',
+        type: 'purple'
+      },
+    ];
+
+    grid.innerHTML = kpis.map(k => ("\n      <div class=\"kpi-card " + (k.type) + "\">\n        <div class=\"kpi-label\"><span>" + (k.icon) + "</span> " + (k.label) + "</div>\n        <div class=\"kpi-value\">" + (k.value) + "</div>\n        <div class=\"kpi-sub\">" + (k.sub) + "</div>\n      </div>")).join('');
+  }
+
+  // ---- FACILITY COMPLIANCE ----
+  function renderFacilityGrid(facilities) {
+    const grid = document.getElementById('facility-grid');
+    if (!grid) return;
+
+    if (!facilities.length) {
+      grid.innerHTML = '<div class="text-muted">No facility data available.</div>';
+      return;
+    }
+
+    grid.innerHTML = facilities.map(f => {
+      const pct = f.compliancePct || 0;
+      const color = pct >= 98 ? 'var(--clr-ok)' : pct >= 90 ? 'var(--clr-warn)' : 'var(--clr-danger)';
+      return ("\n      <div class=\"facility-card\">\n        <div class=\"facility-name\">\n          🏭 " + (Utils.escHTML(f.facility)) + "\n          <span class=\"badge " + (pct>=98?'badge-ok':pct>=90?'badge-warn':'badge-danger') + "\">" + (f.rank ? '#'+f.rank : '') + "</span>\n        </div>\n        <div class=\"facility-compliance\" style=\"color:" + (color) + "\">" + (Utils.fmtPct(pct)) + "</div>\n        <div style=\"margin-bottom:8px;\">\n          <div class=\"progress-bar\">\n            <div class=\"progress-fill\" style=\"background:" + (color) + ";width:" + (Math.min(pct,100)) + "%\"></div>\n          </div>\n        </div>\n        <div class=\"facility-stats\">\n          <div class=\"facility-stat\"><div class=\"fs-label\">Total GPs</div><div class=\"fs-value\">" + (Utils.fmtNum(f.totalGps)) + "</div></div>\n          <div class=\"facility-stat\"><div class=\"fs-label\">Violations</div><div class=\"fs-value\" style=\"color:var(--clr-danger);\">" + (Utils.fmtNum(f.violations)) + "</div></div>\n          <div class=\"facility-stat\"><div class=\"fs-label\">Skipped Qty</div><div class=\"fs-value\">" + (Utils.fmtQty(f.skippedQty)) + "</div></div>\n          <div class=\"facility-stat\"><div class=\"fs-label\">Loss ₹</div><div class=\"fs-value\">" + (Utils.fmtCurrency(f.lossOpportunity)) + "</div></div>\n        </div>\n      </div>");
+    }).join('');
+  }
+
+  // ---- TOP VIOLATORS ----
+  function renderTopViolators(users) {
+    const el = document.getElementById('top-violators-list');
+    if (!el) return;
+    if (!users.length) {
+      el.innerHTML = '<div class="empty-state" style="padding:16px;"><div class="empty-icon">🎉</div><div>No violations found</div></div>';
+      return;
+    }
+    const max = Math.max(...users.map(u => u.violations || 0), 1);
+    el.innerHTML = users.slice(0,7).map((u, i) => ("\n      <div class=\"user-rank-row\">\n        <div class=\"rank-num\">" + (i+1) + "</div>\n        <div style=\"flex:1;min-width:0;\">\n          <div class=\"truncate\" style=\"font-weight:600;font-size:0.8rem;\">" + (Utils.escHTML(u.userName || u.email)) + "</div>\n          <div style=\"font-size:0.7rem;color:var(--clr-text-muted);\">" + (Utils.escHTML(u.facility||'')) + "</div>\n        </div>\n        <div style=\"width:60px;\">\n          <div class=\"progress-bar\"><div class=\"progress-fill progress-fill-danger\" style=\"width:" + ((u.violations/max*100).toFixed(0)) + "%\"></div></div>\n        </div>\n        <div class=\"rank-value\" style=\"color:var(--clr-danger);\">" + (Utils.fmtNum(u.violations)) + "</div>\n      </div>")).join('');
+  }
+
+  // ---- CHAMPIONS ----
+  function renderChampions(users) {
+    const el = document.getElementById('champions-list');
+    if (!el) return;
+    if (!users.length) {
+      el.innerHTML = '<div class="empty-state" style="padding:16px;"><div class="empty-icon">📊</div><div>No champions yet<br><small>Need 50+ GPs at >98% compliance</small></div></div>';
+      return;
+    }
+    el.innerHTML = users.slice(0,7).map((u, i) => ("\n      <div class=\"user-rank-row\">\n        <div class=\"rank-num\" style=\"color:var(--clr-purple);\">" + (i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)) + "</div>\n        <div style=\"flex:1;min-width:0;\">\n          <div class=\"truncate\" style=\"font-weight:600;font-size:0.8rem;\">" + (Utils.escHTML(u.userName||u.email)) + "</div>\n          <div style=\"font-size:0.7rem;color:var(--clr-text-muted);\">" + (Utils.fmtNum(u.totalGps)) + " GPs</div>\n        </div>\n        <div class=\"rank-value\" style=\"color:var(--clr-ok);\">" + (Utils.fmtPct(u.compliancePct)) + "</div>\n      </div>")).join('');
+  }
+
+  // ---- EXPIRY BUCKETS ----
+  function renderExpiryBuckets(exposure) {
+    var el = document.getElementById('expiry-buckets');
+    if (!el) return;
+
+    var buckets = [
+      { key: 'b0_30',   label: '0–30 Days',   cls: 'urgent'  },
+      { key: 'b31_60',  label: '31–60 Days',  cls: 'warning' },
+      { key: 'b61_90',  label: '61–90 Days',  cls: 'caution' },
+      { key: 'b91_180', label: '91–180 Days', cls: 'ok'      },
+      { key: 'b180p',   label: '180+ Days',   cls: ''        },
+    ];
+
+    el.innerHTML = buckets.map(function(b) {
+      var d = exposure[b.key] || {};
+      var skuCount = d.skuCount || 0;
+      var totalQty = d.totalQty || 0;
+      return '<div class="expiry-bucket ' + b.cls + '">' +
+        '<div class="eb-label">' + b.label + '</div>' +
+        '<div class="eb-value">' + Utils.fmtNum(skuCount) + '</div>' +
+        '<div class="eb-sub">' + Utils.fmtNum(totalQty) + ' units</div>' +
+        '<div class="eb-detail">' + skuCount + ' SKUs</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function renderRecentViolations(violations) {
+    const tbody = document.getElementById('recent-violations-body');
+    if (!tbody) return;
+
+    if (!violations || !violations.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted" style="padding:24px;">No recent violations</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = violations.map(function(v) {
+      var sev = (v.severity||'').toLowerCase();
+      return '<tr class="row-' + sev + ' clickable" onclick="Violations.openDrilldown(' + "'" + Utils.escHTML(v.id||'') + "'" + ')">' +
+        '<td class="td-mono">' + Utils.escHTML(v.gpNumber || '') + '</td>' +
+        '<td>' + Utils.fmtDate(v.date) + '</td>' +
+        '<td>' + Utils.escHTML(v.user || '') + '</td>' +
+        '<td>' + Utils.escHTML(v.facility || '') + '</td>' +
+        '<td class="td-mono">' + Utils.escHTML(v.skuCode || '') + '</td>' +
+        '<td class="truncate" style="max-width:140px;" title="' + Utils.escHTML(v.itemName||'') + '">' + Utils.escHTML(v.itemName||'') + '</td>' +
+        '<td>' + Utils.getSeverityBadge(v.severity) + '</td>' +
+        '<td>' + Utils.getStatusBadge(v.status) + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function exportFacilitySummary() {
+    Exports.facilitySummaryCSV();
+  }
+
+  return { load, exportFacilitySummary };
+})();
+
+
+/* === violations.js === */
+/* ================================================
+   violations.js — Violations Tab
+   ================================================ */
+
+const Violations = (() => {
+
+  const PAGE_SIZE = 50;
+  let _state = {
+    page: 1, total: 0,
+    tab: 'all',
+    search: '', facility: '', severity: '', dateFrom: '', dateTo: '',
+    sortCol: 'date', sortDir: 'desc'
+  };
+
+  async function load() {
+    _state.page = 1;
+    await fetchData();
+  }
+
+  function switchTab(tab) {
+    _state.tab = tab;
+    _state.page = 1;
+    document.querySelectorAll('[data-vtab]').forEach(el => {
+      el.classList.toggle('active', el.dataset.vtab === tab);
+    });
+    fetchData();
+  }
+
+  async function fetchData() {
+    const tbody = document.getElementById('violations-body');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="13" class="text-center" style="padding:32px;"><div class="spinner" style="margin:0 auto;"></div></td></tr>';
+
+    try {
+      const params = {
+        page: _state.page,
+        pageSize: PAGE_SIZE,
+        tab: _state.tab,
+        search: _state.search,
+        facility: _state.facility,
+        severity: _state.severity,
+        dateFrom: _state.dateFrom,
+        dateTo: _state.dateTo,
+        sortCol: _state.sortCol,
+        sortDir: _state.sortDir
+      };
+
+      const result = await App.api('getViolations', params);
+
+      if (!result || !result.success) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="13" class="text-center text-danger" style="padding:32px;">Failed to load data.</td></tr>';
+        return;
+      }
+
+      _state.total = result.total || 0;
+      const totalPages = Math.ceil(_state.total / PAGE_SIZE);
+
+      Utils.setText('violations-count', Utils.fmtNum(_state.total) + ' records');
+      renderTable(result.data || []);
+      updateSortHeaders();
+      Utils.buildPagination('violations-pagination', _state.page, totalPages, 'function(p){Violations._setPage(p)}');
+
+    } catch(e) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="13" class="text-center text-danger" style="padding:32px;">Error loading data.</td></tr>';
+      console.error('[Violations] Fetch error:', e);
+    }
+  }
+
+  function renderTable(rows) {
+    const tbody = document.getElementById('violations-body');
+    if (!tbody) return;
+
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="13"><div class="empty-state"><div class="empty-icon">✅</div><div>No records found for the current filters.</div></div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(function(v) {
+      var sev    = (v.severity||'').toLowerCase();
+      var status = (v.status||'').toUpperCase();
+      var rowCls = sev === 'critical' ? 'row-critical' :
+                   sev === 'major'    ? 'row-major'    :
+                   sev === 'minor'    ? 'row-minor'    :
+                   status === 'COMPLIANT' ? 'row-compliant' : '';
+      return '<tr class="' + rowCls + ' clickable" onclick="Violations.openDrilldown(\'' + Utils.escHTML(v.id||'') + '\')">' +
+        '<td class="td-mono">' + Utils.fmtDate(v.date) + '</td>' +
+        '<td class="td-mono">' + Utils.escHTML(v.gpNumber || v.gpCode || '') + '</td>' +
+        '<td class="truncate" style="max-width:110px;" title="' + Utils.escHTML(v.user) + '">' + Utils.escHTML(v.user) + '</td>' +
+        '<td>' + Utils.escHTML(v.toParty || '—') + '</td>' +
+        '<td class="td-mono">' + Utils.escHTML(v.skuCode) + '</td>' +
+        '<td class="truncate" style="max-width:130px;" title="' + Utils.escHTML(v.itemName) + '">' + Utils.escHTML(v.itemName) + '</td>' +
+        '<td class="td-right">' + Utils.fmtNum(v.dispatchedQty || v.qty || 0) + '</td>' +
+        '<td class="td-center">' + Utils.fmtNum(v.olderBatchCount) + '</td>' +
+        '<td class="td-right" style="color:var(--clr-warn);">' + Utils.fmtNum(v.olderInventoryQty) + '</td>' +
+        '<td>' + Utils.getSeverityBadge(v.severity) + '</td>' +
+        '<td>' + Utils.getStatusBadge(v.status) + '</td>' +
+        '<td>' + Utils.escHTML(v.gpStatus || '') + '</td>' +
+        '<td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();Violations.openDrilldown(\'' + Utils.escHTML(v.id||'') + '\')">Detail</button></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function updateSortHeaders() {
+    document.querySelectorAll('#violations-table th.sortable').forEach(th => {
+      th.classList.remove('sort-asc', 'sort-desc');
+      const col = th.getAttribute('onclick').match(/'([^']+)'/);
+      if (col && col[1] === _state.sortCol) {
+        th.classList.add('sort-' + _state.sortDir);
+      }
+    });
+  }
+
+  // ---- DRILLDOWN ----
+  var _pendingDrilldownId = null;
+
+  async function openDrilldown(id) {
+    if (!id) return;
+    _pendingDrilldownId = id;
+    App.openModal('drilldown-modal');
+    document.getElementById('drilldown-grid').innerHTML = '<div class="spinner spinner-lg" style="margin:20px auto;display:block;"></div>';
+    document.getElementById('drilldown-batches-body').innerHTML = '';
+
+    try {
+      const result = await App.api('getViolationDetail', { id });
+      // Ignore stale response if user clicked a different row while loading
+      if (_pendingDrilldownId !== id) return;
+      if (!result || !result.success) {
+        document.getElementById('drilldown-grid').innerHTML = '<div class="text-danger">Failed to load detail.</div>';
+        return;
+      }
+      renderDrilldown(result.data);
+    } catch(e) {
+      if (_pendingDrilldownId !== id) return;
+      document.getElementById('drilldown-grid').innerHTML = '<div class="text-danger">Error loading detail.</div>';
+      console.error('[Violations] Drilldown error:', e);
+    }
+  }
+
+  function renderDrilldown(d) {
+    Utils.setText('drilldown-title', (d.gpNumber || d.gpCode || '—') + ' — ' + (d.itemName || ''));
+
+    const fields = [
+      { label: 'Gatepass Code',        value: d.gpNumber || d.gpCode || '—', mono: true },
+      { label: 'GP Status',            value: d.gpStatus || '—' },
+      { label: 'Date',                 value: Utils.fmtDate(d.date) },
+      { label: 'User',                 value: d.user },
+      { label: 'Facility',             value: d.facility },
+      { label: 'To Party',             value: d.toParty },
+      { label: 'SKU Code',             value: d.skuCode,          mono: true },
+      { label: 'Item Name',            value: d.itemName },
+      { label: 'Dispatched Batch',     value: d.batchCode || '—', mono: true },
+      { label: 'Vendor Batch',         value: d.vendorBatch || '—', mono: true },
+      { label: 'Mfg Date (Dispatched)',value: Utils.fmtDate(d.mfgDate) || '—' },
+      { label: 'Expiry (Dispatched)',  value: Utils.fmtDate(d.expiryDate) || '—', color: 'var(--clr-warn)' },
+      { label: 'Dispatch Qty',         value: Utils.fmtNum(d.dispatchedQty || d.qty || 0) },
+      { label: 'FIFO Rank',            value: d.fifoRank || '—' },
+      { label: 'Older Batch Count',    value: Utils.fmtNum(d.olderBatchCount) },
+      { label: 'Older Inv Qty',        value: Utils.fmtNum(d.olderInventoryQty), color: 'var(--clr-warn)' },
+      { label: 'Severity',             html: Utils.getSeverityBadge(d.severity) },
+      { label: 'Status',               html: Utils.getStatusBadge(d.status) },
+      { label: 'Loss Opportunity',     value: Utils.fmtCurrency(d.lossOpportunity), color: 'var(--clr-danger)' },
+    ];
+
+    document.getElementById('drilldown-grid').innerHTML = fields.map(function(f) {
+      return '<div class="drilldown-cell">' +
+        '<div class="dc-label">' + f.label + '</div>' +
+        '<div class="dc-value ' + (f.mono?'mono':'') + '" style="' + (f.color?'color:'+f.color:'') + '">' + (f.html || Utils.escHTML(f.value||'—')) + '</div>' +
+        '</div>';
+    }).join('');
+
+    // Older batches
+    const batches = d.olderBatches || [];
+    const batchBody = document.getElementById('drilldown-batches-body');
+    if (!batches.length) {
+      batchBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted" style="padding:16px;">No older batch details available.</td></tr>';
+    } else {
+      batchBody.innerHTML = batches.map(function(b) {
+        return '<tr>' +
+          '<td><span class="badge badge-accent">#' + b.fifoRank + '</span></td>' +
+          '<td class="td-mono">' + Utils.escHTML(b.batchCode) + '</td>' +
+          '<td class="td-mono">' + Utils.escHTML(b.vendorBatch||'—') + '</td>' +
+          '<td>' + Utils.fmtDate(b.mfgDate) + '</td>' +
+          '<td>' + Utils.fmtDate(b.expiryDate || '') + '</td>' +
+          '<td>' + Utils.escHTML(b.shelf||'—') + '</td>' +
+          '<td class="td-right">' + Utils.fmtNum(b.quantity || 0) + '</td>' +
+          '<td class="td-right">₹' + Utils.fmtNum(b.mrp,2) + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    // Store current drilldown data for PDF export
+    window._currentDrilldownData = d;
+  }
+
+  // ---- CONTROLS ----
+  const _debouncedSearch = Utils.debounce(val => { _state.search = val; _state.page = 1; fetchData(); }, 350);
+  function onSearch(val) { _debouncedSearch(val); }
+
+  function applyFilters() {
+    _state.facility = document.getElementById('violations-facility').value;
+    _state.severity  = document.getElementById('violations-severity').value;
+    _state.dateFrom  = document.getElementById('violations-date-from').value;
+    _state.dateTo    = document.getElementById('violations-date-to').value;
+    _state.page = 1;
+    fetchData();
+  }
+
+  function sort(col) {
+    if (_state.sortCol === col) {
+      _state.sortDir = _state.sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      _state.sortCol = col;
+      _state.sortDir = 'desc';
+    }
+    _state.page = 1;
+    fetchData();
+  }
+
+  function _setPage(p) { _state.page = p; fetchData(); }
+
+  return { load, switchTab, onSearch, applyFilters, sort, openDrilldown, _setPage };
+})();
+
+
+/* === prevention.js === */
+/* ================================================
+   prevention.js — Prevention Dashboard
+   ================================================ */
+
+const Prevention = (() => {
+  const PAGE_SIZE = 50;
+  let _state = { page: 1, total: 0, search: '', facility: '', risk: '', sortCol: 'expiry', sortDir: 'asc' };
+
+  async function load() {
+    _state.page = 1;
+    await fetchData();
+  }
+
+  async function fetchData() {
+    const tbody = document.getElementById('prevention-body');
+    if (tbody) tbody.innerHTML = ("<tr><td colspan=\"12\" class=\"text-center\" style=\"padding:32px;\"><div class=\"spinner\" style=\"margin:0 auto;\"></div></td></tr>");
+
+    try {
+      const result = await App.api('getPreventionData', {
+        page: _state.page, pageSize: PAGE_SIZE,
+        search: _state.search, facility: _state.facility,
+        risk: _state.risk, sortCol: _state.sortCol, sortDir: _state.sortDir
+      });
+
+      if (!result || !result.success) {
+        if (tbody) tbody.innerHTML = ("<tr><td colspan=\"12\" class=\"text-center text-danger\" style=\"padding:32px;\">Failed to load data.</td></tr>");
+        return;
+      }
+
+      _state.total = result.total || 0;
+      Utils.setText('prevention-count', Utils.fmtNum(_state.total) + ' records');
+      renderExpiryBuckets(result.expiryExposure || {});
+      renderTable(result.data || []);
+      Utils.buildPagination('prevention-pagination', _state.page, Math.ceil(_state.total / PAGE_SIZE), ("function(p){Prevention._setPage(p)}"));
+    } catch(e) {
+      if (tbody) tbody.innerHTML = ("<tr><td colspan=\"12\" class=\"text-center text-danger\" style=\"padding:32px;\">Error loading data.</td></tr>");
+      console.error('[Prevention] Fetch error:', e);
+    }
+  }
+
+  function renderExpiryBuckets(exposure) {
+    const el = document.getElementById('prevention-expiry-buckets');
+    if (!el) return;
+    const buckets = [
+      { key:'b0_30',   label:'0–30 Days',   cls:'urgent'  },
+      { key:'b31_60',  label:'31–60 Days',  cls:'warning' },
+      { key:'b61_90',  label:'61–90 Days',  cls:'caution' },
+      { key:'b91_180', label:'91–180 Days', cls:'ok'      },
+      { key:'b180p',   label:'180+ Days',   cls:''        },
+    ];
+    el.innerHTML = buckets.map(b => {
+      const d = exposure[b.key] || {};
+      return ("<div class=\"expiry-bucket " + (b.cls) + "\">\n        <div class=\"bucket-label\">" + (b.label) + "</div>\n        <div class=\"bucket-qty\">" + (Utils.fmtQty(d.qty||0)) + "</div>\n        <div class=\"bucket-value\">" + (Utils.fmtCurrency(d.value||0)) + "</div>\n        <div class=\"bucket-skus\">" + (Utils.fmtNum(d.skuCount||0)) + " SKUs · " + (Utils.fmtNum(d.batchCount||0)) + " batches</div>\n      </div>");
+    }).join('');
+  }
+
+  function renderTable(rows) {
+    const tbody = document.getElementById('prevention-body');
+    if (!tbody) return;
+    if (!rows.length) {
+      tbody.innerHTML = ("<tr><td colspan=\"12\"><div class=\"empty-state\"><div class=\"empty-icon\">📦</div><div>No at-risk inventory found.</div></div></td></tr>");
+      return;
+    }
+    tbody.innerHTML = rows.map(r => {
+      const days = r.daysToExpiry;
+      const dayColor = Utils.getDaysColor(days);
+      return ("\n      <tr>\n        <td class=\"td-center\"><span class=\"badge badge-accent\">#" + (Utils.escHTML(String(r.fifoRank||''))) + "</span></td>\n        <td class=\"td-mono\">" + (Utils.escHTML(r.skuCode)) + "</td>\n        <td class=\"truncate\" style=\"max-width:150px;\" title=\"" + (Utils.escHTML(r.itemName)) + "\">" + (Utils.escHTML(r.itemName)) + "</td>\n        <td class=\"td-mono\">" + (Utils.escHTML(r.batchCode)) + "</td>\n        <td>" + (Utils.fmtDate(r.expiryDate)) + "</td>\n        <td style=\"color:" + (dayColor) + ";font-weight:600;\">" + (days === null ? '—' : days + 'd') + "</td>\n        <td>" + (Utils.fmtDate(r.mfgDate)) + "</td>\n        <td class=\"text-muted\">" + (Utils.escHTML(r.shelves||'—')) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(r.totalQty)) + "</td>\n        <td class=\"td-right\">₹" + (Utils.fmtNum(r.mrp,2)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-warn);\">" + (Utils.fmtCurrency(r.inventoryValue)) + "</td>\n        <td>" + (Utils.getRiskBadge(r.riskLevel)) + "</td>\n      </tr>");
+    }).join('');
+  }
+
+  const _debouncedSearch = Utils.debounce(val => { _state.search = val; _state.page = 1; fetchData(); }, 350);
+  function onSearch(val) { _debouncedSearch(val); }
+  function applyFilters() {
+    _state.facility = document.getElementById('prevention-facility').value;
+    _state.risk = document.getElementById('prevention-risk').value;
+    _state.page = 1; fetchData();
+  }
+  function sort(col) {
+    _state.sortDir = _state.sortCol === col && _state.sortDir === 'asc' ? 'desc' : 'asc';
+    _state.sortCol = col; _state.page = 1; fetchData();
+  }
+  function _setPage(p) { _state.page = p; fetchData(); }
+
+  return { load, onSearch, applyFilters, sort, _setPage };
+})();
+
+
+
+/* === compliance.js === */
+/* ================================================
+   compliance.js — User Compliance Analytics
+   ================================================ */
+
+const Compliance = (() => {
+
+  const PAGE_SIZE = 50;
+  let _currentTab = 'overview';
+  let _offPage = 1, _allPage = 1;
+  let _offSearch = '', _allSearch = '', _allFacility = '';
+  let _rawData = null;
+
+  async function load() {
+    if (!_rawData) await fetchAll();
+    else renderCurrentTab();
+  }
+
+  async function fetchAll() {
+    try {
+      const result = await App.api('getUserCompliance', {});
+      if (!result || !result.success) return;
+      _rawData = result.data;
+      renderCurrentTab();
+    } catch(e) { console.error('[Compliance] Load error:', e); }
+  }
+
+  function renderCurrentTab() {
+    switch (_currentTab) {
+      case 'overview':  renderOverview(); break;
+      case 'offenders': renderOffenders(); break;
+      case 'champions': renderChampions(); break;
+      case 'detail':    renderAllUsers(); break;
+    }
+  }
+
+  function switchTab(tab) {
+    _currentTab = tab;
+    document.querySelectorAll('[data-ctab]').forEach(el => {
+      el.classList.toggle('active', el.dataset.ctab === tab);
+    });
+    document.querySelectorAll('.tab-panel[id^="ctab-"]').forEach(el => {
+      el.classList.toggle('active', el.id === 'ctab-' + tab);
+    });
+    if (!_rawData) fetchAll();
+    else renderCurrentTab();
+  }
+
+  function renderOverview() {
+    if (!_rawData) return;
+    const all = _rawData.allUsers || [];
+
+    // Top violators
+    const topViol = all.slice().sort((a,b)=>(b.violations||0)-(a.violations||0)).slice(0,7);
+    renderRankList('cu-top-violators', topViol, u => ({
+      name: u.userName||u.email, sub: u.facility||'',
+      value: Utils.fmtNum(u.violations) + ' violations',
+      color: 'var(--clr-danger)'
+    }));
+
+    // Top loss
+    const topLoss = all.slice().sort((a,b)=>(b.lossOpportunity||0)-(a.lossOpportunity||0)).slice(0,7);
+    renderRankList('cu-top-loss', topLoss, u => ({
+      name: u.userName||u.email, sub: u.facility||'',
+      value: Utils.fmtCurrency(u.lossOpportunity),
+      color: 'var(--clr-danger)'
+    }));
+
+    // Lowest compliance
+    const lowComp = all.slice().filter(u=>(u.totalGps||0)>=5).sort((a,b)=>(a.compliancePct||0)-(b.compliancePct||0)).slice(0,7);
+    renderRankList('cu-lowest-compliance', lowComp, u => ({
+      name: u.userName||u.email, sub: Utils.fmtNum(u.totalGps)+' GPs',
+      value: Utils.fmtPct(u.compliancePct),
+      color: Utils.getComplianceColor(u.compliancePct||0)
+    }));
+  }
+
+  function renderRankList(elId, rows, mapFn) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    if (!rows.length) { el.innerHTML = '<div class="text-muted text-center" style="padding:16px;">No data.</div>'; return; }
+    el.innerHTML = ("<div class=\"user-rank-list\">") + rows.map((r,i) => {
+      const m = mapFn(r);
+      return ("<div class=\"user-rank-row\">\n        <div class=\"rank-num\">" + (i+1) + "</div>\n        <div style=\"flex:1;min-width:0;\">\n          <div class=\"truncate\" style=\"font-weight:600;font-size:0.8rem;\">" + (Utils.escHTML(m.name)) + "</div>\n          <div style=\"font-size:0.7rem;color:var(--clr-text-muted);\">" + (Utils.escHTML(m.sub)) + "</div>\n        </div>\n        <div style=\"font-weight:700;font-size:0.82rem;color:" + (m.color) + ";\">" + (m.value) + "</div>\n      </div>");
+    }).join('') + ("</div>");
+  }
+
+  function renderOffenders() {
+    if (!_rawData) return;
+    const offenders = (_rawData.allUsers || []).filter(u => (u.violations30d || 0) >= 5);
+    const filtered = offenders.filter(u => !_offSearch || (u.userName||u.email||'').toLowerCase().includes(_offSearch.toLowerCase()));
+    Utils.setText('offenders-count', Utils.fmtNum(filtered.length) + ' offenders');
+    const paged = paginate(filtered, _offPage, PAGE_SIZE);
+
+    const tbody = document.getElementById('offenders-body');
+    if (!tbody) return;
+    if (!paged.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted" style="padding:24px;">No repeat offenders.</td></tr>'; return; }
+
+    tbody.innerHTML = paged.map(u => ("\n      <tr>\n        <td style=\"font-weight:600;\">" + (Utils.escHTML(u.userName||u.email)) + "</td>\n        <td>" + (Utils.escHTML(u.facility||'')) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-danger);font-weight:700;\">" + (Utils.fmtNum(u.violations30d)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.violations)) + "</td>\n        <td class=\"td-right\" style=\"color:" + (Utils.getComplianceColor(u.compliancePct||0)) + ";font-weight:700;\">" + (Utils.fmtPct(u.compliancePct)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.skippedQty)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-danger);\">" + (Utils.fmtCurrency(u.lossOpportunity)) + "</td>\n        <td>" + (Utils.getOffenderBadge(u.offenderLevel)) + "</td>\n        <td>" + (Utils.fmtDate(u.lastViolationDate)) + "</td>\n      </tr>")).join('');
+
+    Utils.buildPagination('offenders-pagination', _offPage, Math.ceil(filtered.length/PAGE_SIZE), ("function(p){Compliance._setOffPage(p)}"));
+  }
+
+  function renderChampions() {
+    if (!_rawData) return;
+    const champs = (_rawData.allUsers||[]).filter(u => u.offenderLevel === 'CHAMPION');
+
+    const tbody = document.getElementById('champions-body');
+    if (!tbody) return;
+    if (!champs.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:32px;"><div class="empty-icon">🏆</div><div class="text-muted" style="margin-top:8px;">No FIFO champions yet.<br><small>Need 50+ GPs with >98% compliance</small></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = champs.map((u,i) => ("\n      <tr>\n        <td class=\"td-center\">" + (i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)) + "</td>\n        <td style=\"font-weight:700;color:var(--clr-purple);\">" + (Utils.escHTML(u.userName||u.email)) + "</td>\n        <td>" + (Utils.escHTML(u.facility||'')) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.totalGps)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.violations)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-ok);font-weight:700;\">" + (Utils.fmtPct(u.compliancePct)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.skippedQty)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtCurrency(u.lossOpportunity)) + "</td>\n      </tr>")).join('');
+  }
+
+  function renderAllUsers() {
+    if (!_rawData) return;
+    const all = (_rawData.allUsers||[]).filter(u => {
+      const matchSearch = !_allSearch || (u.userName||u.email||'').toLowerCase().includes(_allSearch.toLowerCase());
+      const matchFac = !_allFacility || u.facility === _allFacility;
+      return matchSearch && matchFac;
+    });
+    Utils.setText('allusers-count', Utils.fmtNum(all.length) + ' users');
+    const paged = paginate(all, _allPage, PAGE_SIZE);
+
+    const tbody = document.getElementById('allusers-body');
+    if (!tbody) return;
+    if (!paged.length) { tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted" style="padding:24px;">No users found.</td></tr>'; return; }
+
+    tbody.innerHTML = paged.map(u => {
+      const color = Utils.getComplianceColor(u.compliancePct||0);
+      return ("\n      <tr>\n        <td style=\"font-weight:600;\">" + (Utils.escHTML(u.userName||u.email)) + "</td>\n        <td>" + (Utils.escHTML(u.facility||'')) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.totalGps)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-danger);\">" + (Utils.fmtNum(u.violations)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-info);\">" + (Utils.fmtNum(u.partialFifo)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-ok);\">" + (Utils.fmtNum(u.compliant)) + "</td>\n        <td class=\"td-right\" style=\"color:" + (color) + ";font-weight:700;\">" + (Utils.fmtPct(u.compliancePct)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.skippedQty)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-danger);\">" + (Utils.fmtCurrency(u.lossOpportunity)) + "</td>\n        <td>" + (Utils.fmtDate(u.lastViolationDate)) + "</td>\n        <td>" + (Utils.getOffenderBadge(u.offenderLevel)) + "</td>\n      </tr>");
+    }).join('');
+
+    Utils.buildPagination('allusers-pagination', _allPage, Math.ceil(all.length/PAGE_SIZE), ("function(p){Compliance._setAllPage(p)}"));
+  }
+
+  function paginate(arr, page, size) { return arr.slice((page-1)*size, page*size); }
+
+  const _dSearchOff = Utils.debounce(v => { _offSearch = v; _offPage = 1; renderOffenders(); }, 300);
+  const _dSearchAll = Utils.debounce(v => { _allSearch = v; _allPage = 1; renderAllUsers(); }, 300);
+
+  function searchOffenders(v) { _dSearchOff(v); }
+  function searchAllUsers(v) { _dSearchAll(v); }
+  function applyAllUsersFilter() { _allFacility = document.getElementById('allusers-facility').value; _allPage = 1; renderAllUsers(); }
+  function _setOffPage(p) { _offPage = p; renderOffenders(); }
+  function _setAllPage(p) { _allPage = p; renderAllUsers(); }
+
+  return { load, switchTab, searchOffenders, searchAllUsers, applyAllUsersFilter, _setOffPage, _setAllPage };
+})();
+
+
+/* === exports.js === */
+/* ================================================
+   exports.js — CSV, Excel, PDF export handlers
+   Uses native browser APIs only (no heavy libs).
+   Excel via SheetJS loaded on demand.
+   ================================================ */
+
+const Exports = (() => {
+
+  // ---- CSV HELPERS ----
+  function toCSV(rows, headers) {
+    const escape = v => {
+      if (v === null || v === undefined) return '';
+      const s = String(v);
+      if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    };
+    const lines = [
+      headers.map(escape).join(','),
+      ...rows.map(row => row.map(escape).join(','))
+    ];
+    return lines.join('\r\n');
+  }
+
+  function downloadCSV(csv, filename) {
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = filename + '_' + dateSuffix() + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function dateSuffix() {
+    return new Date().toISOString().slice(0,10).replace(/-/g,'');
+  }
+
+  // ---- LOAD SHEETJS (on demand) ----
+  function loadSheetJS() {
+    return new Promise((resolve, reject) => {
+      if (window.XLSX) { resolve(window.XLSX); return; }
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload  = () => resolve(window.XLSX);
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  async function downloadExcel(data, sheetName, filename) {
+    try {
+      const XLSX = await loadSheetJS();
+      const ws   = XLSX.utils.aoa_to_sheet(data);
+      const wb   = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+      XLSX.writeFile(wb, filename + '_' + dateSuffix() + '.xlsx');
+    } catch(e) {
+      Utils.toast('Excel export failed. Try CSV instead.', 'warn');
+      console.error('[Exports] Excel error:', e);
+    }
+  }
+
+  // ---- PDF via PRINT ----
+  function printTable(title, headers, rows, filename) {
+    const html = ("\n      <!DOCTYPE html><html>\n      <head>\n        <title>" + (title) + "</title>\n        <style>\n          body{font-family:Arial,sans-serif;font-size:11px;margin:20px;color:#111;}\n          h1{font-size:15px;margin-bottom:4px;}\n          .meta{font-size:10px;color:#666;margin-bottom:14px;}\n          table{width:100%;border-collapse:collapse;}\n          th{background:#1a1a2e;color:#fff;padding:6px 8px;text-align:left;font-size:10px;}\n          td{padding:5px 8px;border-bottom:1px solid #e0e0e0;font-size:10px;}\n          tr:nth-child(even) td{background:#f7f7f7;}\n          @media print{@page{size:A4 landscape;margin:10mm;}}\n        </style>\n      </head>\n      <body>\n        <h1>" + (title) + "</h1>\n        <div class=\"meta\">Generated: " + (new Date().toLocaleString('en-IN')) + " | FIFO Control Tower</div>\n        <table>\n          <thead><tr>" + (headers.map(h=>("<th>" + (h) + "</th>")).join('')) + "</tr></thead>\n          <tbody>" + (rows.map(r=>("<tr>" + (r.map(c=>("<td>" + (c===null||c===undefined?'—':c) + "</td>")).join('')) + "</tr>")).join('')) + "</tbody>\n        </table>\n      </body></html>");
+    const win = window.open('', '_blank');
+    if (!win) { Utils.toast('Pop-up blocked. Allow pop-ups for PDF export.', 'warn'); return; }
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => { win.print(); win.close(); }, 400);
+  }
+
+  // ---- VIOLATIONS EXPORTS ----
+  async function violationsCSV() {
+    Utils.toast('Fetching violation data for export…', 'info', 2000);
+    try {
+      const result = await App.api('exportViolations', { format: 'csv' });
+      if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
+      const headers = ['Date','GP Code','User','Facility','SKU Code','Item Name','Qty','Older Batches','Skipped Qty','Severity','Status','Loss ₹'];
+      const rows = (result.data||[]).map(v => [
+        v.date, v.gpCode, v.user, v.facility, v.skuCode, v.itemName,
+        v.qty, v.olderBatchCount, v.olderInventoryQty, v.severity, v.status, v.lossOpportunity
+      ]);
+      downloadCSV(toCSV(rows, headers), 'FIFO_Violations');
+      Utils.toast('Violations CSV downloaded.', 'ok');
+    } catch(e) { Utils.toast('Export error.', 'danger'); }
+  }
+
+  async function violationsExcel() {
+    Utils.toast('Preparing Excel export…', 'info', 2000);
+    try {
+      const result = await App.api('exportViolations', { format: 'excel' });
+      if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
+      const headers = ['Date','GP Code','User','Facility','SKU Code','Item Name','Qty','Older Batches','Skipped Qty','Severity','Status','Loss ₹'];
+      const rows = (result.data||[]).map(v => [
+        v.date, v.gpCode, v.user, v.facility, v.skuCode, v.itemName,
+        v.qty, v.olderBatchCount, v.olderInventoryQty, v.severity, v.status, v.lossOpportunity
+      ]);
+      await downloadExcel([].concat([headers], rows), 'Violations', 'FIFO_Violations');
+    } catch(e) { Utils.toast('Excel export error.', 'danger'); }
+  }
+
+  async function violationsPDF() {
+    Utils.toast('Preparing PDF…', 'info', 1500);
+    try {
+      const result = await App.api('exportViolations', { format: 'pdf', limit: 500 });
+      if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
+      const headers = ['Date','GP Code','User','Severity','Skipped Qty','Loss ₹','Status'];
+      const rows = (result.data||[]).map(v => [v.date, v.gpCode, v.user, v.severity, v.olderInventoryQty, '₹'+v.lossOpportunity, v.status]);
+      printTable('FIFO Violations Report', headers, rows, 'FIFO_Violations');
+    } catch(e) { Utils.toast('PDF export error.', 'danger'); }
+  }
+
+  // ---- PREVENTION EXPORTS ----
+  async function preventionCSV() {
+    Utils.toast('Fetching prevention data…', 'info', 2000);
+    try {
+      const result = await App.api('exportPrevention', {});
+      if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
+      const headers = ['FIFO Rank','SKU Code','Item Name','Batch Code','Expiry Date','Days to Expiry','Mfg Date','Total Qty','MRP ₹','Inv Value ₹','Risk Level'];
+      const rows = (result.data||[]).map(r => [
+        r.fifoRank, r.skuCode, r.itemName, r.batchCode, r.expiryDate,
+        r.daysToExpiry, r.mfgDate, r.totalQty, r.mrp, r.inventoryValue, r.riskLevel
+      ]);
+      downloadCSV(toCSV(rows, headers), 'Prevention_Dashboard');
+      Utils.toast('Prevention CSV downloaded.', 'ok');
+    } catch(e) { Utils.toast('Export error.', 'danger'); }
+  }
+
+  // ---- FINANCIAL EXPORTS ----
+  async function financialCSV() {
+    Utils.toast('Fetching financial data…', 'info', 2000);
+    try {
+      const result = await App.api('exportFinancial', {});
+      if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
+      const headers = ['SKU Code','Item Name','Violations','Skipped Qty','Loss Opportunity ₹','Avg MRP ₹','Facility'];
+      const rows = (result.data||[]).map(r => [r.skuCode, r.itemName, r.violations, r.skippedQty, r.lossOpportunity, r.avgMrp, r.facility]);
+      downloadCSV(toCSV(rows, headers), 'Financial_Impact');
+      Utils.toast('Financial CSV downloaded.', 'ok');
+    } catch(e) { Utils.toast('Export error.', 'danger'); }
+  }
+
+  // ---- COMPLIANCE EXPORTS ----
+  async function complianceCSV() {
+    Utils.toast('Fetching compliance data…', 'info', 2000);
+    try {
+      const result = await App.api('exportCompliance', {});
+      if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
+      const headers = ['User','Facility','Total GPs','Violations','Partial FIFO','Compliant','Compliance %','Skipped Qty','Loss ₹','Last Violation','Level'];
+      const rows = (result.data||[]).map(u => [
+        u.userName||u.email, u.facility, u.totalGps, u.violations, u.partialFifo,
+        u.compliant, u.compliancePct, u.skippedQty, u.lossOpportunity, u.lastViolationDate, u.offenderLevel
+      ]);
+      downloadCSV(toCSV(rows, headers), 'User_Compliance');
+      Utils.toast('Compliance CSV downloaded.', 'ok');
+    } catch(e) { Utils.toast('Export error.', 'danger'); }
+  }
+
+  function offendersCSV() {
+    Utils.toast('Use the Compliance CSV export for all user data.', 'info');
+    complianceCSV();
+  }
+
+  // ---- FACILITY SUMMARY ----
+  function facilitySummaryCSV(facilities) {
+    const headers = ['Facility','Compliance %','Total GPs','Violations','Partial FIFO','Skipped Qty','Loss ₹'];
+    const rows = facilities.map(f => [f.facility, f.compliancePct, f.totalGps, f.violations, f.partialFifo, f.skippedQty, f.lossOpportunity]);
+    downloadCSV(toCSV(rows, headers), 'Facility_Summary');
+    Utils.toast('Facility summary CSV downloaded.', 'ok');
+  }
+
+  // ---- DRILLDOWN PDF ----
+  function drilldownPDF() {
+    const d = window._currentDrilldownData;
+    if (!d) { Utils.toast('No drilldown data to export.', 'warn'); return; }
+    const headers = ['Field','Value'];
+    const rows = [
+      ['GP Code', d.gpCode], ['Date', d.date], ['User', d.user],
+      ['Facility', d.facility], ['SKU Code', d.skuCode], ['Item Name', d.itemName],
+      ['Dispatch Qty', d.qty], ['Older Batch Count', d.olderBatchCount],
+      ['Older Inventory Qty', d.olderInventoryQty], ['Severity', d.severity],
+      ['Status', d.status], ['Loss Opportunity ₹', d.lossOpportunity]
+    ];
+    printTable('Violation Drilldown — ' + d.gpCode, headers, rows, 'Drilldown');
+  }
+
+  return {
+    violationsCSV, violationsExcel, violationsPDF,
+    preventionCSV, financialCSV, complianceCSV, offendersCSV,
+    facilitySummaryCSV, drilldownPDF
+  };
+})();
+
+</script>
+
+</body>
+</html>
