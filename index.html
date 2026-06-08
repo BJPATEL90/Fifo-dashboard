@@ -4,11 +4,15 @@
 <meta charset="UTF-8">
 <script>
   // =====================================================================
-  // REQUIRED: Paste your Apps Script Web App URL below.
-  // Deploy Backend.gs as Web App → Execute as: Me → Who can access: Anyone
-  // Then copy the /exec URL and paste it here.
+  // STEP 1 — Paste your Apps Script /exec URL below (between the quotes).
+  // Apps Script → Deploy → Manage Deployments → copy the /exec URL.
   // =====================================================================
-  var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbw-fERhLivpvxNTWF9lk5bgqqIFvkxmrg13dXdcjLtwqOv8llRXwYw8hOuANRWkPc06Uw/exec';
+  var GAS_BACKEND_URL = 'YOUR_APPS_SCRIPT_EXEC_URL_HERE';
+
+  // Quick check — warns in browser console if URL not set
+  if (GAS_BACKEND_URL === 'https://script.google.com/macros/s/AKfycbw-fERhLivpvxNTWF9lk5bgqqIFvkxmrg13dXdcjLtwqOv8llRXwYw8hOuANRWkPc06Uw/exec') {
+    console.warn('[FIFO] GAS_BACKEND_URL is not set. Open index.html and replace the placeholder on line 11 with your Apps Script /exec URL.');
+  }
 </script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -2176,11 +2180,18 @@ const Utils = (() => {
       var body = JSON.stringify({ action: fnName, params: params, token: params._token || '' });
       fetch(gasUrl, {
         method: 'POST',
+        redirect: 'follow',
         headers: { 'Content-Type': 'text/plain' },
         body: body
       })
-      .then(function(res) { return res.json(); })
-      .then(function(data) { resolve(data); })
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
+      .then(function(text) {
+        try { resolve(JSON.parse(text)); }
+        catch(e) { reject(new Error('Bad JSON from backend: ' + text.slice(0,200))); }
+      })
       .catch(function(err) { reject(err); });
     });
   }
