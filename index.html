@@ -2278,9 +2278,14 @@ const Auth = (() => {
     Utils.setText('user-name-display', user.name);
     Utils.setText('user-role-display', user.email);
 
-    // Everyone sees everything
-    Utils.show('nav-settings');
-    Utils.show('nav-audit');
+    // Settings + Audit only visible to admin
+    if (isAdmin()) {
+      Utils.show('nav-settings');
+      Utils.show('nav-audit');
+    } else {
+      Utils.hide('nav-settings');
+      Utils.hide('nav-audit');
+    }
 
     Utils.hide('login-page');
     Utils.show('app-shell');
@@ -2322,8 +2327,12 @@ const Auth = (() => {
     return true;
   }
 
-  // Everyone is admin — no restrictions
-  function isAdmin() { return true; }
+  // Only bhavesh.patel@mosaicwellness.in is admin
+  var ADMIN_EMAIL = 'bhavesh.patel@mosaicwellness.in';
+  function isAdmin() {
+    var s = getSession();
+    return s && s.email && s.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+  }
 
   function currentUser() { return getSession(); }
 
@@ -3914,14 +3923,11 @@ const Exports = (() => {
     try {
       const result = await App.api('exportViolations', { format: 'csv' });
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = ['Date','GP Code','User','Facility','SKU Code','Item Name','Qty','Older Batches','Skipped Qty','Severity','Status','Loss ₹'];
-      const rows = (result.data||[]).map(v => [
-        v.date, v.gpCode, v.user, v.facility, v.skuCode, v.itemName,
-        v.qty, v.olderBatchCount, v.olderInventoryQty, v.severity, v.status, v.lossOpportunity
-      ]);
+      const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (₹)','FIFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
+      const rows = result.rows || [];
       downloadCSV(toCSV(rows, headers), 'FIFO_Violations');
       Utils.toast('Violations CSV downloaded.', 'ok');
-    } catch(e) { Utils.toast('Export error.', 'danger'); }
+    } catch(e) { Utils.toast('Export error.', 'danger'); console.error(e); }
   }
 
   async function violationsExcel() {
@@ -3929,13 +3935,11 @@ const Exports = (() => {
     try {
       const result = await App.api('exportViolations', { format: 'excel' });
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = ['Date','GP Code','User','Facility','SKU Code','Item Name','Qty','Older Batches','Skipped Qty','Severity','Status','Loss ₹'];
-      const rows = (result.data||[]).map(v => [
-        v.date, v.gpCode, v.user, v.facility, v.skuCode, v.itemName,
-        v.qty, v.olderBatchCount, v.olderInventoryQty, v.severity, v.status, v.lossOpportunity
-      ]);
+      const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (₹)','FIFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
+      const rows = result.rows || [];
       await downloadExcel([].concat([headers], rows), 'Violations', 'FIFO_Violations');
-    } catch(e) { Utils.toast('Excel export error.', 'danger'); }
+      Utils.toast('Violations Excel downloaded.', 'ok');
+    } catch(e) { Utils.toast('Excel export error.', 'danger'); console.error(e); }
   }
 
   async function violationsPDF() {
@@ -3943,10 +3947,11 @@ const Exports = (() => {
     try {
       const result = await App.api('exportViolations', { format: 'pdf', limit: 500 });
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = ['Date','GP Code','User','Severity','Skipped Qty','Loss ₹','Status'];
-      const rows = (result.data||[]).map(v => [v.date, v.gpCode, v.user, v.severity, v.olderInventoryQty, '₹'+v.lossOpportunity, v.status]);
+      // Backend rows are arrays: [Date, GPNumber, User, UserEmail, Facility, SKUCode, ItemName, BatchCode, VendorBatch, DispatchedQty, Shelf, Status, Severity, OlderBatchCount, OlderInventoryQty, LossOpp, FIFORank, MfgDate, ExpiryDate, ToParty, UploadID]
+      const headers = ['Date','GP Number','User','Facility','Severity','Skipped Qty','Loss Opp (₹)','Status'];
+      const rows = (result.rows||[]).map(r => [r[0], r[1], r[2], r[4], r[12], r[14], r[15], r[11]]);
       printTable('FIFO Violations Report', headers, rows, 'FIFO_Violations');
-    } catch(e) { Utils.toast('PDF export error.', 'danger'); }
+    } catch(e) { Utils.toast('PDF export error.', 'danger'); console.error(e); }
   }
 
   // ---- PREVENTION EXPORTS ----
@@ -3955,27 +3960,24 @@ const Exports = (() => {
     try {
       const result = await App.api('exportPrevention', {});
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = ['FIFO Rank','SKU Code','Item Name','Batch Code','Expiry Date','Days to Expiry','Mfg Date','Total Qty','MRP ₹','Inv Value ₹','Risk Level'];
-      const rows = (result.data||[]).map(r => [
-        r.fifoRank, r.skuCode, r.itemName, r.batchCode, r.expiryDate,
-        r.daysToExpiry, r.mfgDate, r.totalQty, r.mrp, r.inventoryValue, r.riskLevel
-      ]);
+      const headers = result.headers || ['Facility','SKU Code','Item Name','Shelf','Batch Code','Vendor Batch','Manufacturing Date','Expiry Date','Quantity','MRP (₹)','Value (₹)','Days to Expiry','Risk Level'];
+      const rows = result.rows || [];
       downloadCSV(toCSV(rows, headers), 'Prevention_Dashboard');
       Utils.toast('Prevention CSV downloaded.', 'ok');
-    } catch(e) { Utils.toast('Export error.', 'danger'); }
+    } catch(e) { Utils.toast('Export error.', 'danger'); console.error(e); }
   }
 
   // ---- FINANCIAL EXPORTS ----
   async function financialCSV() {
-    Utils.toast('Fetching financial data…', 'info', 2000);
+    Utils.toast('Fetching compliance data for financial export…', 'info', 2000);
     try {
-      const result = await App.api('exportFinancial', {});
+      const result = await App.api('exportCompliance', {});
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = ['SKU Code','Item Name','Violations','Skipped Qty','Loss Opportunity ₹','Avg MRP ₹','Facility'];
-      const rows = (result.data||[]).map(r => [r.skuCode, r.itemName, r.violations, r.skippedQty, r.lossOpportunity, r.avgMrp, r.facility]);
+      const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FIFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (₹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
+      const rows = result.rows || [];
       downloadCSV(toCSV(rows, headers), 'Financial_Impact');
       Utils.toast('Financial CSV downloaded.', 'ok');
-    } catch(e) { Utils.toast('Export error.', 'danger'); }
+    } catch(e) { Utils.toast('Export error.', 'danger'); console.error(e); }
   }
 
   // ---- COMPLIANCE EXPORTS ----
@@ -3984,14 +3986,11 @@ const Exports = (() => {
     try {
       const result = await App.api('exportCompliance', {});
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = ['User','Facility','Total GPs','Violations','Partial FIFO','Compliant','Compliance %','Skipped Qty','Loss ₹','Last Violation','Level'];
-      const rows = (result.data||[]).map(u => [
-        u.userName||u.email, u.facility, u.totalGps, u.violations, u.partialFifo,
-        u.compliant, u.compliancePct, u.skippedQty, u.lossOpportunity, u.lastViolationDate, u.offenderLevel
-      ]);
+      const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FIFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (₹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
+      const rows = result.rows || [];
       downloadCSV(toCSV(rows, headers), 'User_Compliance');
       Utils.toast('Compliance CSV downloaded.', 'ok');
-    } catch(e) { Utils.toast('Export error.', 'danger'); }
+    } catch(e) { Utils.toast('Export error.', 'danger'); console.error(e); }
   }
 
   function offendersCSV() {
