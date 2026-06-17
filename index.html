@@ -10,7 +10,7 @@
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbw-fERhLivpvxNTWF9lk5bgqqIFvkxmrg13dXdcjLtwqOv8llRXwYw8hOuANRWkPc06Uw/exec';
 
   // Quick check — warns in browser console if URL not set
-  if (GAS_BACKEND_URL === 'https://script.google.com/macros/s/AKfycbw-fERhLivpvxNTWF9lk5bgqqIFvkxmrg13dXdcjLtwqOv8llRXwYw8hOuANRWkPc06Uw/exec') {
+  if (!GAS_BACKEND_URL) {
     console.warn('[FIFO] GAS_BACKEND_URL is not set. Open index.html and replace the placeholder on line 11 with your Apps Script /exec URL.');
   }
 </script>
@@ -1318,6 +1318,18 @@ canvas { max-width: 100%; }
 
       <!-- ==================== HOME PAGE ==================== -->
       <div id="page-home" class="page hidden">
+        <div class="section-header" style="margin-bottom:12px;">
+          <div class="section-title">Report Scope</div>
+          <div class="section-actions" id="dashboard-scope-actions">
+            <button class="btn btn-primary btn-sm" data-dashboard-scope="today" onclick="Dashboard.setScope('today')">Today</button>
+            <button class="btn btn-ghost btn-sm" data-dashboard-scope="mtd" onclick="Dashboard.setScope('mtd')">MTD</button>
+            <button class="btn btn-ghost btn-sm" data-dashboard-scope="custom" onclick="Dashboard.setScope('custom')">Custom</button>
+          </div>
+        </div>
+        <div id="dashboard-custom-dates" class="table-toolbar hidden" style="margin-bottom:12px;">
+          <input type="date" id="dashboard-date-from" class="btn btn-ghost btn-sm" onchange="Dashboard.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+          <input type="date" id="dashboard-date-to" class="btn btn-ghost btn-sm" onchange="Dashboard.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+        </div>
         <div class="kpi-grid" id="kpi-grid">
           <!-- Populated by dashboard.js -->
           <div class="kpi-card" style="grid-column:1/-1; text-align:center; padding:32px;">
@@ -1394,6 +1406,14 @@ canvas { max-width: 100%; }
 
       <!-- ==================== VIOLATIONS PAGE ==================== -->
       <div id="page-violations" class="page hidden">
+        <div class="section-header" style="margin-bottom:12px;">
+          <div class="section-title">Report Scope</div>
+          <div class="section-actions" id="violations-scope-actions">
+            <button class="btn btn-primary btn-sm" data-violations-scope="today" onclick="Violations.setScope('today')">Today</button>
+            <button class="btn btn-ghost btn-sm" data-violations-scope="mtd" onclick="Violations.setScope('mtd')">MTD</button>
+            <button class="btn btn-ghost btn-sm" data-violations-scope="custom" onclick="Violations.setScope('custom')">Custom</button>
+          </div>
+        </div>
         <div class="tab-bar">
           <button class="tab-btn active" data-vtab="all" onclick="Violations.switchTab('all')">All Records</button>
           <button class="tab-btn" data-vtab="violations" onclick="Violations.switchTab('violations')">⚠️ Violations</button>
@@ -1418,8 +1438,8 @@ canvas { max-width: 100%; }
               <option value="MAJOR">Major</option>
               <option value="MINOR">Minor</option>
             </select>
-            <input type="date" id="violations-date-from" class="btn btn-ghost btn-sm" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
-            <input type="date" id="violations-date-to" class="btn btn-ghost btn-sm" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+            <input type="date" id="violations-date-from" class="btn btn-ghost btn-sm hidden" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+            <input type="date" id="violations-date-to" class="btn btn-ghost btn-sm hidden" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
             <div class="table-count" id="violations-count">—</div>
             <div style="display:flex;gap:6px;margin-left:auto;">
               <button class="btn btn-ghost btn-sm" onclick="Exports.violationsCSV()">CSV</button>
@@ -1520,6 +1540,18 @@ canvas { max-width: 100%; }
       <!-- ==================== FINANCIAL PAGE ==================== -->
 
       <div id="page-compliance" class="page hidden">
+        <div class="section-header" style="margin-bottom:12px;">
+          <div class="section-title">Report Scope</div>
+          <div class="section-actions" id="compliance-scope-actions">
+            <button class="btn btn-primary btn-sm" data-compliance-scope="today" onclick="Compliance.setScope('today')">Today</button>
+            <button class="btn btn-ghost btn-sm" data-compliance-scope="mtd" onclick="Compliance.setScope('mtd')">MTD</button>
+            <button class="btn btn-ghost btn-sm" data-compliance-scope="custom" onclick="Compliance.setScope('custom')">Custom</button>
+          </div>
+        </div>
+        <div id="compliance-custom-dates" class="table-toolbar hidden" style="margin-bottom:12px;">
+          <input type="date" id="compliance-date-from" class="btn btn-ghost btn-sm" onchange="Compliance.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+          <input type="date" id="compliance-date-to" class="btn btn-ghost btn-sm" onchange="Compliance.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+        </div>
         <div class="tab-bar">
           <button class="tab-btn active" data-ctab="overview" onclick="Compliance.switchTab('overview')">📊 Overview</button>
           <button class="tab-btn" data-ctab="offenders" onclick="Compliance.switchTab('offenders')">🔴 Repeat Offenders</button>
@@ -2020,7 +2052,23 @@ const Utils = (() => {
   }
 
   function todayISO() {
-    return new Date().toISOString().slice(0, 10);
+    var d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 10);
+  }
+
+  function monthStartISO() {
+    var d = new Date();
+    d = new Date(d.getFullYear(), d.getMonth(), 1);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 10);
+  }
+
+  function scopeLabel(scope) {
+    if (scope === 'today') return 'Today';
+    if (scope === 'mtd') return 'MTD';
+    if (scope === 'custom') return 'Custom';
+    return 'All';
   }
 
   // ---- DEBOUNCE ----
@@ -2215,7 +2263,7 @@ const Utils = (() => {
 
   return {
     fmtNum, fmtCurrency, fmtPct, fmtQty,
-    fmtDate, fmtDateTime, daysFromNow, todayISO,
+    fmtDate, fmtDateTime, daysFromNow, todayISO, monthStartISO, scopeLabel,
     debounce,
     getSeverityBadge, getStatusBadge, getOffenderBadge, getRiskBadge,
     getComplianceColor, getDaysColor,
@@ -3161,11 +3209,15 @@ document.addEventListener('DOMContentLoaded', () => App.init());
 const Dashboard = (() => {
 
   let _summaryCache = null;
+  let _scope = 'today';
+  let _dateFrom = Utils.todayISO();
+  let _dateTo = Utils.todayISO();
 
   async function load() {
+    syncScopeUI();
     renderKPILoading();
     try {
-      const result = await App.api('getDashboardSummary', {});
+      const result = await App.api('getDashboardSummary', getScopeParams());
       if (!result || !result.success) {
         renderKPIError();
         return;
@@ -3199,6 +3251,48 @@ const Dashboard = (() => {
       renderKPIError();
       console.error('[Dashboard] Load error:', e);
     }
+  }
+
+  function getScopeParams() {
+    return { scope: _scope, dateFrom: _dateFrom, dateTo: _dateTo };
+  }
+
+  function setScope(scope) {
+    _scope = scope || 'today';
+    if (_scope === 'today') {
+      _dateFrom = Utils.todayISO();
+      _dateTo = Utils.todayISO();
+    } else if (_scope === 'mtd') {
+      _dateFrom = Utils.monthStartISO();
+      _dateTo = Utils.todayISO();
+    } else {
+      _dateFrom = document.getElementById('dashboard-date-from').value || Utils.todayISO();
+      _dateTo = document.getElementById('dashboard-date-to').value || Utils.todayISO();
+    }
+    syncScopeUI();
+    load();
+  }
+
+  function applyCustomDates() {
+    _scope = 'custom';
+    _dateFrom = document.getElementById('dashboard-date-from').value || '';
+    _dateTo = document.getElementById('dashboard-date-to').value || '';
+    syncScopeUI();
+    load();
+  }
+
+  function syncScopeUI() {
+    document.querySelectorAll('[data-dashboard-scope]').forEach(function(btn) {
+      var active = btn.getAttribute('data-dashboard-scope') === _scope;
+      btn.classList.toggle('btn-primary', active);
+      btn.classList.toggle('btn-ghost', !active);
+    });
+    var custom = document.getElementById('dashboard-custom-dates');
+    if (custom) custom.classList.toggle('hidden', _scope !== 'custom');
+    var from = document.getElementById('dashboard-date-from');
+    var to = document.getElementById('dashboard-date-to');
+    if (from && !from.value) from.value = _dateFrom;
+    if (to && !to.value) to.value = _dateTo;
   }
 
   // ---- KPI CARDS ----
@@ -3380,7 +3474,7 @@ const Dashboard = (() => {
     Exports.facilitySummaryCSV();
   }
 
-  return { load, exportFacilitySummary };
+  return { load, setScope, applyCustomDates, getScopeParams, exportFacilitySummary };
 })();
 
 
@@ -3395,12 +3489,13 @@ const Violations = (() => {
   let _state = {
     page: 1, total: 0,
     tab: 'all',
-    search: '', facility: '', severity: '', dateFrom: '', dateTo: '',
+    search: '', facility: '', severity: '', scope: 'today', dateFrom: Utils.todayISO(), dateTo: Utils.todayISO(),
     sortCol: 'date', sortDir: 'desc'
   };
 
   async function load() {
     _state.page = 1;
+    syncScopeUI();
     await fetchData();
   }
 
@@ -3425,6 +3520,7 @@ const Violations = (() => {
         search: _state.search,
         facility: _state.facility,
         severity: _state.severity,
+        scope: _state.scope,
         dateFrom: _state.dateFrom,
         dateTo: _state.dateTo,
         sortCol: _state.sortCol,
@@ -3441,7 +3537,7 @@ const Violations = (() => {
       _state.total = result.total || 0;
       const totalPages = Math.ceil(_state.total / PAGE_SIZE);
 
-      Utils.setText('violations-count', Utils.fmtNum(_state.total) + ' records');
+      Utils.setText('violations-count', Utils.scopeLabel(_state.scope) + ': ' + Utils.fmtNum(_state.total) + ' records');
       renderTable(result.data || []);
       updateSortHeaders();
       Utils.buildPagination('violations-pagination', _state.page, totalPages, 'function(p){Violations._setPage(p)}');
@@ -3587,8 +3683,67 @@ const Violations = (() => {
     _state.severity  = document.getElementById('violations-severity').value;
     _state.dateFrom  = document.getElementById('violations-date-from').value;
     _state.dateTo    = document.getElementById('violations-date-to').value;
+    if (_state.scope !== 'custom') applyScopeDates();
     _state.page = 1;
+    syncScopeUI();
     fetchData();
+  }
+
+  function applyScopeDates() {
+    if (_state.scope === 'today') {
+      _state.dateFrom = Utils.todayISO();
+      _state.dateTo = Utils.todayISO();
+    } else if (_state.scope === 'mtd') {
+      _state.dateFrom = Utils.monthStartISO();
+      _state.dateTo = Utils.todayISO();
+    }
+  }
+
+  function setScope(scope) {
+    _state.scope = scope || 'today';
+    if (_state.scope === 'custom') {
+      _state.dateFrom = document.getElementById('violations-date-from').value || Utils.todayISO();
+      _state.dateTo = document.getElementById('violations-date-to').value || Utils.todayISO();
+    } else {
+      applyScopeDates();
+    }
+    _state.page = 1;
+    syncScopeUI();
+    fetchData();
+  }
+
+  function syncScopeUI() {
+    document.querySelectorAll('[data-violations-scope]').forEach(function(btn) {
+      var active = btn.getAttribute('data-violations-scope') === _state.scope;
+      btn.classList.toggle('btn-primary', active);
+      btn.classList.toggle('btn-ghost', !active);
+    });
+    var from = document.getElementById('violations-date-from');
+    var to = document.getElementById('violations-date-to');
+    if (from) {
+      from.classList.toggle('hidden', _state.scope !== 'custom');
+      from.value = _state.dateFrom || '';
+    }
+    if (to) {
+      to.classList.toggle('hidden', _state.scope !== 'custom');
+      to.value = _state.dateTo || '';
+    }
+  }
+
+  function getExportParams(limit) {
+    var status = '';
+    if (_state.tab === 'violations') status = 'FIFO VIOLATION';
+    if (_state.tab === 'partial') status = 'PARTIAL FIFO POSSIBLE';
+    if (_state.tab === 'compliant') status = 'COMPLIANT';
+    return {
+      limit: limit || 10000,
+      facility: _state.facility,
+      severity: _state.severity,
+      scope: _state.scope,
+      dateFrom: _state.dateFrom,
+      dateTo: _state.dateTo,
+      status: status
+    };
   }
 
   function sort(col) {
@@ -3604,7 +3759,7 @@ const Violations = (() => {
 
   function _setPage(p) { _state.page = p; fetchData(); }
 
-  return { load, switchTab, onSearch, applyFilters, sort, openDrilldown, _setPage };
+  return { load, switchTab, onSearch, applyFilters, setScope, getExportParams, sort, openDrilldown, _setPage };
 })();
 
 
@@ -3709,19 +3864,67 @@ const Compliance = (() => {
   let _offPage = 1, _allPage = 1;
   let _offSearch = '', _allSearch = '', _allFacility = '';
   let _rawData = null;
+  let _scope = 'today';
+  let _dateFrom = Utils.todayISO();
+  let _dateTo = Utils.todayISO();
 
   async function load() {
+    syncScopeUI();
     if (!_rawData) await fetchAll();
     else renderCurrentTab();
   }
 
   async function fetchAll() {
     try {
-      const result = await App.api('getUserCompliance', {});
+      const result = await App.api('getUserCompliance', getScopeParams());
       if (!result || !result.success) return;
-      _rawData = result.data;
+      _rawData = { allUsers: result.allUsers || result.data || [] };
       renderCurrentTab();
     } catch(e) { console.error('[Compliance] Load error:', e); }
+  }
+
+  function getScopeParams() {
+    return { scope: _scope, dateFrom: _dateFrom, dateTo: _dateTo };
+  }
+
+  function setScope(scope) {
+    _scope = scope || 'today';
+    if (_scope === 'today') {
+      _dateFrom = Utils.todayISO();
+      _dateTo = Utils.todayISO();
+    } else if (_scope === 'mtd') {
+      _dateFrom = Utils.monthStartISO();
+      _dateTo = Utils.todayISO();
+    } else {
+      _dateFrom = document.getElementById('compliance-date-from').value || Utils.todayISO();
+      _dateTo = document.getElementById('compliance-date-to').value || Utils.todayISO();
+    }
+    _rawData = null;
+    syncScopeUI();
+    fetchAll();
+  }
+
+  function applyCustomDates() {
+    _scope = 'custom';
+    _dateFrom = document.getElementById('compliance-date-from').value || '';
+    _dateTo = document.getElementById('compliance-date-to').value || '';
+    _rawData = null;
+    syncScopeUI();
+    fetchAll();
+  }
+
+  function syncScopeUI() {
+    document.querySelectorAll('[data-compliance-scope]').forEach(function(btn) {
+      var active = btn.getAttribute('data-compliance-scope') === _scope;
+      btn.classList.toggle('btn-primary', active);
+      btn.classList.toggle('btn-ghost', !active);
+    });
+    var custom = document.getElementById('compliance-custom-dates');
+    if (custom) custom.classList.toggle('hidden', _scope !== 'custom');
+    var from = document.getElementById('compliance-date-from');
+    var to = document.getElementById('compliance-date-to');
+    if (from) from.value = _dateFrom || '';
+    if (to) to.value = _dateTo || '';
   }
 
   function renderCurrentTab() {
@@ -3846,7 +4049,7 @@ const Compliance = (() => {
   function _setOffPage(p) { _offPage = p; renderOffenders(); }
   function _setAllPage(p) { _allPage = p; renderAllUsers(); }
 
-  return { load, switchTab, searchOffenders, searchAllUsers, applyAllUsersFilter, _setOffPage, _setAllPage };
+  return { load, switchTab, setScope, applyCustomDates, getScopeParams, searchOffenders, searchAllUsers, applyAllUsersFilter, _setOffPage, _setAllPage };
 })();
 
 
@@ -3932,11 +4135,12 @@ const Exports = (() => {
   async function violationsCSV() {
     Utils.toast('Fetching violation data for export…', 'info', 2000);
     try {
-      const result = await App.api('exportViolations', { format: 'csv' });
+      const exportParams = Object.assign({ format: 'csv' }, Violations.getExportParams());
+      const result = await App.api('exportViolations', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
       const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (₹)','FIFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
       const rows = result.rows || [];
-      downloadCSV(toCSV(rows, headers), 'FIFO_Violations');
+      downloadCSV(toCSV(rows, headers), 'FIFO_Violations_' + Utils.scopeLabel(exportParams.scope));
       Utils.toast('Violations CSV downloaded.', 'ok');
     } catch(e) { Utils.toast('Export error.', 'danger'); console.error(e); }
   }
@@ -3944,11 +4148,12 @@ const Exports = (() => {
   async function violationsExcel() {
     Utils.toast('Preparing Excel export…', 'info', 2000);
     try {
-      const result = await App.api('exportViolations', { format: 'excel' });
+      const exportParams = Object.assign({ format: 'excel' }, Violations.getExportParams());
+      const result = await App.api('exportViolations', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
       const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (₹)','FIFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
       const rows = result.rows || [];
-      await downloadExcel([].concat([headers], rows), 'Violations', 'FIFO_Violations');
+      await downloadExcel([].concat([headers], rows), 'Violations', 'FIFO_Violations_' + Utils.scopeLabel(exportParams.scope));
       Utils.toast('Violations Excel downloaded.', 'ok');
     } catch(e) { Utils.toast('Excel export error.', 'danger'); console.error(e); }
   }
@@ -3956,12 +4161,13 @@ const Exports = (() => {
   async function violationsPDF() {
     Utils.toast('Preparing PDF…', 'info', 1500);
     try {
-      const result = await App.api('exportViolations', { format: 'pdf', limit: 500 });
+      const exportParams = Object.assign({ format: 'pdf' }, Violations.getExportParams(500));
+      const result = await App.api('exportViolations', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
       // Backend rows are arrays: [Date, GPNumber, User, UserEmail, Facility, SKUCode, ItemName, BatchCode, VendorBatch, DispatchedQty, Shelf, Status, Severity, OlderBatchCount, OlderInventoryQty, LossOpp, FIFORank, MfgDate, ExpiryDate, ToParty, UploadID]
       const headers = ['Date','GP Number','User','Facility','Severity','Skipped Qty','Loss Opp (₹)','Status'];
       const rows = (result.rows||[]).map(r => [r[0], r[1], r[2], r[4], r[12], r[14], r[15], r[11]]);
-      printTable('FIFO Violations Report', headers, rows, 'FIFO_Violations');
+      printTable('FIFO Violations Report - ' + Utils.scopeLabel(exportParams.scope), headers, rows, 'FIFO_Violations');
     } catch(e) { Utils.toast('PDF export error.', 'danger'); console.error(e); }
   }
 
@@ -3982,7 +4188,8 @@ const Exports = (() => {
   async function financialCSV() {
     Utils.toast('Fetching compliance data for financial export…', 'info', 2000);
     try {
-      const result = await App.api('exportCompliance', {});
+      const exportParams = Compliance.getScopeParams ? Compliance.getScopeParams() : {};
+      const result = await App.api('exportCompliance', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
       const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FIFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (₹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
       const rows = result.rows || [];
@@ -3999,7 +4206,7 @@ const Exports = (() => {
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
       const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FIFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (₹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
       const rows = result.rows || [];
-      downloadCSV(toCSV(rows, headers), 'User_Compliance');
+      downloadCSV(toCSV(rows, headers), 'User_Compliance_' + Utils.scopeLabel(exportParams.scope));
       Utils.toast('Compliance CSV downloaded.', 'ok');
     } catch(e) { Utils.toast('Export error.', 'danger'); console.error(e); }
   }
