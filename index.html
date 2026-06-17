@@ -2026,6 +2026,10 @@ const Utils = (() => {
   // ---- DATE FORMATTERS ----
   function fmtDate(val) {
     if (!val) return '—';
+    if (typeof val === 'string') {
+      var m = val.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (m) return m[3].padStart(2, '0') + '/' + m[2].padStart(2, '0') + '/' + m[1];
+    }
     const d = new Date(val);
     if (isNaN(d)) return val;
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
