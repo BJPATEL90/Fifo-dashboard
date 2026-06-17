@@ -2032,7 +2032,7 @@ const Utils = (() => {
     }
     const d = new Date(val);
     if (isNaN(d)) return val;
-    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' });
   }
 
   function fmtDateTime(val) {
@@ -2041,7 +2041,8 @@ const Utils = (() => {
     if (isNaN(d)) return val;
     return d.toLocaleString('en-IN', {
       day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
+      hour: '2-digit', minute: '2-digit',
+      timeZone: 'Asia/Kolkata'
     });
   }
 
@@ -2056,19 +2057,32 @@ const Utils = (() => {
   }
 
   function todayISO() {
-    return localISODate(new Date());
+    return kolkataISODate(new Date());
   }
 
   function monthStartISO() {
-    var d = new Date();
-    return localISODate(new Date(d.getFullYear(), d.getMonth(), 1));
+    var parts = kolkataDateParts(new Date());
+    return parts.y + '-' + parts.m + '-01';
   }
 
-  function localISODate(d) {
-    var y = d.getFullYear();
-    var m = String(d.getMonth() + 1).padStart(2, '0');
-    var day = String(d.getDate()).padStart(2, '0');
-    return y + '-' + m + '-' + day;
+  function kolkataDateParts(d) {
+    var parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(d).reduce(function(acc, p) {
+      if (p.type === 'year') acc.y = p.value;
+      if (p.type === 'month') acc.m = p.value;
+      if (p.type === 'day') acc.d = p.value;
+      return acc;
+    }, {});
+    return parts;
+  }
+
+  function kolkataISODate(d) {
+    var parts = kolkataDateParts(d);
+    return parts.y + '-' + parts.m + '-' + parts.d;
   }
 
   function scopeLabel(scope) {
