@@ -3294,7 +3294,7 @@ const Dashboard = (() => {
   }
 
   function getScopeParams() {
-    return { scope: _scope, dateFrom: _dateFrom, dateTo: _dateTo };
+    return { scope: _scope };
   }
 
   function setScope(scope) {
@@ -3554,8 +3554,6 @@ const Violations = (() => {
         facility: _state.facility,
         severity: _state.severity,
         scope: _state.scope,
-        dateFrom: _state.dateFrom,
-        dateTo: _state.dateTo,
         sortCol: _state.sortCol,
         sortDir: _state.sortDir
       };
@@ -3759,8 +3757,6 @@ const Violations = (() => {
       facility: _state.facility,
       severity: _state.severity,
       scope: _state.scope,
-      dateFrom: _state.dateFrom,
-      dateTo: _state.dateTo,
       status: status
     };
   }
@@ -3903,7 +3899,7 @@ const Compliance = (() => {
   }
 
   function getScopeParams() {
-    return { scope: _scope, dateFrom: _dateFrom, dateTo: _dateTo };
+    return { scope: _scope };
   }
 
   function setScope(scope) {
