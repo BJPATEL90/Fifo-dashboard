@@ -2056,16 +2056,19 @@ const Utils = (() => {
   }
 
   function todayISO() {
-    var d = new Date();
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    return d.toISOString().slice(0, 10);
+    return localISODate(new Date());
   }
 
   function monthStartISO() {
     var d = new Date();
-    d = new Date(d.getFullYear(), d.getMonth(), 1);
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    return d.toISOString().slice(0, 10);
+    return localISODate(new Date(d.getFullYear(), d.getMonth(), 1));
+  }
+
+  function localISODate(d) {
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
   }
 
   function scopeLabel(scope) {
@@ -3295,8 +3298,8 @@ const Dashboard = (() => {
     if (custom) custom.classList.toggle('hidden', _scope !== 'custom');
     var from = document.getElementById('dashboard-date-from');
     var to = document.getElementById('dashboard-date-to');
-    if (from && !from.value) from.value = _dateFrom;
-    if (to && !to.value) to.value = _dateTo;
+    if (from) from.value = _dateFrom || '';
+    if (to) to.value = _dateTo || '';
   }
 
   // ---- KPI CARDS ----
@@ -3706,8 +3709,8 @@ const Violations = (() => {
   function setScope(scope) {
     _state.scope = scope || 'today';
     if (_state.scope === 'custom') {
-      _state.dateFrom = document.getElementById('violations-date-from').value || Utils.todayISO();
-      _state.dateTo = document.getElementById('violations-date-to').value || Utils.todayISO();
+      _state.dateFrom = document.getElementById('violations-date-from').value || _state.dateFrom || Utils.todayISO();
+      _state.dateTo = document.getElementById('violations-date-to').value || _state.dateTo || Utils.todayISO();
     } else {
       applyScopeDates();
     }
@@ -3726,10 +3729,12 @@ const Violations = (() => {
     var to = document.getElementById('violations-date-to');
     if (from) {
       from.classList.toggle('hidden', _state.scope !== 'custom');
+      from.style.display = _state.scope === 'custom' ? 'inline-flex' : 'none';
       from.value = _state.dateFrom || '';
     }
     if (to) {
       to.classList.toggle('hidden', _state.scope !== 'custom');
+      to.style.display = _state.scope === 'custom' ? 'inline-flex' : 'none';
       to.value = _state.dateTo || '';
     }
   }
