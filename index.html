@@ -2240,24 +2240,26 @@ const Utils = (() => {
           [fnName](params);
         return;
       }
-      // GitHub Pages — call Apps Script via GET with params in URL.
-      // GET survives Apps Script's internal redirect (POST→GET loses body).
+      // GitHub Pages / external hosting: call via fetch POST
       var gasUrl = (typeof GAS_BACKEND_URL !== 'undefined') ? GAS_BACKEND_URL : '';
       if (!gasUrl) {
-        reject(new Error('GAS_BACKEND_URL not configured.'));
+        reject(new Error('GAS_BACKEND_URL not configured. Open index.html and set the GAS_BACKEND_URL variable.'));
         return;
       }
-      // Encode action and params as URL query string
-      var paramsClean = Object.assign({}, params);
-      delete paramsClean._token;
-      var url = gasUrl
-        + '?action=' + encodeURIComponent(fnName)
-        + '&params=' + encodeURIComponent(JSON.stringify(paramsClean));
-      fetch(url, { method: 'GET', redirect: 'follow' })
-      .then(function(res) { return res.text(); })
+      var body = JSON.stringify({ action: fnName, params: params, token: params._token || '' });
+      fetch(gasUrl, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain' },
+        body: body
+      })
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
       .then(function(text) {
         try { resolve(JSON.parse(text)); }
-        catch(e) { reject(new Error('Bad JSON: ' + text.slice(0, 200))); }
+        catch(e) { reject(new Error('Bad JSON from backend: ' + text.slice(0,200))); }
       })
       .catch(function(err) { reject(err); });
     });
