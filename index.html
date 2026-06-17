@@ -8,6 +8,7 @@
   // Apps Script → Deploy → Manage Deployments → copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbw-fERhLivpvxNTWF9lk5bgqqIFvkxmrg13dXdcjLtwqOv8llRXwYw8hOuANRWkPc06Uw/exec';
+  var FRONTEND_BUILD_ID = 'fifo-scope-today-yesterday-mtd-20260617-v4';
 
   // Quick check — warns in browser console if URL not set
   if (!GAS_BACKEND_URL) {
@@ -2790,12 +2791,34 @@ const App = (() => {
     }
   }
 
+  async function verifyBackendBuild() {
+    try {
+      const result = await api('getBuildInfo', {});
+      var expected = (typeof FRONTEND_BUILD_ID !== 'undefined') ? FRONTEND_BUILD_ID : '';
+      if (!result || !result.success || result.buildId !== expected) {
+        var backendBuild = result && result.buildId ? result.buildId : 'old or unknown';
+        var msg = 'Backend code is not the latest copy. Expected ' + expected + ', got ' + backendBuild + '. Redeploy Backend.gs in Apps Script.';
+        console.warn('[FIFO]', msg, result);
+        Utils.toast(msg, 'danger', 9000);
+        var el = document.getElementById('last-updated-text');
+        if (el) el.textContent = 'Backend old copy';
+      }
+    } catch (err) {
+      var msg = 'Backend version check failed. Redeploy Backend.gs in Apps Script, then refresh this page.';
+      console.warn('[FIFO]', msg, err);
+      Utils.toast(msg, 'danger', 9000);
+      var el = document.getElementById('last-updated-text');
+      if (el) el.textContent = 'Backend not verified';
+    }
+  }
+
   // ---- INIT ----
   function init() {
     updateSyncIndicator();
+    verifyBackendBuild();
   }
 
-  return { navigate, refreshData, openModal, closeModal, toggleSidebar, api, init };
+  return { navigate, refreshData, openModal, closeModal, toggleSidebar, api, init, verifyBackendBuild };
 })();
 
 // ==================== GATEPASS UPLOAD MODULE ====================
@@ -3308,6 +3331,12 @@ const Dashboard = (() => {
   function renderKPIError(message) {
     const grid = document.getElementById('kpi-grid');
     var detail = message ? '<div class="text-muted" style="font-size:0.78rem;margin:8px auto 12px;max-width:720px;white-space:normal;">' + Utils.escHTML(message) + '</div>' : '';
+    if (grid && detail) {
+      setTimeout(function() {
+        var host = grid.querySelector('.kpi-card');
+        if (host) host.insertAdjacentHTML('beforeend', detail);
+      }, 0);
+    }
     if (grid) grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:24px;\">\n        <div style=\"color:var(--clr-danger);margin-bottom:6px;\">⚠️ Failed to load dashboard data</div>\n        <button class=\"btn btn-ghost btn-sm\" onclick=\"Dashboard.load()\">Retry</button>\n      </div>");
   }
 
@@ -4225,4 +4254,3 @@ const Exports = (() => {
 
 </body>
 </html>
-
