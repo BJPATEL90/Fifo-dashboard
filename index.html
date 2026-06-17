@@ -1322,13 +1322,9 @@ canvas { max-width: 100%; }
           <div class="section-title">Report Scope</div>
           <div class="section-actions" id="dashboard-scope-actions">
             <button class="btn btn-primary btn-sm" data-dashboard-scope="today" onclick="Dashboard.setScope('today')">Today</button>
+            <button class="btn btn-ghost btn-sm" data-dashboard-scope="yesterday" onclick="Dashboard.setScope('yesterday')">Yesterday</button>
             <button class="btn btn-ghost btn-sm" data-dashboard-scope="mtd" onclick="Dashboard.setScope('mtd')">MTD</button>
-            <button class="btn btn-ghost btn-sm" data-dashboard-scope="custom" onclick="Dashboard.setScope('custom')">Custom</button>
           </div>
-        </div>
-        <div id="dashboard-custom-dates" class="table-toolbar hidden" style="margin-bottom:12px;">
-          <input type="date" id="dashboard-date-from" class="btn btn-ghost btn-sm" onchange="Dashboard.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
-          <input type="date" id="dashboard-date-to" class="btn btn-ghost btn-sm" onchange="Dashboard.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
         </div>
         <div class="kpi-grid" id="kpi-grid">
           <!-- Populated by dashboard.js -->
@@ -1410,8 +1406,8 @@ canvas { max-width: 100%; }
           <div class="section-title">Report Scope</div>
           <div class="section-actions" id="violations-scope-actions">
             <button class="btn btn-primary btn-sm" data-violations-scope="today" onclick="Violations.setScope('today')">Today</button>
+            <button class="btn btn-ghost btn-sm" data-violations-scope="yesterday" onclick="Violations.setScope('yesterday')">Yesterday</button>
             <button class="btn btn-ghost btn-sm" data-violations-scope="mtd" onclick="Violations.setScope('mtd')">MTD</button>
-            <button class="btn btn-ghost btn-sm" data-violations-scope="custom" onclick="Violations.setScope('custom')">Custom</button>
           </div>
         </div>
         <div class="tab-bar">
@@ -1438,8 +1434,6 @@ canvas { max-width: 100%; }
               <option value="MAJOR">Major</option>
               <option value="MINOR">Minor</option>
             </select>
-            <input type="date" id="violations-date-from" class="btn btn-ghost btn-sm hidden" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
-            <input type="date" id="violations-date-to" class="btn btn-ghost btn-sm hidden" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
             <div class="table-count" id="violations-count">—</div>
             <div style="display:flex;gap:6px;margin-left:auto;">
               <button class="btn btn-ghost btn-sm" onclick="Exports.violationsCSV()">CSV</button>
@@ -1544,13 +1538,9 @@ canvas { max-width: 100%; }
           <div class="section-title">Report Scope</div>
           <div class="section-actions" id="compliance-scope-actions">
             <button class="btn btn-primary btn-sm" data-compliance-scope="today" onclick="Compliance.setScope('today')">Today</button>
+            <button class="btn btn-ghost btn-sm" data-compliance-scope="yesterday" onclick="Compliance.setScope('yesterday')">Yesterday</button>
             <button class="btn btn-ghost btn-sm" data-compliance-scope="mtd" onclick="Compliance.setScope('mtd')">MTD</button>
-            <button class="btn btn-ghost btn-sm" data-compliance-scope="custom" onclick="Compliance.setScope('custom')">Custom</button>
           </div>
-        </div>
-        <div id="compliance-custom-dates" class="table-toolbar hidden" style="margin-bottom:12px;">
-          <input type="date" id="compliance-date-from" class="btn btn-ghost btn-sm" onchange="Compliance.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
-          <input type="date" id="compliance-date-to" class="btn btn-ghost btn-sm" onchange="Compliance.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
         </div>
         <div class="tab-bar">
           <button class="tab-btn active" data-ctab="overview" onclick="Compliance.switchTab('overview')">📊 Overview</button>
@@ -2065,6 +2055,12 @@ const Utils = (() => {
     return parts.y + '-' + parts.m + '-01';
   }
 
+  function yesterdayISO() {
+    var d = new Date();
+    d.setDate(d.getDate() - 1);
+    return kolkataISODate(d);
+  }
+
   function kolkataDateParts(d) {
     var parts = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Kolkata',
@@ -2087,8 +2083,8 @@ const Utils = (() => {
 
   function scopeLabel(scope) {
     if (scope === 'today') return 'Today';
+    if (scope === 'yesterday') return 'Yesterday';
     if (scope === 'mtd') return 'MTD';
-    if (scope === 'custom') return 'Custom';
     return 'All';
   }
 
@@ -2284,7 +2280,7 @@ const Utils = (() => {
 
   return {
     fmtNum, fmtCurrency, fmtPct, fmtQty,
-    fmtDate, fmtDateTime, daysFromNow, todayISO, monthStartISO, scopeLabel,
+    fmtDate, fmtDateTime, daysFromNow, todayISO, yesterdayISO, monthStartISO, scopeLabel,
     debounce,
     getSeverityBadge, getStatusBadge, getOffenderBadge, getRiskBadge,
     getComplianceColor, getDaysColor,
@@ -3240,7 +3236,7 @@ const Dashboard = (() => {
     try {
       const result = await App.api('getDashboardSummary', getScopeParams());
       if (!result || !result.success) {
-        renderKPIError();
+        renderKPIError((result && (result.message || result.error)) || 'Backend returned an empty response.');
         return;
       }
       _summaryCache = result.data;
@@ -3269,7 +3265,7 @@ const Dashboard = (() => {
       document.getElementById('sync-dot').classList.remove('stale');
 
     } catch(e) {
-      renderKPIError();
+      renderKPIError(e && (e.message || e.toString()));
       console.error('[Dashboard] Load error:', e);
     }
   }
@@ -3283,21 +3279,13 @@ const Dashboard = (() => {
     if (_scope === 'today') {
       _dateFrom = Utils.todayISO();
       _dateTo = Utils.todayISO();
+    } else if (_scope === 'yesterday') {
+      _dateFrom = Utils.yesterdayISO();
+      _dateTo = Utils.yesterdayISO();
     } else if (_scope === 'mtd') {
       _dateFrom = Utils.monthStartISO();
       _dateTo = Utils.todayISO();
-    } else {
-      _dateFrom = document.getElementById('dashboard-date-from').value || Utils.todayISO();
-      _dateTo = document.getElementById('dashboard-date-to').value || Utils.todayISO();
     }
-    syncScopeUI();
-    load();
-  }
-
-  function applyCustomDates() {
-    _scope = 'custom';
-    _dateFrom = document.getElementById('dashboard-date-from').value || '';
-    _dateTo = document.getElementById('dashboard-date-to').value || '';
     syncScopeUI();
     load();
   }
@@ -3308,12 +3296,6 @@ const Dashboard = (() => {
       btn.classList.toggle('btn-primary', active);
       btn.classList.toggle('btn-ghost', !active);
     });
-    var custom = document.getElementById('dashboard-custom-dates');
-    if (custom) custom.classList.toggle('hidden', _scope !== 'custom');
-    var from = document.getElementById('dashboard-date-from');
-    var to = document.getElementById('dashboard-date-to');
-    if (from) from.value = _dateFrom || '';
-    if (to) to.value = _dateTo || '';
   }
 
   // ---- KPI CARDS ----
@@ -3323,8 +3305,9 @@ const Dashboard = (() => {
     grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:32px;\">\n        <div class=\"spinner spinner-lg\" style=\"margin:0 auto 10px;\"></div>\n        <div class=\"text-muted\">Loading dashboard…</div>\n      </div>");
   }
 
-  function renderKPIError() {
+  function renderKPIError(message) {
     const grid = document.getElementById('kpi-grid');
+    var detail = message ? '<div class="text-muted" style="font-size:0.78rem;margin:8px auto 12px;max-width:720px;white-space:normal;">' + Utils.escHTML(message) + '</div>' : '';
     if (grid) grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:24px;\">\n        <div style=\"color:var(--clr-danger);margin-bottom:6px;\">⚠️ Failed to load dashboard data</div>\n        <button class=\"btn btn-ghost btn-sm\" onclick=\"Dashboard.load()\">Retry</button>\n      </div>");
   }
 
@@ -3495,7 +3478,7 @@ const Dashboard = (() => {
     Exports.facilitySummaryCSV();
   }
 
-  return { load, setScope, applyCustomDates, getScopeParams, exportFacilitySummary };
+  return { load, setScope, getScopeParams, exportFacilitySummary };
 })();
 
 
@@ -3702,9 +3685,7 @@ const Violations = (() => {
   function applyFilters() {
     _state.facility = document.getElementById('violations-facility').value;
     _state.severity  = document.getElementById('violations-severity').value;
-    _state.dateFrom  = document.getElementById('violations-date-from').value;
-    _state.dateTo    = document.getElementById('violations-date-to').value;
-    if (_state.scope !== 'custom') applyScopeDates();
+    applyScopeDates();
     _state.page = 1;
     syncScopeUI();
     fetchData();
@@ -3714,6 +3695,9 @@ const Violations = (() => {
     if (_state.scope === 'today') {
       _state.dateFrom = Utils.todayISO();
       _state.dateTo = Utils.todayISO();
+    } else if (_state.scope === 'yesterday') {
+      _state.dateFrom = Utils.yesterdayISO();
+      _state.dateTo = Utils.yesterdayISO();
     } else if (_state.scope === 'mtd') {
       _state.dateFrom = Utils.monthStartISO();
       _state.dateTo = Utils.todayISO();
@@ -3722,12 +3706,7 @@ const Violations = (() => {
 
   function setScope(scope) {
     _state.scope = scope || 'today';
-    if (_state.scope === 'custom') {
-      _state.dateFrom = document.getElementById('violations-date-from').value || _state.dateFrom || Utils.todayISO();
-      _state.dateTo = document.getElementById('violations-date-to').value || _state.dateTo || Utils.todayISO();
-    } else {
-      applyScopeDates();
-    }
+    applyScopeDates();
     _state.page = 1;
     syncScopeUI();
     fetchData();
@@ -3739,18 +3718,6 @@ const Violations = (() => {
       btn.classList.toggle('btn-primary', active);
       btn.classList.toggle('btn-ghost', !active);
     });
-    var from = document.getElementById('violations-date-from');
-    var to = document.getElementById('violations-date-to');
-    if (from) {
-      from.classList.toggle('hidden', _state.scope !== 'custom');
-      from.style.display = _state.scope === 'custom' ? 'inline-flex' : 'none';
-      from.value = _state.dateFrom || '';
-    }
-    if (to) {
-      to.classList.toggle('hidden', _state.scope !== 'custom');
-      to.style.display = _state.scope === 'custom' ? 'inline-flex' : 'none';
-      to.value = _state.dateTo || '';
-    }
   }
 
   function getExportParams(limit) {
@@ -3915,22 +3882,13 @@ const Compliance = (() => {
     if (_scope === 'today') {
       _dateFrom = Utils.todayISO();
       _dateTo = Utils.todayISO();
+    } else if (_scope === 'yesterday') {
+      _dateFrom = Utils.yesterdayISO();
+      _dateTo = Utils.yesterdayISO();
     } else if (_scope === 'mtd') {
       _dateFrom = Utils.monthStartISO();
       _dateTo = Utils.todayISO();
-    } else {
-      _dateFrom = document.getElementById('compliance-date-from').value || Utils.todayISO();
-      _dateTo = document.getElementById('compliance-date-to').value || Utils.todayISO();
     }
-    _rawData = null;
-    syncScopeUI();
-    fetchAll();
-  }
-
-  function applyCustomDates() {
-    _scope = 'custom';
-    _dateFrom = document.getElementById('compliance-date-from').value || '';
-    _dateTo = document.getElementById('compliance-date-to').value || '';
     _rawData = null;
     syncScopeUI();
     fetchAll();
@@ -3942,12 +3900,6 @@ const Compliance = (() => {
       btn.classList.toggle('btn-primary', active);
       btn.classList.toggle('btn-ghost', !active);
     });
-    var custom = document.getElementById('compliance-custom-dates');
-    if (custom) custom.classList.toggle('hidden', _scope !== 'custom');
-    var from = document.getElementById('compliance-date-from');
-    var to = document.getElementById('compliance-date-to');
-    if (from) from.value = _dateFrom || '';
-    if (to) to.value = _dateTo || '';
   }
 
   function renderCurrentTab() {
@@ -4072,7 +4024,7 @@ const Compliance = (() => {
   function _setOffPage(p) { _offPage = p; renderOffenders(); }
   function _setAllPage(p) { _allPage = p; renderAllUsers(); }
 
-  return { load, switchTab, setScope, applyCustomDates, getScopeParams, searchOffenders, searchAllUsers, applyAllUsersFilter, _setOffPage, _setAllPage };
+  return { load, switchTab, setScope, getScopeParams, searchOffenders, searchAllUsers, applyAllUsersFilter, _setOffPage, _setAllPage };
 })();
 
 
