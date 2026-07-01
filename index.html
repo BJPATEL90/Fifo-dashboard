@@ -2077,6 +2077,12 @@ const Utils = (() => {
     return kolkataISODate(new Date());
   }
 
+  function yesterdayISO() {
+    var d = new Date();
+    d.setDate(d.getDate() - 1);
+    return kolkataISODate(d);
+  }
+
   function monthStartISO() {
     var parts = kolkataDateParts(new Date());
     return parts.y + '-' + parts.m + '-01';
@@ -2313,20 +2319,6 @@ const Utils = (() => {
       .replace(/"/g, '&quot;');
   }
 
-  return {
-    fmtNum, fmtCurrency, fmtPct, fmtQty,
-    fmtDate, fmtDateTime, daysFromNow, todayISO, monthStartISO, scopeLabel,
-    debounce,
-    getSeverityBadge, getStatusBadge, getOffenderBadge, getRiskBadge,
-    getComplianceColor, getDaysColor,
-    buildPagination,
-    show, hide, setText, setHTML,
-    toast,
-    sortBy,
-    callGAS,
-    fmtFileSize, escHTML,
-    buildMonthOptions, populateMonthSelect, hideMonthSelect, monthFirstDay
-  };
 
   // ---- MONTH PICKER HELPERS ----
   function buildMonthOptions() {
@@ -2368,6 +2360,20 @@ const Utils = (() => {
     return parts[0] + '-' + parts[1] + '-01';
   }
 
+  return {
+    fmtNum, fmtCurrency, fmtPct, fmtQty,
+    fmtDate, fmtDateTime, daysFromNow, todayISO, yesterdayISO, monthStartISO, scopeLabel,
+    debounce,
+    getSeverityBadge, getStatusBadge, getOffenderBadge, getRiskBadge,
+    getComplianceColor, getDaysColor,
+    buildPagination,
+    show, hide, setText, setHTML,
+    toast,
+    sortBy,
+    callGAS,
+    fmtFileSize, escHTML,
+    buildMonthOptions, populateMonthSelect, hideMonthSelect, monthFirstDay
+  };
 })();
 
 
@@ -3596,12 +3602,12 @@ const Dashboard = (() => {
    ================================================ */
 
 function getBucketBadgeClass(bucket) {
-    if (bucket === 'DS')  return 'badge-info';
-    if (bucket === 'B2B') return 'badge-purple';
-    return 'badge-neutral';
-  }
+  if (bucket === 'DS')  return 'badge-info';
+  if (bucket === 'B2B') return 'badge-purple';
+  return 'badge-neutral';
+}
 
-  const Violations = (() => {
+const Violations = (() => {
 
   const PAGE_SIZE = 50;
   let _state = {
