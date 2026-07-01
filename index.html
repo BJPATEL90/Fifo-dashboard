@@ -7,21 +7,20 @@
   // STEP 1 — Paste your Apps Script /exec URL below (between the quotes).
   // Apps Script → Deploy → Manage Deployments → copy the /exec URL.
   // =====================================================================
-  var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fifo-scope-today-yesterday-mtd-20260617-v4';
+  var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbw-fERhLivpvxNTWF9lk5bgqqIFvkxmrg13dXdcjLtwqOv8llRXwYw8hOuANRWkPc06Uw/exec';
 
   // Quick check — warns in browser console if URL not set
   if (!GAS_BACKEND_URL) {
-    console.warn('[FIFO] GAS_BACKEND_URL is not set. Open index.html and replace the placeholder on line 11 with your Apps Script /exec URL.');
+    console.warn('[FEFO] GAS_BACKEND_URL is not set. Open index.html and replace the placeholder on line 11 with your Apps Script /exec URL.');
   }
 </script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FIFO Control Tower — Warehouse Dashboard</title>
-<meta name="description" content="FIFO Violation Monitoring, Prevention & User Compliance Dashboard">
+<title>FEFO Control Tower — Warehouse Dashboard</title>
+<meta name="description" content="FEFO Violation Monitoring, Prevention & User Compliance Dashboard">
 <style>
 /* ================================================
-   FIFO DASHBOARD — main.css
+   FEFO DASHBOARD — main.css
    Base styles, CSS variables, reset, typography
    Optimized for warehouse laptops
    ================================================ */
@@ -471,7 +470,7 @@ select option { background: var(--clr-surface2); color: var(--clr-text); }
 }
 
 /* ================================================
-   FIFO DASHBOARD — dashboard.css
+   FEFO DASHBOARD — dashboard.css
    Layout, sidebar, header, KPIs, tables, tabs
    ================================================ */
 
@@ -1200,7 +1199,7 @@ canvas { max-width: 100%; }
     <div class="login-logo">
       <div class="logo-icon">📦</div>
       <div>
-        <div class="logo-text">FIFO Control Tower</div>
+        <div class="logo-text">FEFO Control Tower</div>
         <div class="logo-sub">Warehouse Operations Dashboard</div>
       </div>
     </div>
@@ -1232,7 +1231,7 @@ canvas { max-width: 100%; }
     <div class="sidebar-brand">
       <div class="brand-icon">📦</div>
       <div>
-        <div class="brand-text">FIFO Tower</div>
+        <div class="brand-text">FEFO Tower</div>
         <div class="brand-sub">Control Dashboard</div>
       </div>
     </div>
@@ -1321,11 +1320,18 @@ canvas { max-width: 100%; }
       <div id="page-home" class="page hidden">
         <div class="section-header" style="margin-bottom:12px;">
           <div class="section-title">Report Scope</div>
-          <div class="section-actions" id="dashboard-scope-actions">
+          <div class="section-actions" id="dashboard-scope-actions" style="flex-wrap:wrap;gap:6px;">
             <button class="btn btn-primary btn-sm" data-dashboard-scope="today" onclick="Dashboard.setScope('today')">Today</button>
             <button class="btn btn-ghost btn-sm" data-dashboard-scope="yesterday" onclick="Dashboard.setScope('yesterday')">Yesterday</button>
             <button class="btn btn-ghost btn-sm" data-dashboard-scope="mtd" onclick="Dashboard.setScope('mtd')">MTD</button>
+            <button class="btn btn-ghost btn-sm" data-dashboard-scope="month" onclick="Dashboard.setScope('month')">📅 Month</button>
+            <button class="btn btn-ghost btn-sm" data-dashboard-scope="custom" onclick="Dashboard.setScope('custom')">Custom</button>
+            <select id="dashboard-month-select" class="hidden" onchange="Dashboard.applyMonthPicker()" style="border:1px solid var(--clr-border);border-radius:6px;padding:4px 8px;font-size:0.8rem;background:var(--clr-surface);color:var(--clr-text);"></select>
           </div>
+        </div>
+        <div id="dashboard-custom-dates" class="table-toolbar hidden" style="margin-bottom:12px;">
+          <input type="date" id="dashboard-date-from" class="btn btn-ghost btn-sm" onchange="Dashboard.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+          <input type="date" id="dashboard-date-to" class="btn btn-ghost btn-sm" onchange="Dashboard.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
         </div>
         <div class="kpi-grid" id="kpi-grid">
           <!-- Populated by dashboard.js -->
@@ -1359,7 +1365,7 @@ canvas { max-width: 100%; }
           </div>
           <div class="card">
             <div class="card-header">
-              <div class="card-title">🏆 FIFO Champions</div>
+              <div class="card-title">🏆 FEFO Champions</div>
               <a href="#" onclick="App.navigate('compliance'); return false;" style="font-size:0.75rem;">View All</a>
             </div>
             <div class="user-rank-list" id="champions-list">
@@ -1405,16 +1411,19 @@ canvas { max-width: 100%; }
       <div id="page-violations" class="page hidden">
         <div class="section-header" style="margin-bottom:12px;">
           <div class="section-title">Report Scope</div>
-          <div class="section-actions" id="violations-scope-actions">
+          <div class="section-actions" id="violations-scope-actions" style="flex-wrap:wrap;gap:6px;">
             <button class="btn btn-primary btn-sm" data-violations-scope="today" onclick="Violations.setScope('today')">Today</button>
             <button class="btn btn-ghost btn-sm" data-violations-scope="yesterday" onclick="Violations.setScope('yesterday')">Yesterday</button>
             <button class="btn btn-ghost btn-sm" data-violations-scope="mtd" onclick="Violations.setScope('mtd')">MTD</button>
+            <button class="btn btn-ghost btn-sm" data-violations-scope="month" onclick="Violations.setScope('month')">📅 Month</button>
+            <button class="btn btn-ghost btn-sm" data-violations-scope="custom" onclick="Violations.setScope('custom')">Custom</button>
+            <select id="violations-month-select" class="hidden" onchange="Violations.applyMonthPicker()" style="border:1px solid var(--clr-border);border-radius:6px;padding:4px 8px;font-size:0.8rem;background:var(--clr-surface);color:var(--clr-text);"></select>
           </div>
         </div>
         <div class="tab-bar">
           <button class="tab-btn active" data-vtab="all" onclick="Violations.switchTab('all')">All Records</button>
           <button class="tab-btn" data-vtab="violations" onclick="Violations.switchTab('violations')">⚠️ Violations</button>
-          <button class="tab-btn" data-vtab="partial" onclick="Violations.switchTab('partial')">🔵 Partial FIFO</button>
+          <button class="tab-btn" data-vtab="partial" onclick="Violations.switchTab('partial')">🔵 Partial FEFO</button>
           <button class="tab-btn" data-vtab="compliant" onclick="Violations.switchTab('compliant')">✅ Compliant</button>
         </div>
 
@@ -1435,6 +1444,14 @@ canvas { max-width: 100%; }
               <option value="MAJOR">Major</option>
               <option value="MINOR">Minor</option>
             </select>
+            <select id="violations-bucket" class="btn btn-ghost btn-sm" onchange="Violations.applyFilters()" style="width:auto; border:1px solid var(--clr-border); padding:5px 10px;">
+              <option value="">All Buckets</option>
+              <option value="3PL">3PL (Rank)</option>
+              <option value="DS">DS (≥45% SL)</option>
+              <option value="B2B">B2B (≥80% SL)</option>
+            </select>
+            <input type="date" id="violations-date-from" class="btn btn-ghost btn-sm hidden" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+            <input type="date" id="violations-date-to" class="btn btn-ghost btn-sm hidden" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
             <div class="table-count" id="violations-count">—</div>
             <div style="display:flex;gap:6px;margin-left:auto;">
               <button class="btn btn-ghost btn-sm" onclick="Exports.violationsCSV()">CSV</button>
@@ -1458,6 +1475,8 @@ canvas { max-width: 100%; }
                   <th class="sortable" onclick="Violations.sort('severity')">Severity <span class="sort-icon">↕</span></th>
                   <th>Status</th>
                   <th>GP Status</th>
+                  <th>Bucket</th>
+                  <th>Shelf Life %</th>
                   <th></th>
                 </tr>
               </thead>
@@ -1508,7 +1527,7 @@ canvas { max-width: 100%; }
             <table class="data-table" id="prevention-table">
               <thead>
                 <tr>
-                  <th>FIFO Rank</th>
+                  <th>FEFO Rank</th>
                   <th class="sortable" onclick="Prevention.sort('sku')">SKU Code <span class="sort-icon">↕</span></th>
                   <th>Item Name</th>
                   <th>Oldest Batch</th>
@@ -1537,11 +1556,18 @@ canvas { max-width: 100%; }
       <div id="page-compliance" class="page hidden">
         <div class="section-header" style="margin-bottom:12px;">
           <div class="section-title">Report Scope</div>
-          <div class="section-actions" id="compliance-scope-actions">
+          <div class="section-actions" id="compliance-scope-actions" style="flex-wrap:wrap;gap:6px;">
             <button class="btn btn-primary btn-sm" data-compliance-scope="today" onclick="Compliance.setScope('today')">Today</button>
             <button class="btn btn-ghost btn-sm" data-compliance-scope="yesterday" onclick="Compliance.setScope('yesterday')">Yesterday</button>
             <button class="btn btn-ghost btn-sm" data-compliance-scope="mtd" onclick="Compliance.setScope('mtd')">MTD</button>
+            <button class="btn btn-ghost btn-sm" data-compliance-scope="month" onclick="Compliance.setScope('month')">📅 Month</button>
+            <button class="btn btn-ghost btn-sm" data-compliance-scope="custom" onclick="Compliance.setScope('custom')">Custom</button>
+            <select id="compliance-month-select" class="hidden" onchange="Compliance.applyMonthPicker()" style="border:1px solid var(--clr-border);border-radius:6px;padding:4px 8px;font-size:0.8rem;background:var(--clr-surface);color:var(--clr-text);"></select>
           </div>
+        </div>
+        <div id="compliance-custom-dates" class="table-toolbar hidden" style="margin-bottom:12px;">
+          <input type="date" id="compliance-date-from" class="btn btn-ghost btn-sm" onchange="Compliance.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+          <input type="date" id="compliance-date-to" class="btn btn-ghost btn-sm" onchange="Compliance.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
         </div>
         <div class="tab-bar">
           <button class="tab-btn active" data-ctab="overview" onclick="Compliance.switchTab('overview')">📊 Overview</button>
@@ -1639,7 +1665,7 @@ canvas { max-width: 100%; }
                 <thead>
                   <tr>
                     <th>User</th><th>Facility</th><th>Total GPs</th>
-                    <th>Violations</th><th>Partial FIFO</th><th>Compliant</th>
+                    <th>Violations</th><th>Partial FEFO</th><th>Compliant</th>
                     <th>Compliance %</th><th>Skipped Qty</th>
                     <th>Loss ₹</th><th>Last Violation</th><th>Level</th>
                   </tr>
@@ -1818,7 +1844,7 @@ canvas { max-width: 100%; }
       <div id="page-settings" class="page hidden">
         <div style="max-width:720px;">
           <div class="card" style="margin-bottom:14px;">
-            <h3 style="margin-bottom:14px;">⚙️ FIFO Engine Settings</h3>
+            <h3 style="margin-bottom:14px;">⚙️ FEFO Engine Settings</h3>
             <div class="setting-row">
               <div class="setting-info">
                 <div class="setting-name">Minimum Inventory Threshold</div>
@@ -1958,7 +1984,7 @@ canvas { max-width: 100%; }
       <div class="table-scroll-x">
         <table class="data-table" id="drilldown-batches-table">
           <thead>
-            <tr><th>FIFO Rank</th><th>Batch Code</th><th>Vendor Batch</th><th>Mfg Date</th><th>Expiry</th><th>Shelf</th><th>Qty</th><th>MRP ₹</th></tr>
+            <tr><th>FEFO Rank</th><th>Batch Code</th><th>Vendor Batch</th><th>Mfg Date</th><th>Expiry</th><th>Shelf</th><th>Qty</th><th>MRP ₹</th></tr>
           </thead>
           <tbody id="drilldown-batches-body"></tbody>
         </table>
@@ -2056,12 +2082,6 @@ const Utils = (() => {
     return parts.y + '-' + parts.m + '-01';
   }
 
-  function yesterdayISO() {
-    var d = new Date();
-    d.setDate(d.getDate() - 1);
-    return kolkataISODate(d);
-  }
-
   function kolkataDateParts(d) {
     var parts = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Kolkata',
@@ -2084,8 +2104,8 @@ const Utils = (() => {
 
   function scopeLabel(scope) {
     if (scope === 'today') return 'Today';
-    if (scope === 'yesterday') return 'Yesterday';
     if (scope === 'mtd') return 'MTD';
+    if (scope === 'custom') return 'Custom';
     return 'All';
   }
 
@@ -2112,12 +2132,12 @@ const Utils = (() => {
 
   function getStatusBadge(status) {
     var s = (status || '').toUpperCase();
-    if (s === 'FIFO VIOLATION')        return '<span class="badge badge-critical">⚠ Violation</span>';
-    if (s === 'PARTIAL FIFO POSSIBLE') return '<span class="badge badge-partial">◑ Partial</span>';
+    if (s === 'FEFO VIOLATION')        return '<span class="badge badge-critical">⚠ Violation</span>';
+    if (s === 'PARTIAL FEFO POSSIBLE') return '<span class="badge badge-partial">◑ Partial</span>';
     if (s === 'COMPLIANT')             return '<span class="badge badge-compliant">✓ Compliant</span>';
     // Legacy values
     if (s === 'VIOLATION')             return '<span class="badge badge-critical">⚠ Violation</span>';
-    if (s === 'PARTIAL FIFO')          return '<span class="badge badge-partial">◑ Partial</span>';
+    if (s === 'PARTIAL FEFO')          return '<span class="badge badge-partial">◑ Partial</span>';
     return '<span class="badge badge-neutral">' + (status || '—') + '</span>';
   }
 
@@ -2243,22 +2263,36 @@ const Utils = (() => {
         reject(new Error('GAS_BACKEND_URL not configured. Open index.html and set the GAS_BACKEND_URL variable.'));
         return;
       }
-      var body = JSON.stringify({ action: fnName, params: params, token: params._token || '' });
-      fetch(gasUrl, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain' },
-        body: body
-      })
-      .then(function(res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-      })
-      .then(function(text) {
-        try { resolve(JSON.parse(text)); }
-        catch(e) { reject(new Error('Bad JSON from backend: ' + text.slice(0,200))); }
-      })
-      .catch(function(err) { reject(err); });
+      // File uploads (fileData param) use XMLHttpRequest POST — survives Apps Script redirect.
+      // All other calls use GET with params in URL (avoids redirect body-loss for non-file calls).
+      var paramsHaveFile = params && params.fileData && params.fileData.length > 100;
+
+      if (paramsHaveFile) {
+        // XHR POST for file uploads — preserves body through redirect
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', gasUrl, true);
+        xhr.setRequestHeader('Content-Type', 'text/plain');
+        xhr.onload = function() {
+          try { resolve(JSON.parse(xhr.responseText)); }
+          catch(e) { reject(new Error('Bad JSON: ' + xhr.responseText.slice(0, 200))); }
+        };
+        xhr.onerror = function() { reject(new Error('Network error on file upload')); };
+        xhr.send(JSON.stringify({ action: fnName, params: params, token: params._token || '' }));
+      } else {
+        // GET for all non-file calls — avoids POST body loss on Apps Script redirect
+        var paramsClean = Object.assign({}, params);
+        delete paramsClean._token;
+        var url = gasUrl
+          + '?action=' + encodeURIComponent(fnName)
+          + '&params=' + encodeURIComponent(JSON.stringify(paramsClean));
+        fetch(url, { method: 'GET', redirect: 'follow' })
+          .then(function(res) { return res.text(); })
+          .then(function(text) {
+            try { resolve(JSON.parse(text)); }
+            catch(e) { reject(new Error('Bad JSON: ' + text.slice(0, 200))); }
+          })
+          .catch(function(err) { reject(err); });
+      }
     });
   }
 
@@ -2281,7 +2315,7 @@ const Utils = (() => {
 
   return {
     fmtNum, fmtCurrency, fmtPct, fmtQty,
-    fmtDate, fmtDateTime, daysFromNow, todayISO, yesterdayISO, monthStartISO, scopeLabel,
+    fmtDate, fmtDateTime, daysFromNow, todayISO, monthStartISO, scopeLabel,
     debounce,
     getSeverityBadge, getStatusBadge, getOffenderBadge, getRiskBadge,
     getComplianceColor, getDaysColor,
@@ -2290,8 +2324,50 @@ const Utils = (() => {
     toast,
     sortBy,
     callGAS,
-    fmtFileSize, escHTML
+    fmtFileSize, escHTML,
+    buildMonthOptions, populateMonthSelect, hideMonthSelect, monthFirstDay
   };
+
+  // ---- MONTH PICKER HELPERS ----
+  function buildMonthOptions() {
+    var options = [];
+    var now = new Date();
+    for (var i = 0; i < 13; i++) {
+      var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      var parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit'
+      }).format(d).split('-');
+      var yr = parts[0], mo = parts[1];
+      var label = new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata', month: 'long', year: 'numeric'
+      }).format(d);
+      options.push({ label: label, value: yr + '-' + mo + '-01' });
+    }
+    return options;
+  }
+
+  function populateMonthSelect(selectId, currentValue) {
+    var el = document.getElementById(selectId);
+    if (!el) return;
+    var options = buildMonthOptions();
+    el.innerHTML = options.map(function(o) {
+      return '<option value="' + o.value + '"' + (o.value === currentValue ? ' selected' : '') + '>' + o.label + '</option>';
+    }).join('');
+    el.classList.remove('hidden');
+  }
+
+  function hideMonthSelect(selectId) {
+    var el = document.getElementById(selectId);
+    if (el) el.classList.add('hidden');
+  }
+
+  function monthFirstDay() {
+    var parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit'
+    }).format(new Date()).split('-');
+    return parts[0] + '-' + parts[1] + '-01';
+  }
+
 })();
 
 
@@ -2646,8 +2722,8 @@ const Charts = (() => {
 const App = (() => {
 
   const PAGE_TITLES = {
-    home:       ['Home', 'FIFO Control Tower'],
-    violations: ['Violations', 'Detected FIFO Issues'],
+    home:       ['Home', 'FEFO Control Tower'],
+    violations: ['Violations', 'Detected FEFO Issues'],
     prevention: ['Prevention Dashboard', 'At-Risk Inventory'],
 
     compliance: ['User Compliance', 'Performance Analytics'],
@@ -2791,34 +2867,12 @@ const App = (() => {
     }
   }
 
-  async function verifyBackendBuild() {
-    try {
-      const result = await api('getBuildInfo', {});
-      var expected = (typeof FRONTEND_BUILD_ID !== 'undefined') ? FRONTEND_BUILD_ID : '';
-      if (!result || !result.success || result.buildId !== expected) {
-        var backendBuild = result && result.buildId ? result.buildId : 'old or unknown';
-        var msg = 'Backend code is not the latest copy. Expected ' + expected + ', got ' + backendBuild + '. Redeploy Backend.gs in Apps Script.';
-        console.warn('[FIFO]', msg, result);
-        Utils.toast(msg, 'danger', 9000);
-        var el = document.getElementById('last-updated-text');
-        if (el) el.textContent = 'Backend old copy';
-      }
-    } catch (err) {
-      var msg = 'Backend version check failed. Redeploy Backend.gs in Apps Script, then refresh this page.';
-      console.warn('[FIFO]', msg, err);
-      Utils.toast(msg, 'danger', 9000);
-      var el = document.getElementById('last-updated-text');
-      if (el) el.textContent = 'Backend not verified';
-    }
-  }
-
   // ---- INIT ----
   function init() {
     updateSyncIndicator();
-    verifyBackendBuild();
   }
 
-  return { navigate, refreshData, openModal, closeModal, toggleSidebar, api, init, verifyBackendBuild };
+  return { navigate, refreshData, openModal, closeModal, toggleSidebar, api, init };
 })();
 
 // ==================== GATEPASS UPLOAD MODULE ====================
@@ -2935,7 +2989,7 @@ const Gatepass = (() => {
   function showResult(r) {
     const el = document.getElementById('gatepass-result');
     el.classList.remove('hidden');
-    el.innerHTML = ("\n      <div class=\"card\" style=\"background:var(--clr-ok-dim);border-color:rgba(63,185,80,0.3);\">\n        <div style=\"font-weight:700;color:var(--clr-ok);margin-bottom:8px;\">✅ Upload Complete</div>\n        <div style=\"display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:0.82rem;\">\n          <div><div class=\"text-muted\">Total Rows</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.totalRows)) + "</div></div>\n          <div><div class=\"text-muted\">Processed</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.processedRows)) + "</div></div>\n          <div><div class=\"text-muted\">Skipped</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.skippedRows)) + "</div></div>\n          <div><div class=\"text-muted\">Violations</div><div style=\"font-weight:700;color:var(--clr-danger);\">" + (Utils.fmtNum(r.violationCount)) + "</div></div>\n          <div><div class=\"text-muted\">Partial FIFO</div><div style=\"font-weight:700;color:var(--clr-info);\">" + (Utils.fmtNum(r.partialCount)) + "</div></div>\n          <div><div class=\"text-muted\">Compliant</div><div style=\"font-weight:700;color:var(--clr-ok);\">" + (Utils.fmtNum(r.compliantCount)) + "</div></div>\n        </div>\n      </div>");
+    el.innerHTML = ("\n      <div class=\"card\" style=\"background:var(--clr-ok-dim);border-color:rgba(63,185,80,0.3);\">\n        <div style=\"font-weight:700;color:var(--clr-ok);margin-bottom:8px;\">✅ Upload Complete</div>\n        <div style=\"display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:0.82rem;\">\n          <div><div class=\"text-muted\">Total Rows</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.totalRows)) + "</div></div>\n          <div><div class=\"text-muted\">Processed</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.processedRows)) + "</div></div>\n          <div><div class=\"text-muted\">Skipped</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.skippedRows)) + "</div></div>\n          <div><div class=\"text-muted\">Violations</div><div style=\"font-weight:700;color:var(--clr-danger);\">" + (Utils.fmtNum(r.violationCount)) + "</div></div>\n          <div><div class=\"text-muted\">Partial FEFO</div><div style=\"font-weight:700;color:var(--clr-info);\">" + (Utils.fmtNum(r.partialCount)) + "</div></div>\n          <div><div class=\"text-muted\">Compliant</div><div style=\"font-weight:700;color:var(--clr-ok);\">" + (Utils.fmtNum(r.compliantCount)) + "</div></div>\n        </div>\n      </div>");
   }
 
   async function loadHistory() {
@@ -3259,7 +3313,7 @@ const Dashboard = (() => {
     try {
       const result = await App.api('getDashboardSummary', getScopeParams());
       if (!result || !result.success) {
-        renderKPIError((result && (result.message || result.error)) || 'Backend returned an empty response.');
+        renderKPIError();
         return;
       }
       _summaryCache = result.data;
@@ -3288,27 +3342,53 @@ const Dashboard = (() => {
       document.getElementById('sync-dot').classList.remove('stale');
 
     } catch(e) {
-      renderKPIError(e && (e.message || e.toString()));
+      renderKPIError();
       console.error('[Dashboard] Load error:', e);
     }
   }
 
   function getScopeParams() {
-    return { scope: _scope };
+    return { scope: _scope, dateFrom: _dateFrom, dateTo: _dateTo };
   }
 
   function setScope(scope) {
     _scope = scope || 'today';
+    Utils.hideMonthSelect('dashboard-month-select');
     if (_scope === 'today') {
       _dateFrom = Utils.todayISO();
-      _dateTo = Utils.todayISO();
+      _dateTo   = Utils.todayISO();
     } else if (_scope === 'yesterday') {
       _dateFrom = Utils.yesterdayISO();
-      _dateTo = Utils.yesterdayISO();
+      _dateTo   = Utils.yesterdayISO();
     } else if (_scope === 'mtd') {
       _dateFrom = Utils.monthStartISO();
-      _dateTo = Utils.todayISO();
+      _dateTo   = Utils.todayISO();
+    } else if (_scope === 'month') {
+      var cur = _dateFrom && _dateFrom.slice(8) === '01' ? _dateFrom : Utils.monthFirstDay();
+      Utils.populateMonthSelect('dashboard-month-select', cur);
+      _dateFrom = cur;
+      _dateTo   = '';
+    } else if (_scope === 'custom') {
+      _dateFrom = document.getElementById('dashboard-date-from').value || Utils.todayISO();
+      _dateTo   = document.getElementById('dashboard-date-to').value || Utils.todayISO();
     }
+    syncScopeUI();
+    load();
+  }
+
+  function applyMonthPicker() {
+    var el = document.getElementById('dashboard-month-select');
+    if (!el) return;
+    _dateFrom = el.value;
+    _dateTo   = '';
+    _scope    = 'month';
+    load();
+  }
+
+  function applyCustomDates() {
+    _scope = 'custom';
+    _dateFrom = document.getElementById('dashboard-date-from').value || '';
+    _dateTo = document.getElementById('dashboard-date-to').value || '';
     syncScopeUI();
     load();
   }
@@ -3319,6 +3399,12 @@ const Dashboard = (() => {
       btn.classList.toggle('btn-primary', active);
       btn.classList.toggle('btn-ghost', !active);
     });
+    var custom = document.getElementById('dashboard-custom-dates');
+    if (custom) custom.classList.toggle('hidden', _scope !== 'custom');
+    var from = document.getElementById('dashboard-date-from');
+    var to = document.getElementById('dashboard-date-to');
+    if (from) from.value = _dateFrom || '';
+    if (to) to.value = _dateTo || '';
   }
 
   // ---- KPI CARDS ----
@@ -3328,15 +3414,8 @@ const Dashboard = (() => {
     grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:32px;\">\n        <div class=\"spinner spinner-lg\" style=\"margin:0 auto 10px;\"></div>\n        <div class=\"text-muted\">Loading dashboard…</div>\n      </div>");
   }
 
-  function renderKPIError(message) {
+  function renderKPIError() {
     const grid = document.getElementById('kpi-grid');
-    var detail = message ? '<div class="text-muted" style="font-size:0.78rem;margin:8px auto 12px;max-width:720px;white-space:normal;">' + Utils.escHTML(message) + '</div>' : '';
-    if (grid && detail) {
-      setTimeout(function() {
-        var host = grid.querySelector('.kpi-card');
-        if (host) host.insertAdjacentHTML('beforeend', detail);
-      }, 0);
-    }
     if (grid) grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:24px;\">\n        <div style=\"color:var(--clr-danger);margin-bottom:6px;\">⚠️ Failed to load dashboard data</div>\n        <button class=\"btn btn-ghost btn-sm\" onclick=\"Dashboard.load()\">Retry</button>\n      </div>");
   }
 
@@ -3355,19 +3434,19 @@ const Dashboard = (() => {
         type: 'info'
       },
       {
-        label: 'FIFO Violations', icon: '⚠️',
+        label: 'FEFO Violations', icon: '⚠️',
         value: Utils.fmtNum(data.fifoViolations),
         sub: Utils.fmtNum(data.criticalViolations) + ' critical',
         type: 'danger'
       },
       {
-        label: 'Partial FIFO Cases', icon: '◑',
+        label: 'Partial FEFO Cases', icon: '◑',
         value: Utils.fmtNum(data.partialFifoCases),
         sub: 'Partial compliance',
         type: 'warn'
       },
       {
-        label: 'FIFO Compliance', icon: '📊',
+        label: 'FEFO Compliance', icon: '📊',
         value: Utils.fmtPct(compliance),
         sub: 'Overall rate',
         type: compColor
@@ -3403,7 +3482,7 @@ const Dashboard = (() => {
         type: 'danger'
       },
       {
-        label: 'FIFO Champions', icon: '🏆',
+        label: 'FEFO Champions', icon: '🏆',
         value: Utils.fmtNum(data.fifoChampions),
         sub: '≥50 GPs, >98% compliant',
         type: 'purple'
@@ -3507,7 +3586,7 @@ const Dashboard = (() => {
     Exports.facilitySummaryCSV();
   }
 
-  return { load, setScope, getScopeParams, exportFacilitySummary };
+  return { load, setScope, applyMonthPicker, applyCustomDates, getScopeParams, exportFacilitySummary };
 })();
 
 
@@ -3516,13 +3595,20 @@ const Dashboard = (() => {
    violations.js — Violations Tab
    ================================================ */
 
-const Violations = (() => {
+function getBucketBadgeClass(bucket) {
+    if (bucket === 'DS')  return 'badge-info';
+    if (bucket === 'B2B') return 'badge-purple';
+    return 'badge-neutral';
+  }
+
+  const Violations = (() => {
 
   const PAGE_SIZE = 50;
   let _state = {
     page: 1, total: 0,
     tab: 'all',
-    search: '', facility: '', severity: '', scope: 'today', dateFrom: Utils.todayISO(), dateTo: Utils.todayISO(),
+    search: '', facility: '', severity: '', bucket: '',
+    scope: 'today', dateFrom: Utils.todayISO(), dateTo: Utils.todayISO(),
     sortCol: 'date', sortDir: 'desc'
   };
 
@@ -3547,15 +3633,16 @@ const Violations = (() => {
 
     try {
       const params = {
-        page: _state.page,
+        page:     _state.page,
         pageSize: PAGE_SIZE,
-        tab: _state.tab,
-        search: _state.search,
+        tab:      _state.tab,
+        search:   _state.search,
         facility: _state.facility,
         severity: _state.severity,
-        scope: _state.scope,
-        sortCol: _state.sortCol,
-        sortDir: _state.sortDir
+        bucket:   _state.bucket || '',
+        scope:    _state.scope,
+        sortCol:  _state.sortCol,
+        sortDir:  _state.sortDir
       };
 
       const result = await App.api('getViolations', params);
@@ -3608,6 +3695,8 @@ const Violations = (() => {
         '<td>' + Utils.getSeverityBadge(v.severity) + '</td>' +
         '<td>' + Utils.getStatusBadge(v.status) + '</td>' +
         '<td>' + Utils.escHTML(v.gpStatus || '') + '</td>' +
+        '<td><span class="badge ' + getBucketBadgeClass(v.bucket) + '">' + Utils.escHTML(v.bucket || '3PL') + '</span></td>' +
+        '<td class="td-right">' + (v.shelfLifePct ? parseFloat(v.shelfLifePct).toFixed(1) + '%' : '—') + '</td>' +
         '<td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();Violations.openDrilldown(\'' + Utils.escHTML(v.id||'') + '\')">Detail</button></td>' +
         '</tr>';
     }).join('');
@@ -3666,7 +3755,7 @@ const Violations = (() => {
       { label: 'Mfg Date (Dispatched)',value: Utils.fmtDate(d.mfgDate) || '—' },
       { label: 'Expiry (Dispatched)',  value: Utils.fmtDate(d.expiryDate) || '—', color: 'var(--clr-warn)' },
       { label: 'Dispatch Qty',         value: Utils.fmtNum(d.dispatchedQty || d.qty || 0) },
-      { label: 'FIFO Rank',            value: d.fifoRank || '—' },
+      { label: 'FEFO Rank',            value: d.fifoRank || '—' },
       { label: 'Older Batch Count',    value: Utils.fmtNum(d.olderBatchCount) },
       { label: 'Older Inv Qty',        value: Utils.fmtNum(d.olderInventoryQty), color: 'var(--clr-warn)' },
       { label: 'Severity',             html: Utils.getSeverityBadge(d.severity) },
@@ -3712,7 +3801,11 @@ const Violations = (() => {
   function applyFilters() {
     _state.facility = document.getElementById('violations-facility').value;
     _state.severity  = document.getElementById('violations-severity').value;
-    applyScopeDates();
+    var bucketEl = document.getElementById('violations-bucket');
+    _state.bucket = bucketEl ? bucketEl.value : '';
+    _state.dateFrom  = document.getElementById('violations-date-from').value;
+    _state.dateTo    = document.getElementById('violations-date-to').value;
+    if (_state.scope !== 'custom') applyScopeDates();
     _state.page = 1;
     syncScopeUI();
     fetchData();
@@ -3721,21 +3814,48 @@ const Violations = (() => {
   function applyScopeDates() {
     if (_state.scope === 'today') {
       _state.dateFrom = Utils.todayISO();
-      _state.dateTo = Utils.todayISO();
+      _state.dateTo   = Utils.todayISO();
     } else if (_state.scope === 'yesterday') {
       _state.dateFrom = Utils.yesterdayISO();
-      _state.dateTo = Utils.yesterdayISO();
+      _state.dateTo   = Utils.yesterdayISO();
     } else if (_state.scope === 'mtd') {
       _state.dateFrom = Utils.monthStartISO();
-      _state.dateTo = Utils.todayISO();
+      _state.dateTo   = Utils.todayISO();
+    } else if (_state.scope === 'month') {
+      if (!_state.dateFrom || _state.dateFrom.slice(8) !== '01') {
+        _state.dateFrom = Utils.monthFirstDay();
+      }
+      _state.dateTo = ''; // backend computes last day
     }
+    // custom: dateFrom/dateTo already set from date inputs
   }
 
   function setScope(scope) {
     _state.scope = scope || 'today';
-    applyScopeDates();
+    Utils.hideMonthSelect('violations-month-select');
+    if (_state.scope === 'month') {
+      var cur = _state.dateFrom && _state.dateFrom.slice(8) === '01' ? _state.dateFrom : Utils.monthFirstDay();
+      Utils.populateMonthSelect('violations-month-select', cur);
+      _state.dateFrom = cur;
+      _state.dateTo   = '';
+    } else if (_state.scope !== 'custom') {
+      applyScopeDates();
+    } else {
+      _state.dateFrom = document.getElementById('violations-date-from').value || _state.dateFrom || Utils.todayISO();
+      _state.dateTo   = document.getElementById('violations-date-to').value   || _state.dateTo   || Utils.todayISO();
+    }
     _state.page = 1;
     syncScopeUI();
+    fetchData();
+  }
+
+  function applyMonthPicker() {
+    var el = document.getElementById('violations-month-select');
+    if (!el) return;
+    _state.dateFrom = el.value;
+    _state.dateTo   = '';
+    _state.scope    = 'month';
+    _state.page     = 1;
     fetchData();
   }
 
@@ -3745,18 +3865,32 @@ const Violations = (() => {
       btn.classList.toggle('btn-primary', active);
       btn.classList.toggle('btn-ghost', !active);
     });
+    var from = document.getElementById('violations-date-from');
+    var to = document.getElementById('violations-date-to');
+    if (from) {
+      from.classList.toggle('hidden', _state.scope !== 'custom');
+      from.style.display = _state.scope === 'custom' ? 'inline-flex' : 'none';
+      from.value = _state.dateFrom || '';
+    }
+    if (to) {
+      to.classList.toggle('hidden', _state.scope !== 'custom');
+      to.style.display = _state.scope === 'custom' ? 'inline-flex' : 'none';
+      to.value = _state.dateTo || '';
+    }
   }
 
   function getExportParams(limit) {
     var status = '';
-    if (_state.tab === 'violations') status = 'FIFO VIOLATION';
-    if (_state.tab === 'partial') status = 'PARTIAL FIFO POSSIBLE';
+    if (_state.tab === 'violations') status = 'FEFO VIOLATION';
+    if (_state.tab === 'partial') status = 'PARTIAL FEFO POSSIBLE';
     if (_state.tab === 'compliant') status = 'COMPLIANT';
     return {
       limit: limit || 10000,
       facility: _state.facility,
       severity: _state.severity,
       scope: _state.scope,
+      dateFrom: _state.dateFrom,
+      dateTo: _state.dateTo,
       status: status
     };
   }
@@ -3774,7 +3908,7 @@ const Violations = (() => {
 
   function _setPage(p) { _state.page = p; fetchData(); }
 
-  return { load, switchTab, onSearch, applyFilters, setScope, getExportParams, sort, openDrilldown, _setPage };
+  return { load, switchTab, onSearch, applyFilters, setScope, applyMonthPicker, applyCustomRange: applyFilters, getExportParams, sort, openDrilldown, _setPage };
 })();
 
 
@@ -3899,22 +4033,50 @@ const Compliance = (() => {
   }
 
   function getScopeParams() {
-    return { scope: _scope };
+    return { scope: _scope, dateFrom: _dateFrom, dateTo: _dateTo };
   }
 
   function setScope(scope) {
     _scope = scope || 'today';
+    Utils.hideMonthSelect('compliance-month-select');
     if (_scope === 'today') {
       _dateFrom = Utils.todayISO();
-      _dateTo = Utils.todayISO();
+      _dateTo   = Utils.todayISO();
     } else if (_scope === 'yesterday') {
       _dateFrom = Utils.yesterdayISO();
-      _dateTo = Utils.yesterdayISO();
+      _dateTo   = Utils.yesterdayISO();
     } else if (_scope === 'mtd') {
       _dateFrom = Utils.monthStartISO();
-      _dateTo = Utils.todayISO();
+      _dateTo   = Utils.todayISO();
+    } else if (_scope === 'month') {
+      var cur = _dateFrom && _dateFrom.slice(8) === '01' ? _dateFrom : Utils.monthFirstDay();
+      Utils.populateMonthSelect('compliance-month-select', cur);
+      _dateFrom = cur;
+      _dateTo   = '';
+    } else if (_scope === 'custom') {
+      _dateFrom = document.getElementById('compliance-date-from').value || Utils.todayISO();
+      _dateTo   = document.getElementById('compliance-date-to').value   || Utils.todayISO();
     }
     _rawData = null;
+    syncScopeUI();
+    fetchAll();
+  }
+
+  function applyMonthPicker() {
+    var el = document.getElementById('compliance-month-select');
+    if (!el) return;
+    _dateFrom = el.value;
+    _dateTo   = '';
+    _scope    = 'month';
+    _rawData  = null;
+    fetchAll();
+  }
+
+  function applyCustomDates() {
+    _scope = 'custom';
+    _dateFrom = document.getElementById('compliance-date-from').value || '';
+    _dateTo   = document.getElementById('compliance-date-to').value || '';
+    _rawData  = null;
     syncScopeUI();
     fetchAll();
   }
@@ -3925,6 +4087,12 @@ const Compliance = (() => {
       btn.classList.toggle('btn-primary', active);
       btn.classList.toggle('btn-ghost', !active);
     });
+    var custom = document.getElementById('compliance-custom-dates');
+    if (custom) custom.classList.toggle('hidden', _scope !== 'custom');
+    var from = document.getElementById('compliance-date-from');
+    var to = document.getElementById('compliance-date-to');
+    if (from) from.value = _dateFrom || '';
+    if (to) to.value = _dateTo || '';
   }
 
   function renderCurrentTab() {
@@ -4010,7 +4178,7 @@ const Compliance = (() => {
     const tbody = document.getElementById('champions-body');
     if (!tbody) return;
     if (!champs.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:32px;"><div class="empty-icon">🏆</div><div class="text-muted" style="margin-top:8px;">No FIFO champions yet.<br><small>Need 50+ GPs with >98% compliance</small></div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:32px;"><div class="empty-icon">🏆</div><div class="text-muted" style="margin-top:8px;">No FEFO champions yet.<br><small>Need 50+ GPs with >98% compliance</small></div></td></tr>';
       return;
     }
     tbody.innerHTML = champs.map((u,i) => ("\n      <tr>\n        <td class=\"td-center\">" + (i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)) + "</td>\n        <td style=\"font-weight:700;color:var(--clr-purple);\">" + (Utils.escHTML(u.userName||u.email)) + "</td>\n        <td>" + (Utils.escHTML(u.facility||'')) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.totalGps)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.violations)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-ok);font-weight:700;\">" + (Utils.fmtPct(u.compliancePct)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.skippedQty)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtCurrency(u.lossOpportunity)) + "</td>\n      </tr>")).join('');
@@ -4049,7 +4217,7 @@ const Compliance = (() => {
   function _setOffPage(p) { _offPage = p; renderOffenders(); }
   function _setAllPage(p) { _allPage = p; renderAllUsers(); }
 
-  return { load, switchTab, setScope, getScopeParams, searchOffenders, searchAllUsers, applyAllUsersFilter, _setOffPage, _setAllPage };
+  return { load, switchTab, setScope, applyMonthPicker, applyCustomDates, getScopeParams, searchOffenders, searchAllUsers, applyAllUsersFilter, _setOffPage, _setAllPage };
 })();
 
 
@@ -4122,7 +4290,7 @@ const Exports = (() => {
 
   // ---- PDF via PRINT ----
   function printTable(title, headers, rows, filename) {
-    const html = ("\n      <!DOCTYPE html><html>\n      <head>\n        <title>" + (title) + "</title>\n        <style>\n          body{font-family:Arial,sans-serif;font-size:11px;margin:20px;color:#111;}\n          h1{font-size:15px;margin-bottom:4px;}\n          .meta{font-size:10px;color:#666;margin-bottom:14px;}\n          table{width:100%;border-collapse:collapse;}\n          th{background:#1a1a2e;color:#fff;padding:6px 8px;text-align:left;font-size:10px;}\n          td{padding:5px 8px;border-bottom:1px solid #e0e0e0;font-size:10px;}\n          tr:nth-child(even) td{background:#f7f7f7;}\n          @media print{@page{size:A4 landscape;margin:10mm;}}\n        </style>\n      </head>\n      <body>\n        <h1>" + (title) + "</h1>\n        <div class=\"meta\">Generated: " + (new Date().toLocaleString('en-IN')) + " | FIFO Control Tower</div>\n        <table>\n          <thead><tr>" + (headers.map(h=>("<th>" + (h) + "</th>")).join('')) + "</tr></thead>\n          <tbody>" + (rows.map(r=>("<tr>" + (r.map(c=>("<td>" + (c===null||c===undefined?'—':c) + "</td>")).join('')) + "</tr>")).join('')) + "</tbody>\n        </table>\n      </body></html>");
+    const html = ("\n      <!DOCTYPE html><html>\n      <head>\n        <title>" + (title) + "</title>\n        <style>\n          body{font-family:Arial,sans-serif;font-size:11px;margin:20px;color:#111;}\n          h1{font-size:15px;margin-bottom:4px;}\n          .meta{font-size:10px;color:#666;margin-bottom:14px;}\n          table{width:100%;border-collapse:collapse;}\n          th{background:#1a1a2e;color:#fff;padding:6px 8px;text-align:left;font-size:10px;}\n          td{padding:5px 8px;border-bottom:1px solid #e0e0e0;font-size:10px;}\n          tr:nth-child(even) td{background:#f7f7f7;}\n          @media print{@page{size:A4 landscape;margin:10mm;}}\n        </style>\n      </head>\n      <body>\n        <h1>" + (title) + "</h1>\n        <div class=\"meta\">Generated: " + (new Date().toLocaleString('en-IN')) + " | FEFO Control Tower</div>\n        <table>\n          <thead><tr>" + (headers.map(h=>("<th>" + (h) + "</th>")).join('')) + "</tr></thead>\n          <tbody>" + (rows.map(r=>("<tr>" + (r.map(c=>("<td>" + (c===null||c===undefined?'—':c) + "</td>")).join('')) + "</tr>")).join('')) + "</tbody>\n        </table>\n      </body></html>");
     const win = window.open('', '_blank');
     if (!win) { Utils.toast('Pop-up blocked. Allow pop-ups for PDF export.', 'warn'); return; }
     win.document.write(html);
@@ -4138,9 +4306,9 @@ const Exports = (() => {
       const exportParams = Object.assign({ format: 'csv' }, Violations.getExportParams());
       const result = await App.api('exportViolations', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (₹)','FIFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
+      const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (₹)','FEFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
       const rows = result.rows || [];
-      downloadCSV(toCSV(rows, headers), 'FIFO_Violations_' + Utils.scopeLabel(exportParams.scope));
+      downloadCSV(toCSV(rows, headers), 'FEFO_Violations_' + Utils.scopeLabel(exportParams.scope));
       Utils.toast('Violations CSV downloaded.', 'ok');
     } catch(e) { Utils.toast('Export error.', 'danger'); console.error(e); }
   }
@@ -4151,9 +4319,9 @@ const Exports = (() => {
       const exportParams = Object.assign({ format: 'excel' }, Violations.getExportParams());
       const result = await App.api('exportViolations', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (₹)','FIFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
+      const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (₹)','FEFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
       const rows = result.rows || [];
-      await downloadExcel([].concat([headers], rows), 'Violations', 'FIFO_Violations_' + Utils.scopeLabel(exportParams.scope));
+      await downloadExcel([].concat([headers], rows), 'Violations', 'FEFO_Violations_' + Utils.scopeLabel(exportParams.scope));
       Utils.toast('Violations Excel downloaded.', 'ok');
     } catch(e) { Utils.toast('Excel export error.', 'danger'); console.error(e); }
   }
@@ -4164,10 +4332,10 @@ const Exports = (() => {
       const exportParams = Object.assign({ format: 'pdf' }, Violations.getExportParams(500));
       const result = await App.api('exportViolations', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      // Backend rows are arrays: [Date, GPNumber, User, UserEmail, Facility, SKUCode, ItemName, BatchCode, VendorBatch, DispatchedQty, Shelf, Status, Severity, OlderBatchCount, OlderInventoryQty, LossOpp, FIFORank, MfgDate, ExpiryDate, ToParty, UploadID]
+      // Backend rows are arrays: [Date, GPNumber, User, UserEmail, Facility, SKUCode, ItemName, BatchCode, VendorBatch, DispatchedQty, Shelf, Status, Severity, OlderBatchCount, OlderInventoryQty, LossOpp, FEFORank, MfgDate, ExpiryDate, ToParty, UploadID]
       const headers = ['Date','GP Number','User','Facility','Severity','Skipped Qty','Loss Opp (₹)','Status'];
       const rows = (result.rows||[]).map(r => [r[0], r[1], r[2], r[4], r[12], r[14], r[15], r[11]]);
-      printTable('FIFO Violations Report - ' + Utils.scopeLabel(exportParams.scope), headers, rows, 'FIFO_Violations');
+      printTable('FEFO Violations Report - ' + Utils.scopeLabel(exportParams.scope), headers, rows, 'FEFO_Violations');
     } catch(e) { Utils.toast('PDF export error.', 'danger'); console.error(e); }
   }
 
@@ -4191,7 +4359,7 @@ const Exports = (() => {
       const exportParams = Compliance.getScopeParams ? Compliance.getScopeParams() : {};
       const result = await App.api('exportCompliance', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FIFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (₹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
+      const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FEFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (₹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
       const rows = result.rows || [];
       downloadCSV(toCSV(rows, headers), 'Financial_Impact');
       Utils.toast('Financial CSV downloaded.', 'ok');
@@ -4204,7 +4372,7 @@ const Exports = (() => {
     try {
       const result = await App.api('exportCompliance', {});
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FIFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (₹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
+      const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FEFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (₹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
       const rows = result.rows || [];
       downloadCSV(toCSV(rows, headers), 'User_Compliance_' + Utils.scopeLabel(exportParams.scope));
       Utils.toast('Compliance CSV downloaded.', 'ok');
@@ -4218,7 +4386,7 @@ const Exports = (() => {
 
   // ---- FACILITY SUMMARY ----
   function facilitySummaryCSV(facilities) {
-    const headers = ['Facility','Compliance %','Total GPs','Violations','Partial FIFO','Skipped Qty','Loss ₹'];
+    const headers = ['Facility','Compliance %','Total GPs','Violations','Partial FEFO','Skipped Qty','Loss ₹'];
     const rows = facilities.map(f => [f.facility, f.compliancePct, f.totalGps, f.violations, f.partialFifo, f.skippedQty, f.lossOpportunity]);
     downloadCSV(toCSV(rows, headers), 'Facility_Summary');
     Utils.toast('Facility summary CSV downloaded.', 'ok');
