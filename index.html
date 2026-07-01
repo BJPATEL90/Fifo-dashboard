@@ -3318,8 +3318,10 @@ const Dashboard = (() => {
     renderKPILoading();
     try {
       const result = await App.api('getDashboardSummary', getScopeParams());
+      console.log('[Dashboard] raw result:', JSON.stringify(result).slice(0, 300));
       if (!result || !result.success) {
-        renderKPIError();
+        var errMsg = (result && (result.message || result.error)) || 'Backend returned no data.';
+        renderKPIError(errMsg);
         return;
       }
       _summaryCache = result.data;
@@ -3348,7 +3350,7 @@ const Dashboard = (() => {
       document.getElementById('sync-dot').classList.remove('stale');
 
     } catch(e) {
-      renderKPIError();
+      renderKPIError(e && e.message ? e.message : String(e));
       console.error('[Dashboard] Load error:', e);
     }
   }
@@ -3420,9 +3422,13 @@ const Dashboard = (() => {
     grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:32px;\">\n        <div class=\"spinner spinner-lg\" style=\"margin:0 auto 10px;\"></div>\n        <div class=\"text-muted\">Loading dashboard…</div>\n      </div>");
   }
 
-  function renderKPIError() {
+  function renderKPIError(msg) {
     const grid = document.getElementById('kpi-grid');
-    if (grid) grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:24px;\">\n        <div style=\"color:var(--clr-danger);margin-bottom:6px;\">⚠️ Failed to load dashboard data</div>\n        <button class=\"btn btn-ghost btn-sm\" onclick=\"Dashboard.load()\">Retry</button>\n      </div>");
+    var detail = msg ? '<div style="font-size:0.75rem;color:var(--clr-text-muted);margin:6px 0 10px;max-width:500px;">' + msg + '</div>' : '';
+    if (grid) grid.innerHTML = '<div class="kpi-card" style="grid-column:1/-1;text-align:center;padding:24px;">' +
+      '<div style="color:var(--clr-danger);margin-bottom:6px;">⚠️ Failed to load dashboard data</div>' +
+      detail +
+      '<button class="btn btn-ghost btn-sm" onclick="Dashboard.load()">Retry</button></div>';
   }
 
   function renderKPIs(data) {
