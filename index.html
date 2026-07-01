@@ -1,27 +1,26 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <script>
   // =====================================================================
-  // STEP 1 â€” Paste your Apps Script /exec URL below (between the quotes).
-  // Apps Script â†’ Deploy â†’ Manage Deployments â†’ copy the /exec URL.
+  // STEP 1 — Paste your Apps Script /exec URL below (between the quotes).
+  // Apps Script → Deploy → Manage Deployments → copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fifo-scope-today-yesterday-mtd-20260617-v4';
 
-  // Quick check â€” warns in browser console if URL not set
+  // Quick check — warns in browser console if URL not set
   if (!GAS_BACKEND_URL) {
-    console.warn('[FIFO] GAS_BACKEND_URL is not set. Open index.html and replace the placeholder on line 11 with your Apps Script /exec URL.');
+    console.warn('[FEFO] GAS_BACKEND_URL is not set. Open index.html and replace the placeholder on line 11 with your Apps Script /exec URL.');
   }
 </script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FIFO Control Tower â€” Warehouse Dashboard</title>
-<meta name="description" content="FIFO Violation Monitoring, Prevention & User Compliance Dashboard">
+<title>FEFO Control Tower — Warehouse Dashboard</title>
+<meta name="description" content="FEFO Violation Monitoring, Prevention & User Compliance Dashboard">
 <style>
 /* ================================================
-   FIFO DASHBOARD â€” main.css
+   FEFO DASHBOARD — main.css
    Base styles, CSS variables, reset, typography
    Optimized for warehouse laptops
    ================================================ */
@@ -471,7 +470,7 @@ select option { background: var(--clr-surface2); color: var(--clr-text); }
 }
 
 /* ================================================
-   FIFO DASHBOARD â€” dashboard.css
+   FEFO DASHBOARD — dashboard.css
    Layout, sidebar, header, KPIs, tables, tabs
    ================================================ */
 
@@ -1178,7 +1177,7 @@ canvas { max-width: 100%; }
   .data-table th, .data-table td { padding: 7px 8px; }
 }
 
-/* Sidebar â€” white background, dark text */
+/* Sidebar — white background, dark text */
 .sidebar .nav-item { color: #3d4451 !important; }
 .sidebar .nav-item:hover { color: #1a1d23 !important; background: #f0f2f5 !important; }
 .sidebar .nav-item.active { color: #e86c1a !important; background: rgba(232,108,26,0.1) !important; font-weight: 600; }
@@ -1198,9 +1197,9 @@ canvas { max-width: 100%; }
 <div id="login-page">
   <div class="login-box">
     <div class="login-logo">
-      <div class="logo-icon">ðŸ“¦</div>
+      <div class="logo-icon">📦</div>
       <div>
-        <div class="logo-text">FIFO Control Tower</div>
+        <div class="logo-text">FEFO Control Tower</div>
         <div class="logo-sub">Warehouse Operations Dashboard</div>
       </div>
     </div>
@@ -1230,9 +1229,9 @@ canvas { max-width: 100%; }
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <div class="brand-icon">ðŸ“¦</div>
+      <div class="brand-icon">📦</div>
       <div>
-        <div class="brand-text">FIFO Tower</div>
+        <div class="brand-text">FEFO Tower</div>
         <div class="brand-sub">Control Dashboard</div>
       </div>
     </div>
@@ -1241,44 +1240,44 @@ canvas { max-width: 100%; }
       <div class="nav-section">
         <div class="nav-section-title">Overview</div>
         <div class="nav-item active" data-page="home" onclick="App.navigate('home')">
-          <span class="nav-icon">ðŸ </span> Home
+          <span class="nav-icon">🏠</span> Home
         </div>
       </div>
 
       <div class="nav-section">
         <div class="nav-section-title">Analysis</div>
         <div class="nav-item" data-page="violations" onclick="App.navigate('violations')">
-          <span class="nav-icon">âš ï¸</span> Violations
+          <span class="nav-icon">⚠️</span> Violations
           <span class="nav-badge hidden" id="nav-badge-violations">0</span>
         </div>
         <div class="nav-item" data-page="prevention" onclick="App.navigate('prevention')">
-          <span class="nav-icon">ðŸ›¡ï¸</span> Prevention
+          <span class="nav-icon">🛡️</span> Prevention
         </div>
         <div class="nav-item" data-page="compliance" onclick="App.navigate('compliance')">
-          <span class="nav-icon">ðŸ‘¤</span> User Compliance
+          <span class="nav-icon">👤</span> User Compliance
         </div>
       </div>
 
       <div class="nav-section">
         <div class="nav-section-title">Operations</div>
         <div class="nav-item" data-page="gatepass" onclick="App.navigate('gatepass')">
-          <span class="nav-icon">ðŸ“¤</span> Upload Gatepass
+          <span class="nav-icon">📤</span> Upload Gatepass
         </div>
         <div class="nav-item" data-page="inventory" onclick="App.navigate('inventory')">
-          <span class="nav-icon">ðŸ—‚ï¸</span> Inventory Import
+          <span class="nav-icon">🗂️</span> Inventory Import
         </div>
       </div>
 
       <div class="nav-section">
         <div class="nav-section-title">System</div>
         <div class="nav-item" data-page="settings" onclick="App.navigate('settings')" id="nav-settings">
-          <span class="nav-icon">âš™ï¸</span> Settings
+          <span class="nav-icon">⚙️</span> Settings
         </div>
         <div class="nav-item" data-page="audit" onclick="App.navigate('audit')" id="nav-audit">
-          <span class="nav-icon">ðŸ“‹</span> Audit Log
+          <span class="nav-icon">📋</span> Audit Log
         </div>
         <div class="nav-item" onclick="Auth.logout()">
-          <span class="nav-icon">ðŸšª</span> Sign Out
+          <span class="nav-icon">🚪</span> Sign Out
         </div>
       </div>
     </nav>
@@ -1291,7 +1290,7 @@ canvas { max-width: 100%; }
           <div class="user-role" id="user-role-display">Operator</div>
         </div>
       </div>
-      <div class="text-dim" style="font-size:0.65rem;">v1.0.0 Â· Google Apps Script</div>
+      <div class="text-dim" style="font-size:0.65rem;">v1.0.0 · Google Apps Script</div>
     </div>
   </aside>
 
@@ -1300,17 +1299,17 @@ canvas { max-width: 100%; }
 
     <!-- TOPBAR -->
     <div class="topbar">
-      <button class="btn btn-icon mobile-menu-btn" onclick="App.toggleSidebar()">â˜°</button>
+      <button class="btn btn-icon mobile-menu-btn" onclick="App.toggleSidebar()">☰</button>
       <div class="topbar-title" id="topbar-title">
         Home
         <span class="topbar-sub" id="topbar-sub"></span>
       </div>
       <div class="last-updated" id="last-updated-indicator">
         <span class="sync-dot" id="sync-dot"></span>
-        <span id="last-updated-text">Loadingâ€¦</span>
+        <span id="last-updated-text">Loading…</span>
       </div>
       <button class="btn btn-ghost btn-sm" onclick="App.refreshData()" id="refresh-btn" title="Refresh Data">
-        ðŸ”„
+        🔄
       </button>
     </div>
 
@@ -1321,23 +1320,30 @@ canvas { max-width: 100%; }
       <div id="page-home" class="page hidden">
         <div class="section-header" style="margin-bottom:12px;">
           <div class="section-title">Report Scope</div>
-          <div class="section-actions" id="dashboard-scope-actions">
+          <div class="section-actions" id="dashboard-scope-actions" style="flex-wrap:wrap;gap:6px;">
             <button class="btn btn-primary btn-sm" data-dashboard-scope="today" onclick="Dashboard.setScope('today')">Today</button>
             <button class="btn btn-ghost btn-sm" data-dashboard-scope="yesterday" onclick="Dashboard.setScope('yesterday')">Yesterday</button>
             <button class="btn btn-ghost btn-sm" data-dashboard-scope="mtd" onclick="Dashboard.setScope('mtd')">MTD</button>
+            <button class="btn btn-ghost btn-sm" data-dashboard-scope="month" onclick="Dashboard.setScope('month')">📅 Month</button>
+            <button class="btn btn-ghost btn-sm" data-dashboard-scope="custom" onclick="Dashboard.setScope('custom')">Custom</button>
+            <select id="dashboard-month-select" class="hidden" onchange="Dashboard.applyMonthPicker()" style="border:1px solid var(--clr-border);border-radius:6px;padding:4px 8px;font-size:0.8rem;background:var(--clr-surface);color:var(--clr-text);"></select>
           </div>
+        </div>
+        <div id="dashboard-custom-dates" class="table-toolbar hidden" style="margin-bottom:12px;">
+          <input type="date" id="dashboard-date-from" class="btn btn-ghost btn-sm" onchange="Dashboard.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+          <input type="date" id="dashboard-date-to" class="btn btn-ghost btn-sm" onchange="Dashboard.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
         </div>
         <div class="kpi-grid" id="kpi-grid">
           <!-- Populated by dashboard.js -->
           <div class="kpi-card" style="grid-column:1/-1; text-align:center; padding:32px;">
             <div class="spinner spinner-lg" style="margin:0 auto 10px;"></div>
-            <div class="text-muted">Loading dashboardâ€¦</div>
+            <div class="text-muted">Loading dashboard…</div>
           </div>
         </div>
 
         <!-- Facility Compliance -->
         <div class="section-header">
-          <div class="section-title">ðŸ­ Facility Compliance</div>
+          <div class="section-title">🏭 Facility Compliance</div>
           <div class="section-actions">
             <button class="btn btn-ghost btn-sm" onclick="Dashboard.exportFacilitySummary()">Export</button>
           </div>
@@ -1350,27 +1356,27 @@ canvas { max-width: 100%; }
         <div class="two-col" style="margin-bottom:18px;">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">âš ï¸ Top Violators (30 days)</div>
+              <div class="card-title">⚠️ Top Violators (30 days)</div>
               <a href="#" onclick="App.navigate('compliance'); return false;" style="font-size:0.75rem;">View All</a>
             </div>
             <div class="user-rank-list" id="top-violators-list">
-              <div class="text-muted text-center" style="padding:20px;">Loadingâ€¦</div>
+              <div class="text-muted text-center" style="padding:20px;">Loading…</div>
             </div>
           </div>
           <div class="card">
             <div class="card-header">
-              <div class="card-title">ðŸ† FIFO Champions</div>
+              <div class="card-title">🏆 FEFO Champions</div>
               <a href="#" onclick="App.navigate('compliance'); return false;" style="font-size:0.75rem;">View All</a>
             </div>
             <div class="user-rank-list" id="champions-list">
-              <div class="text-muted text-center" style="padding:20px;">Loadingâ€¦</div>
+              <div class="text-muted text-center" style="padding:20px;">Loading…</div>
             </div>
           </div>
         </div>
 
         <!-- Expiry Exposure -->
         <div class="section-header">
-          <div class="section-title">â° Expiry Exposure</div>
+          <div class="section-title">⏰ Expiry Exposure</div>
         </div>
         <div class="expiry-buckets" id="expiry-buckets" style="margin-bottom:18px;">
           <!-- Populated dynamically -->
@@ -1378,9 +1384,9 @@ canvas { max-width: 100%; }
 
         <!-- Recent Violations -->
         <div class="section-header">
-          <div class="section-title">ðŸ”´ Recent Violations</div>
+          <div class="section-title">🔴 Recent Violations</div>
           <div class="section-actions">
-            <button class="btn btn-ghost btn-sm" onclick="App.navigate('violations')">View All â†’</button>
+            <button class="btn btn-ghost btn-sm" onclick="App.navigate('violations')">View All →</button>
           </div>
         </div>
         <div class="table-wrap">
@@ -1393,7 +1399,7 @@ canvas { max-width: 100%; }
                 </tr>
               </thead>
               <tbody id="recent-violations-body">
-                <tr><td colspan="8" class="text-center text-muted" style="padding:24px;">Loadingâ€¦</td></tr>
+                <tr><td colspan="8" class="text-center text-muted" style="padding:24px;">Loading…</td></tr>
               </tbody>
             </table>
           </div>
@@ -1405,24 +1411,27 @@ canvas { max-width: 100%; }
       <div id="page-violations" class="page hidden">
         <div class="section-header" style="margin-bottom:12px;">
           <div class="section-title">Report Scope</div>
-          <div class="section-actions" id="violations-scope-actions">
+          <div class="section-actions" id="violations-scope-actions" style="flex-wrap:wrap;gap:6px;">
             <button class="btn btn-primary btn-sm" data-violations-scope="today" onclick="Violations.setScope('today')">Today</button>
             <button class="btn btn-ghost btn-sm" data-violations-scope="yesterday" onclick="Violations.setScope('yesterday')">Yesterday</button>
             <button class="btn btn-ghost btn-sm" data-violations-scope="mtd" onclick="Violations.setScope('mtd')">MTD</button>
+            <button class="btn btn-ghost btn-sm" data-violations-scope="month" onclick="Violations.setScope('month')">📅 Month</button>
+            <button class="btn btn-ghost btn-sm" data-violations-scope="custom" onclick="Violations.setScope('custom')">Custom</button>
+            <select id="violations-month-select" class="hidden" onchange="Violations.applyMonthPicker()" style="border:1px solid var(--clr-border);border-radius:6px;padding:4px 8px;font-size:0.8rem;background:var(--clr-surface);color:var(--clr-text);"></select>
           </div>
         </div>
         <div class="tab-bar">
           <button class="tab-btn active" data-vtab="all" onclick="Violations.switchTab('all')">All Records</button>
-          <button class="tab-btn" data-vtab="violations" onclick="Violations.switchTab('violations')">âš ï¸ Violations</button>
-          <button class="tab-btn" data-vtab="partial" onclick="Violations.switchTab('partial')">ðŸ”µ Partial FIFO</button>
-          <button class="tab-btn" data-vtab="compliant" onclick="Violations.switchTab('compliant')">âœ… Compliant</button>
+          <button class="tab-btn" data-vtab="violations" onclick="Violations.switchTab('violations')">⚠️ Violations</button>
+          <button class="tab-btn" data-vtab="partial" onclick="Violations.switchTab('partial')">🔵 Partial FEFO</button>
+          <button class="tab-btn" data-vtab="compliant" onclick="Violations.switchTab('compliant')">✅ Compliant</button>
         </div>
 
         <div class="table-wrap">
           <div class="table-toolbar">
             <div class="table-search-wrap">
-              <span class="search-icon">ðŸ”</span>
-              <input type="text" id="violations-search" placeholder="Search GP, SKU, userâ€¦" oninput="Violations.onSearch(this.value)">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="violations-search" placeholder="Search GP, SKU, user…" oninput="Violations.onSearch(this.value)">
             </div>
             <select id="violations-facility" class="btn btn-ghost btn-sm" onchange="Violations.applyFilters()" style="width:auto; border:1px solid var(--clr-border); padding:5px 10px;">
               <option value="">All Facilities</option>
@@ -1435,7 +1444,15 @@ canvas { max-width: 100%; }
               <option value="MAJOR">Major</option>
               <option value="MINOR">Minor</option>
             </select>
-            <div class="table-count" id="violations-count">â€”</div>
+            <select id="violations-bucket" class="btn btn-ghost btn-sm" onchange="Violations.applyFilters()" style="width:auto; border:1px solid var(--clr-border); padding:5px 10px;">
+              <option value="">All Buckets</option>
+              <option value="3PL">3PL (Rank)</option>
+              <option value="DS">DS (≥45% SL)</option>
+              <option value="B2B">B2B (≥80% SL)</option>
+            </select>
+            <input type="date" id="violations-date-from" class="btn btn-ghost btn-sm hidden" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+            <input type="date" id="violations-date-to" class="btn btn-ghost btn-sm hidden" onchange="Violations.applyFilters()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+            <div class="table-count" id="violations-count">—</div>
             <div style="display:flex;gap:6px;margin-left:auto;">
               <button class="btn btn-ghost btn-sm" onclick="Exports.violationsCSV()">CSV</button>
               <button class="btn btn-ghost btn-sm" onclick="Exports.violationsExcel()">Excel</button>
@@ -1446,23 +1463,25 @@ canvas { max-width: 100%; }
             <table class="data-table" id="violations-table">
               <thead>
                 <tr>
-                  <th class="sortable" onclick="Violations.sort('date')">Date <span class="sort-icon">â†•</span></th>
-                  <th class="sortable" onclick="Violations.sort('gp')">GP Code <span class="sort-icon">â†•</span></th>
+                  <th class="sortable" onclick="Violations.sort('date')">Date <span class="sort-icon">↕</span></th>
+                  <th class="sortable" onclick="Violations.sort('gp')">GP Code <span class="sort-icon">↕</span></th>
                   <th>User</th>
                   <th>To Party</th>
                   <th>SKU Code</th>
                   <th>Item Name</th>
-                  <th class="sortable" onclick="Violations.sort('qty')">Qty <span class="sort-icon">â†•</span></th>
+                  <th class="sortable" onclick="Violations.sort('qty')">Qty <span class="sort-icon">↕</span></th>
                   <th>Older Batches</th>
-                  <th class="sortable" onclick="Violations.sort('skipped')">Skipped Qty <span class="sort-icon">â†•</span></th>
-                  <th class="sortable" onclick="Violations.sort('severity')">Severity <span class="sort-icon">â†•</span></th>
+                  <th class="sortable" onclick="Violations.sort('skipped')">Skipped Qty <span class="sort-icon">↕</span></th>
+                  <th class="sortable" onclick="Violations.sort('severity')">Severity <span class="sort-icon">↕</span></th>
                   <th>Status</th>
                   <th>GP Status</th>
+                  <th>Bucket</th>
+                  <th>Shelf Life %</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody id="violations-body">
-                <tr><td colspan="13" class="text-center text-muted" style="padding:32px;">Loadingâ€¦</td></tr>
+                <tr><td colspan="13" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
               </tbody>
             </table>
           </div>
@@ -1474,22 +1493,22 @@ canvas { max-width: 100%; }
       <!-- ==================== PREVENTION PAGE ==================== -->
       <div id="page-prevention" class="page hidden">
         <div class="section-header" style="margin-bottom:14px;">
-          <div class="section-title">ðŸ›¡ï¸ At-Risk Inventory â€” Sort by Oldest First</div>
+          <div class="section-title">🛡️ At-Risk Inventory — Sort by Oldest First</div>
           <div class="section-actions">
             <button class="btn btn-ghost btn-sm" onclick="Exports.preventionCSV()">Export CSV</button>
           </div>
         </div>
 
         <!-- Expiry Buckets -->
-        <div class="section-header"><div class="section-title">â° Expiry Exposure Buckets</div></div>
+        <div class="section-header"><div class="section-title">⏰ Expiry Exposure Buckets</div></div>
         <div class="expiry-buckets" id="prevention-expiry-buckets" style="margin-bottom:18px;"></div>
 
         <!-- Risk Table -->
         <div class="table-wrap">
           <div class="table-toolbar">
             <div class="table-search-wrap">
-              <span class="search-icon">ðŸ”</span>
-              <input type="text" id="prevention-search" placeholder="Search SKU, batchâ€¦" oninput="Prevention.onSearch(this.value)">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="prevention-search" placeholder="Search SKU, batch…" oninput="Prevention.onSearch(this.value)">
             </div>
             <select id="prevention-facility" onchange="Prevention.applyFilters()" class="btn btn-ghost btn-sm" style="width:auto;border:1px solid var(--clr-border);padding:5px 10px;">
               <option value="">All Facilities</option>
@@ -1502,28 +1521,28 @@ canvas { max-width: 100%; }
               <option value="MEDIUM">Medium Risk</option>
               <option value="LOW">Low Risk</option>
             </select>
-            <div class="table-count" id="prevention-count">â€”</div>
+            <div class="table-count" id="prevention-count">—</div>
           </div>
           <div class="table-scroll-x">
             <table class="data-table" id="prevention-table">
               <thead>
                 <tr>
-                  <th>FIFO Rank</th>
-                  <th class="sortable" onclick="Prevention.sort('sku')">SKU Code <span class="sort-icon">â†•</span></th>
+                  <th>FEFO Rank</th>
+                  <th class="sortable" onclick="Prevention.sort('sku')">SKU Code <span class="sort-icon">↕</span></th>
                   <th>Item Name</th>
                   <th>Oldest Batch</th>
-                  <th class="sortable" onclick="Prevention.sort('expiry')">Expiry Date <span class="sort-icon">â†•</span></th>
-                  <th class="sortable" onclick="Prevention.sort('days')">Days to Expiry <span class="sort-icon">â†•</span></th>
+                  <th class="sortable" onclick="Prevention.sort('expiry')">Expiry Date <span class="sort-icon">↕</span></th>
+                  <th class="sortable" onclick="Prevention.sort('days')">Days to Expiry <span class="sort-icon">↕</span></th>
                   <th>Mfg Date</th>
                   <th>Shelves</th>
-                  <th class="sortable" onclick="Prevention.sort('qty')">Total Qty <span class="sort-icon">â†•</span></th>
-                  <th>MRP â‚¹</th>
-                  <th>Inv Value â‚¹</th>
+                  <th class="sortable" onclick="Prevention.sort('qty')">Total Qty <span class="sort-icon">↕</span></th>
+                  <th>MRP ₹</th>
+                  <th>Inv Value ₹</th>
                   <th>Risk Level</th>
                 </tr>
               </thead>
               <tbody id="prevention-body">
-                <tr><td colspan="12" class="text-center text-muted" style="padding:32px;">Loadingâ€¦</td></tr>
+                <tr><td colspan="12" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
               </tbody>
             </table>
           </div>
@@ -1537,17 +1556,24 @@ canvas { max-width: 100%; }
       <div id="page-compliance" class="page hidden">
         <div class="section-header" style="margin-bottom:12px;">
           <div class="section-title">Report Scope</div>
-          <div class="section-actions" id="compliance-scope-actions">
+          <div class="section-actions" id="compliance-scope-actions" style="flex-wrap:wrap;gap:6px;">
             <button class="btn btn-primary btn-sm" data-compliance-scope="today" onclick="Compliance.setScope('today')">Today</button>
             <button class="btn btn-ghost btn-sm" data-compliance-scope="yesterday" onclick="Compliance.setScope('yesterday')">Yesterday</button>
             <button class="btn btn-ghost btn-sm" data-compliance-scope="mtd" onclick="Compliance.setScope('mtd')">MTD</button>
+            <button class="btn btn-ghost btn-sm" data-compliance-scope="month" onclick="Compliance.setScope('month')">📅 Month</button>
+            <button class="btn btn-ghost btn-sm" data-compliance-scope="custom" onclick="Compliance.setScope('custom')">Custom</button>
+            <select id="compliance-month-select" class="hidden" onchange="Compliance.applyMonthPicker()" style="border:1px solid var(--clr-border);border-radius:6px;padding:4px 8px;font-size:0.8rem;background:var(--clr-surface);color:var(--clr-text);"></select>
           </div>
         </div>
+        <div id="compliance-custom-dates" class="table-toolbar hidden" style="margin-bottom:12px;">
+          <input type="date" id="compliance-date-from" class="btn btn-ghost btn-sm" onchange="Compliance.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+          <input type="date" id="compliance-date-to" class="btn btn-ghost btn-sm" onchange="Compliance.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
+        </div>
         <div class="tab-bar">
-          <button class="tab-btn active" data-ctab="overview" onclick="Compliance.switchTab('overview')">ðŸ“Š Overview</button>
-          <button class="tab-btn" data-ctab="offenders" onclick="Compliance.switchTab('offenders')">ðŸ”´ Repeat Offenders</button>
-          <button class="tab-btn" data-ctab="champions" onclick="Compliance.switchTab('champions')">ðŸ† Champions</button>
-          <button class="tab-btn" data-ctab="detail" onclick="Compliance.switchTab('detail')">ðŸ“‹ All Users</button>
+          <button class="tab-btn active" data-ctab="overview" onclick="Compliance.switchTab('overview')">📊 Overview</button>
+          <button class="tab-btn" data-ctab="offenders" onclick="Compliance.switchTab('offenders')">🔴 Repeat Offenders</button>
+          <button class="tab-btn" data-ctab="champions" onclick="Compliance.switchTab('champions')">🏆 Champions</button>
+          <button class="tab-btn" data-ctab="detail" onclick="Compliance.switchTab('detail')">📋 All Users</button>
         </div>
 
         <!-- Overview Tab -->
@@ -1573,10 +1599,10 @@ canvas { max-width: 100%; }
           <div class="table-wrap">
             <div class="table-toolbar">
               <div class="table-search-wrap">
-                <span class="search-icon">ðŸ”</span>
-                <input type="text" id="offenders-search" placeholder="Search userâ€¦" oninput="Compliance.searchOffenders(this.value)">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="offenders-search" placeholder="Search user…" oninput="Compliance.searchOffenders(this.value)">
               </div>
-              <div class="table-count" id="offenders-count">â€”</div>
+              <div class="table-count" id="offenders-count">—</div>
               <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="Exports.offendersCSV()">Export</button>
             </div>
             <div class="table-scroll-x">
@@ -1585,12 +1611,12 @@ canvas { max-width: 100%; }
                   <tr>
                     <th>User</th><th>Facility</th><th>30d Violations</th>
                     <th>Total Violations</th><th>Compliance %</th>
-                    <th>Skipped Qty</th><th>Loss â‚¹</th>
+                    <th>Skipped Qty</th><th>Loss ₹</th>
                     <th>Level</th><th>Last Violation</th>
                   </tr>
                 </thead>
                 <tbody id="offenders-body">
-                  <tr><td colspan="9" class="text-center text-muted" style="padding:32px;">Loadingâ€¦</td></tr>
+                  <tr><td colspan="9" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1607,11 +1633,11 @@ canvas { max-width: 100%; }
                   <tr>
                     <th>#</th><th>User</th><th>Facility</th>
                     <th>Total GPs</th><th>Violations</th>
-                    <th>Compliance %</th><th>Skipped Qty</th><th>Loss â‚¹</th>
+                    <th>Compliance %</th><th>Skipped Qty</th><th>Loss ₹</th>
                   </tr>
                 </thead>
                 <tbody id="champions-body">
-                  <tr><td colspan="8" class="text-center text-muted" style="padding:32px;">Loadingâ€¦</td></tr>
+                  <tr><td colspan="8" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1623,15 +1649,15 @@ canvas { max-width: 100%; }
           <div class="table-wrap">
             <div class="table-toolbar">
               <div class="table-search-wrap">
-                <span class="search-icon">ðŸ”</span>
-                <input type="text" id="allusers-search" placeholder="Search userâ€¦" oninput="Compliance.searchAllUsers(this.value)">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="allusers-search" placeholder="Search user…" oninput="Compliance.searchAllUsers(this.value)">
               </div>
               <select id="allusers-facility" onchange="Compliance.applyAllUsersFilter()" class="btn btn-ghost btn-sm" style="width:auto;border:1px solid var(--clr-border);padding:5px 10px;">
                 <option value="">All Facilities</option>
                 <option value="SL Ambient">SL Ambient</option>
                 <option value="SL Mother Hub">SL Mother Hub</option>
               </select>
-              <div class="table-count" id="allusers-count">â€”</div>
+              <div class="table-count" id="allusers-count">—</div>
               <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="Exports.complianceCSV()">Export</button>
             </div>
             <div class="table-scroll-x">
@@ -1639,13 +1665,13 @@ canvas { max-width: 100%; }
                 <thead>
                   <tr>
                     <th>User</th><th>Facility</th><th>Total GPs</th>
-                    <th>Violations</th><th>Partial FIFO</th><th>Compliant</th>
+                    <th>Violations</th><th>Partial FEFO</th><th>Compliant</th>
                     <th>Compliance %</th><th>Skipped Qty</th>
-                    <th>Loss â‚¹</th><th>Last Violation</th><th>Level</th>
+                    <th>Loss ₹</th><th>Last Violation</th><th>Level</th>
                   </tr>
                 </thead>
                 <tbody id="allusers-body">
-                  <tr><td colspan="11" class="text-center text-muted" style="padding:32px;">Loadingâ€¦</td></tr>
+                  <tr><td colspan="11" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1661,7 +1687,7 @@ canvas { max-width: 100%; }
           <h2 style="margin-bottom:6px;">Upload Gatepass File</h2>
           <p style="margin-bottom:20px;">Upload a CSV or XLSX file. Only records from SL Ambient or SL Mother Hub will be processed. B2B to-party records are automatically excluded.</p>
           <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="Gatepass.onDragOver(event)" ondrop="Gatepass.onDrop(event)" ondragleave="Gatepass.onDragLeave(event)">
-            <div class="upload-icon">ðŸ“</div>
+            <div class="upload-icon">📁</div>
             <div class="upload-text">Click to select file or drag & drop here</div>
             <div class="upload-hint">Supported: CSV, XLSX (max 20MB)</div>
           </div>
@@ -1670,12 +1696,12 @@ canvas { max-width: 100%; }
           <div id="gatepass-file-info" class="hidden" style="margin-top:14px;">
             <div class="card" style="background:var(--clr-surface2);margin-bottom:14px;">
               <div style="display:flex;align-items:center;gap:10px;font-size:0.85rem;">
-                <span style="font-size:1.3rem;">ðŸ“„</span>
+                <span style="font-size:1.3rem;">📄</span>
                 <div>
                   <div id="gp-file-name" style="font-weight:600;"></div>
                   <div id="gp-file-size" class="text-muted" style="font-size:0.75rem;"></div>
                 </div>
-                <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="Gatepass.clearFile()">âœ•</button>
+                <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="Gatepass.clearFile()">✕</button>
               </div>
             </div>
             <div style="margin-bottom:14px;">
@@ -1685,22 +1711,22 @@ canvas { max-width: 100%; }
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
               <button class="btn btn-primary btn-lg" id="gp-upload-btn" onclick="Gatepass.upload(false)">
-                <span id="gp-upload-text">âž• Add to Existing</span>
+                <span id="gp-upload-text">➕ Add to Existing</span>
                 <span id="gp-upload-spinner" class="spinner spinner-sm hidden"></span>
               </button>
               <button class="btn btn-lg" style="background:#d1242f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;" id="gp-replace-btn" onclick="Gatepass.upload(true)">
-                <span id="gp-replace-text">ðŸ—‘ï¸ Flush &amp; Replace All</span>
+                <span id="gp-replace-text">🗑️ Flush &amp; Replace All</span>
                 <span id="gp-replace-spinner" class="spinner spinner-sm hidden"></span>
               </button>
             </div>
             <div class="text-muted" style="font-size:0.72rem;margin-top:6px;">
-              <strong>Add to Existing</strong> â€” appends rows. &nbsp;|&nbsp;
-              <strong>Flush &amp; Replace All</strong> â€” deletes ALL previous data then imports fresh.
+              <strong>Add to Existing</strong> — appends rows. &nbsp;|&nbsp;
+              <strong>Flush &amp; Replace All</strong> — deletes ALL previous data then imports fresh.
             </div>
           </div>
 
           <div id="gatepass-progress" class="hidden" style="margin-top:14px;">
-            <div style="font-size:0.82rem;margin-bottom:6px;color:var(--clr-text-muted);" id="gp-progress-text">Processingâ€¦</div>
+            <div style="font-size:0.82rem;margin-bottom:6px;color:var(--clr-text-muted);" id="gp-progress-text">Processing…</div>
             <div class="progress-bar"><div class="progress-fill progress-fill-accent" id="gp-progress-fill" style="width:0%"></div></div>
           </div>
 
@@ -1709,7 +1735,7 @@ canvas { max-width: 100%; }
 
         <!-- Upload History -->
         <div style="max-width:660px;margin:18px auto 0;">
-          <div class="section-header"><div class="section-title">ðŸ“‹ Recent Uploads</div></div>
+          <div class="section-header"><div class="section-title">📋 Recent Uploads</div></div>
           <div class="table-wrap">
             <div class="table-scroll-x">
               <table class="data-table">
@@ -1727,30 +1753,30 @@ canvas { max-width: 100%; }
 
         <!-- STATUS CARDS -->
         <div class="card" style="max-width:720px;margin:0 auto 18px;">
-          <h2 style="margin-bottom:14px;">ðŸ“¦ Inventory Snapshot</h2>
+          <h2 style="margin-bottom:14px;">📦 Inventory Snapshot</h2>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:0.82rem;margin-bottom:0;">
             <div class="card" style="background:var(--clr-surface2);text-align:center;padding:12px;">
               <div class="text-muted" style="font-size:0.7rem;margin-bottom:4px;">Last Import</div>
-              <div id="inv-last-import" style="font-weight:700;font-size:0.85rem;">â€”</div>
+              <div id="inv-last-import" style="font-weight:700;font-size:0.85rem;">—</div>
             </div>
             <div class="card" style="background:var(--clr-surface2);text-align:center;padding:12px;">
               <div class="text-muted" style="font-size:0.7rem;margin-bottom:4px;">Total Records</div>
-              <div id="inv-record-count" style="font-weight:700;font-size:0.85rem;">â€”</div>
+              <div id="inv-record-count" style="font-weight:700;font-size:0.85rem;">—</div>
             </div>
             <div class="card" style="background:var(--clr-surface2);text-align:center;padding:12px;">
               <div class="text-muted" style="font-size:0.7rem;margin-bottom:4px;">SL Ambient</div>
-              <div id="inv-ambient-count" style="font-weight:700;font-size:0.85rem;">â€”</div>
+              <div id="inv-ambient-count" style="font-weight:700;font-size:0.85rem;">—</div>
             </div>
             <div class="card" style="background:var(--clr-surface2);text-align:center;padding:12px;">
               <div class="text-muted" style="font-size:0.7rem;margin-bottom:4px;">SL Mother Hub</div>
-              <div id="inv-hub-count" style="font-weight:700;font-size:0.85rem;">â€”</div>
+              <div id="inv-hub-count" style="font-weight:700;font-size:0.85rem;">—</div>
             </div>
           </div>
         </div>
 
         <!-- FILE UPLOAD -->
         <div class="card" style="max-width:720px;margin:0 auto 18px;">
-          <h3 style="margin-bottom:6px;">ðŸ“¤ Upload Inventory File</h3>
+          <h3 style="margin-bottom:6px;">📤 Upload Inventory File</h3>
           <p class="text-muted" style="font-size:0.8rem;margin-bottom:16px;">
             Upload your inventory CSV or Excel file. This replaces the current snapshot entirely.
             Accepted columns (flexible naming): SKU Code, Item Name, Batch Code, Quantity, MRP, Expiry Date, Manufacturing Date, Facility, Shelf.
@@ -1762,21 +1788,21 @@ canvas { max-width: 100%; }
                ondragleave="Inventory.onDragLeave(event)"
                ondrop="Inventory.onDrop(event)"
                onclick="document.getElementById('inv-file-input').click()">
-            <div class="upload-icon">ðŸ“‚</div>
+            <div class="upload-icon">📂</div>
             <div class="upload-text">Drop inventory file here or <span class="upload-link">browse</span></div>
-            <div class="upload-hint">CSV, XLSX, XLS â€” max 20MB</div>
+            <div class="upload-hint">CSV, XLSX, XLS — max 20MB</div>
             <input type="file" id="inv-file-input" accept=".csv,.xlsx,.xls" style="display:none;" onchange="Inventory.onFileSelect(event)">
           </div>
 
           <!-- File info -->
           <div id="inv-file-info" class="file-info hidden" style="margin-top:12px;">
             <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-size:1.4rem;">ðŸ“„</span>
+              <span style="font-size:1.4rem;">📄</span>
               <div style="flex:1;">
-                <div style="font-weight:600;" id="inv-file-name">â€”</div>
-                <div class="text-muted" style="font-size:0.75rem;" id="inv-file-size">â€”</div>
+                <div style="font-weight:600;" id="inv-file-name">—</div>
+                <div class="text-muted" style="font-size:0.75rem;" id="inv-file-size">—</div>
               </div>
-              <button class="btn btn-ghost btn-sm" onclick="Inventory.clearFile()">âœ• Remove</button>
+              <button class="btn btn-ghost btn-sm" onclick="Inventory.clearFile()">✕ Remove</button>
             </div>
           </div>
 
@@ -1785,7 +1811,7 @@ canvas { max-width: 100%; }
             <div class="progress-bar" style="height:6px;margin-bottom:6px;">
               <div class="progress-fill" id="inv-progress-fill" style="width:0%;transition:width 0.3s;"></div>
             </div>
-            <div class="text-muted" style="font-size:0.75rem;" id="inv-progress-text">Processingâ€¦</div>
+            <div class="text-muted" style="font-size:0.75rem;" id="inv-progress-text">Processing…</div>
           </div>
 
           <!-- Result -->
@@ -1793,14 +1819,14 @@ canvas { max-width: 100%; }
 
           <!-- Upload button -->
           <button class="btn btn-primary btn-lg w-full" style="margin-top:14px;" onclick="Inventory.upload()" id="inv-upload-btn">
-            <span id="inv-upload-text">ðŸ“¤ Upload Inventory File</span>
+            <span id="inv-upload-text">📤 Upload Inventory File</span>
             <span id="inv-upload-spinner" class="spinner spinner-sm hidden"></span>
           </button>
         </div>
 
         <!-- IMPORT HISTORY -->
         <div style="max-width:720px;margin:0 auto;">
-          <div class="section-header"><div class="section-title">ðŸ“‹ Import History</div></div>
+          <div class="section-header"><div class="section-title">📋 Import History</div></div>
           <div class="table-wrap">
             <div class="table-scroll-x">
               <table class="data-table">
@@ -1818,7 +1844,7 @@ canvas { max-width: 100%; }
       <div id="page-settings" class="page hidden">
         <div style="max-width:720px;">
           <div class="card" style="margin-bottom:14px;">
-            <h3 style="margin-bottom:14px;">âš™ï¸ FIFO Engine Settings</h3>
+            <h3 style="margin-bottom:14px;">⚙️ FEFO Engine Settings</h3>
             <div class="setting-row">
               <div class="setting-info">
                 <div class="setting-name">Minimum Inventory Threshold</div>
@@ -1840,7 +1866,7 @@ canvas { max-width: 100%; }
           </div>
 
           <div class="card" style="margin-bottom:14px;">
-            <h3 style="margin-bottom:14px;">ðŸ”´ Severity Thresholds (Skipped Qty)</h3>
+            <h3 style="margin-bottom:14px;">🔴 Severity Thresholds (Skipped Qty)</h3>
             <div class="setting-row">
               <div class="setting-info">
                 <div class="setting-name">Minor Violation Range</div>
@@ -1875,7 +1901,7 @@ canvas { max-width: 100%; }
           </div>
 
           <div class="card" style="margin-bottom:14px;">
-            <h3 style="margin-bottom:14px;">ðŸ† Champion Thresholds</h3>
+            <h3 style="margin-bottom:14px;">🏆 Champion Thresholds</h3>
             <div class="setting-row">
               <div class="setting-info">
                 <div class="setting-name">Minimum GPs for Champion</div>
@@ -1912,8 +1938,8 @@ canvas { max-width: 100%; }
         <div class="table-wrap">
           <div class="table-toolbar">
             <div class="table-search-wrap">
-              <span class="search-icon">ðŸ”</span>
-              <input type="text" id="audit-search" placeholder="Search eventsâ€¦" oninput="Audit.onSearch(this.value)">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="audit-search" placeholder="Search events…" oninput="Audit.onSearch(this.value)">
             </div>
             <select id="audit-type" onchange="Audit.applyFilters()" class="btn btn-ghost btn-sm" style="width:auto;border:1px solid var(--clr-border);padding:5px 10px;">
               <option value="">All Events</option>
@@ -1923,7 +1949,7 @@ canvas { max-width: 100%; }
               <option value="LOGIN">Login</option>
               <option value="ERROR">Error</option>
             </select>
-            <div class="table-count" id="audit-count">â€”</div>
+            <div class="table-count" id="audit-count">—</div>
           </div>
           <div class="table-scroll-x">
             <table class="data-table">
@@ -1931,7 +1957,7 @@ canvas { max-width: 100%; }
                 <tr><th>Timestamp</th><th>Event Type</th><th>User</th><th>Description</th><th>Status</th></tr>
               </thead>
               <tbody id="audit-body">
-                <tr><td colspan="5" class="text-center text-muted" style="padding:32px;">Loadingâ€¦</td></tr>
+                <tr><td colspan="5" class="text-center text-muted" style="padding:32px;">Loading…</td></tr>
               </tbody>
             </table>
           </div>
@@ -1949,16 +1975,16 @@ canvas { max-width: 100%; }
   <div class="modal modal-lg">
     <div class="modal-header">
       <h3 id="drilldown-title">Violation Detail</h3>
-      <button class="modal-close" onclick="App.closeModal('drilldown-modal')">âœ•</button>
+      <button class="modal-close" onclick="App.closeModal('drilldown-modal')">✕</button>
     </div>
     <div class="modal-body">
       <div class="drilldown-grid" id="drilldown-grid"></div>
       <hr class="divider">
-      <div class="section-title" style="margin-bottom:10px;">ðŸ“¦ Skipped Batches Detail</div>
+      <div class="section-title" style="margin-bottom:10px;">📦 Skipped Batches Detail</div>
       <div class="table-scroll-x">
         <table class="data-table" id="drilldown-batches-table">
           <thead>
-            <tr><th>FIFO Rank</th><th>Batch Code</th><th>Vendor Batch</th><th>Mfg Date</th><th>Expiry</th><th>Shelf</th><th>Qty</th><th>MRP â‚¹</th></tr>
+            <tr><th>FEFO Rank</th><th>Batch Code</th><th>Vendor Batch</th><th>Mfg Date</th><th>Expiry</th><th>Shelf</th><th>Qty</th><th>MRP ₹</th></tr>
           </thead>
           <tbody id="drilldown-batches-body"></tbody>
         </table>
@@ -1978,7 +2004,7 @@ canvas { max-width: 100%; }
 <script>
 /* === utils.js === */
 /* ================================================
-   utils.js â€” Shared helpers
+   utils.js — Shared helpers
    ================================================ */
 
 const Utils = (() => {
@@ -1986,28 +2012,28 @@ const Utils = (() => {
   // ---- NUMBER FORMATTERS ----
   function fmtNum(n, decimals) {
     decimals = (decimals !== undefined) ? decimals : 0;
-    if (n === null || n === undefined || isNaN(n)) return 'â€”';
+    if (n === null || n === undefined || isNaN(n)) return '—';
     return Number(n).toLocaleString('en-IN', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   }
 
   function fmtCurrency(n, decimals) {
     decimals = (decimals !== undefined) ? decimals : 0;
-    if (n === null || n === undefined || isNaN(n)) return 'â€”';
+    if (n === null || n === undefined || isNaN(n)) return '—';
     const v = Number(n);
-    if (v >= 10000000) return 'â‚¹' + (v / 10000000).toFixed(2) + 'Cr';
-    if (v >= 100000)   return 'â‚¹' + (v / 100000).toFixed(2) + 'L';
-    if (v >= 1000)     return 'â‚¹' + (v / 1000).toFixed(1) + 'K';
-    return 'â‚¹' + fmtNum(v, decimals);
+    if (v >= 10000000) return '₹' + (v / 10000000).toFixed(2) + 'Cr';
+    if (v >= 100000)   return '₹' + (v / 100000).toFixed(2) + 'L';
+    if (v >= 1000)     return '₹' + (v / 1000).toFixed(1) + 'K';
+    return '₹' + fmtNum(v, decimals);
   }
 
   function fmtPct(n, decimals) {
     decimals = (decimals !== undefined) ? decimals : 1;
-    if (n === null || n === undefined || isNaN(n)) return 'â€”';
+    if (n === null || n === undefined || isNaN(n)) return '—';
     return Number(n).toFixed(decimals) + '%';
   }
 
   function fmtQty(n) {
-    if (n === null || n === undefined || isNaN(n)) return 'â€”';
+    if (n === null || n === undefined || isNaN(n)) return '—';
     const v = Number(n);
     if (v >= 1000000) return (v / 1000000).toFixed(1) + 'M';
     if (v >= 1000)    return (v / 1000).toFixed(1) + 'K';
@@ -2016,7 +2042,7 @@ const Utils = (() => {
 
   // ---- DATE FORMATTERS ----
   function fmtDate(val) {
-    if (!val) return 'â€”';
+    if (!val) return '—';
     if (typeof val === 'string') {
       var m = val.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
       if (m) return m[3].padStart(2, '0') + '/' + m[2].padStart(2, '0') + '/' + m[1];
@@ -2027,7 +2053,7 @@ const Utils = (() => {
   }
 
   function fmtDateTime(val) {
-    if (!val) return 'â€”';
+    if (!val) return '—';
     const d = new Date(val);
     if (isNaN(d)) return val;
     return d.toLocaleString('en-IN', {
@@ -2051,15 +2077,15 @@ const Utils = (() => {
     return kolkataISODate(new Date());
   }
 
-  function monthStartISO() {
-    var parts = kolkataDateParts(new Date());
-    return parts.y + '-' + parts.m + '-01';
-  }
-
   function yesterdayISO() {
     var d = new Date();
     d.setDate(d.getDate() - 1);
     return kolkataISODate(d);
+  }
+
+  function monthStartISO() {
+    var parts = kolkataDateParts(new Date());
+    return parts.y + '-' + parts.m + '-01';
   }
 
   function kolkataDateParts(d) {
@@ -2084,8 +2110,8 @@ const Utils = (() => {
 
   function scopeLabel(scope) {
     if (scope === 'today') return 'Today';
-    if (scope === 'yesterday') return 'Yesterday';
     if (scope === 'mtd') return 'MTD';
+    if (scope === 'custom') return 'Custom';
     return 'All';
   }
 
@@ -2107,29 +2133,29 @@ const Utils = (() => {
       'MAJOR':    '<span class="badge badge-major">Major</span>',
       'MINOR':    '<span class="badge badge-minor">Minor</span>',
     };
-    return map[sev] || '<span class="badge badge-neutral">' + (sev || 'â€”') + '</span>';
+    return map[sev] || '<span class="badge badge-neutral">' + (sev || '—') + '</span>';
   }
 
   function getStatusBadge(status) {
     var s = (status || '').toUpperCase();
-    if (s === 'FIFO VIOLATION')        return '<span class="badge badge-critical">âš  Violation</span>';
-    if (s === 'PARTIAL FIFO POSSIBLE') return '<span class="badge badge-partial">â—‘ Partial</span>';
-    if (s === 'COMPLIANT')             return '<span class="badge badge-compliant">âœ“ Compliant</span>';
+    if (s === 'FEFO VIOLATION')        return '<span class="badge badge-critical">⚠ Violation</span>';
+    if (s === 'PARTIAL FEFO POSSIBLE') return '<span class="badge badge-partial">◑ Partial</span>';
+    if (s === 'COMPLIANT')             return '<span class="badge badge-compliant">✓ Compliant</span>';
     // Legacy values
-    if (s === 'VIOLATION')             return '<span class="badge badge-critical">âš  Violation</span>';
-    if (s === 'PARTIAL FIFO')          return '<span class="badge badge-partial">â—‘ Partial</span>';
-    return '<span class="badge badge-neutral">' + (status || 'â€”') + '</span>';
+    if (s === 'VIOLATION')             return '<span class="badge badge-critical">⚠ Violation</span>';
+    if (s === 'PARTIAL FEFO')          return '<span class="badge badge-partial">◑ Partial</span>';
+    return '<span class="badge badge-neutral">' + (status || '—') + '</span>';
   }
 
   function getOffenderBadge(level) {
     const map = {
-      'CHAMPION':  '<span class="offender-level offender-champion">ðŸ† Champion</span>',
+      'CHAMPION':  '<span class="offender-level offender-champion">🏆 Champion</span>',
       'NORMAL':    '<span class="offender-level offender-normal">Normal</span>',
-      'REPEAT':    '<span class="offender-level offender-repeat">âš  Repeat</span>',
-      'HIGH':      '<span class="offender-level offender-high">ðŸ”´ High Risk</span>',
-      'CRITICAL':  '<span class="offender-level offender-critical">ðŸš¨ Critical</span>',
+      'REPEAT':    '<span class="offender-level offender-repeat">⚠ Repeat</span>',
+      'HIGH':      '<span class="offender-level offender-high">🔴 High Risk</span>',
+      'CRITICAL':  '<span class="offender-level offender-critical">🚨 Critical</span>',
     };
-    return map[level] || '<span class="offender-level offender-normal">' + (level || 'â€”') + '</span>';
+    return map[level] || '<span class="offender-level offender-normal">' + (level || '—') + '</span>';
   }
 
   function getRiskBadge(risk) {
@@ -2138,7 +2164,7 @@ const Utils = (() => {
       'MEDIUM': '<span class="badge risk-badge-medium">Medium</span>',
       'LOW':    '<span class="badge risk-badge-low">Low</span>',
     };
-    return map[risk] || '<span class="badge badge-neutral">' + (risk || 'â€”') + '</span>';
+    return map[risk] || '<span class="badge badge-neutral">' + (risk || '—') + '</span>';
   }
 
   function getComplianceColor(pct) {
@@ -2163,20 +2189,20 @@ const Utils = (() => {
 
     let html = ("<div class=\"pagination-info\">Page " + (currentPage) + " of " + (totalPages) + "</div>");
 
-    html += ("<button class=\"page-btn\" " + (currentPage===1?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(1)\">Â«</button>");
-    html += ("<button class=\"page-btn\" " + (currentPage===1?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(" + (currentPage-1) + ")\">â€¹</button>");
+    html += ("<button class=\"page-btn\" " + (currentPage===1?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(1)\">«</button>");
+    html += ("<button class=\"page-btn\" " + (currentPage===1?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(" + (currentPage-1) + ")\">‹</button>");
 
     const pages = getPaginationRange(currentPage, totalPages);
     pages.forEach(p => {
       if (p === '...') {
-        html += ("<span class=\"page-btn\" style=\"cursor:default;border:none;\">â€¦</span>");
+        html += ("<span class=\"page-btn\" style=\"cursor:default;border:none;\">…</span>");
       } else {
         html += ("<button class=\"page-btn " + (p===currentPage?'active':'') + "\" onclick=\"(" + (onPageChange) + ")(" + (p) + ")\">" + (p) + "</button>");
       }
     });
 
-    html += ("<button class=\"page-btn\" " + (currentPage===totalPages?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(" + (currentPage+1) + ")\">â€º</button>");
-    html += ("<button class=\"page-btn\" " + (currentPage===totalPages?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(" + (totalPages) + ")\">Â»</button>");
+    html += ("<button class=\"page-btn\" " + (currentPage===totalPages?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(" + (currentPage+1) + ")\">›</button>");
+    html += ("<button class=\"page-btn\" " + (currentPage===totalPages?'disabled':'') + " onclick=\"(" + (onPageChange) + ")(" + (totalPages) + ")\">»</button>");
 
     el.innerHTML = html;
   }
@@ -2201,10 +2227,10 @@ const Utils = (() => {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
-    const icons = { ok: 'âœ…', warn: 'âš ï¸', danger: 'âŒ', info: 'â„¹ï¸' };
+    const icons = { ok: '✅', warn: '⚠️', danger: '❌', info: 'ℹ️' };
     const t = document.createElement('div');
     t.className = ("toast toast-" + (type));
-    t.innerHTML = ("<span>" + (icons[type] || 'â„¹ï¸') + "</span><span style=\"flex:1\">" + (msg) + "</span>");
+    t.innerHTML = ("<span>" + (icons[type] || 'ℹ️') + "</span><span style=\"flex:1\">" + (msg) + "</span>");
     container.appendChild(t);
 
     setTimeout(() => {
@@ -2243,22 +2269,36 @@ const Utils = (() => {
         reject(new Error('GAS_BACKEND_URL not configured. Open index.html and set the GAS_BACKEND_URL variable.'));
         return;
       }
-      var body = JSON.stringify({ action: fnName, params: params, token: params._token || '' });
-      fetch(gasUrl, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain' },
-        body: body
-      })
-      .then(function(res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-      })
-      .then(function(text) {
-        try { resolve(JSON.parse(text)); }
-        catch(e) { reject(new Error('Bad JSON from backend: ' + text.slice(0,200))); }
-      })
-      .catch(function(err) { reject(err); });
+      // File uploads (fileData param) use XMLHttpRequest POST — survives Apps Script redirect.
+      // All other calls use GET with params in URL (avoids redirect body-loss for non-file calls).
+      var paramsHaveFile = params && params.fileData && params.fileData.length > 100;
+
+      if (paramsHaveFile) {
+        // XHR POST for file uploads — preserves body through redirect
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', gasUrl, true);
+        xhr.setRequestHeader('Content-Type', 'text/plain');
+        xhr.onload = function() {
+          try { resolve(JSON.parse(xhr.responseText)); }
+          catch(e) { reject(new Error('Bad JSON: ' + xhr.responseText.slice(0, 200))); }
+        };
+        xhr.onerror = function() { reject(new Error('Network error on file upload')); };
+        xhr.send(JSON.stringify({ action: fnName, params: params, token: params._token || '' }));
+      } else {
+        // GET for all non-file calls — avoids POST body loss on Apps Script redirect
+        var paramsClean = Object.assign({}, params);
+        delete paramsClean._token;
+        var url = gasUrl
+          + '?action=' + encodeURIComponent(fnName)
+          + '&params=' + encodeURIComponent(JSON.stringify(paramsClean));
+        fetch(url, { method: 'GET', redirect: 'follow' })
+          .then(function(res) { return res.text(); })
+          .then(function(text) {
+            try { resolve(JSON.parse(text)); }
+            catch(e) { reject(new Error('Bad JSON: ' + text.slice(0, 200))); }
+          })
+          .catch(function(err) { reject(err); });
+      }
     });
   }
 
@@ -2279,6 +2319,47 @@ const Utils = (() => {
       .replace(/"/g, '&quot;');
   }
 
+
+  // ---- MONTH PICKER HELPERS ----
+  function buildMonthOptions() {
+    var options = [];
+    var now = new Date();
+    for (var i = 0; i < 13; i++) {
+      var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      var parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit'
+      }).format(d).split('-');
+      var yr = parts[0], mo = parts[1];
+      var label = new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata', month: 'long', year: 'numeric'
+      }).format(d);
+      options.push({ label: label, value: yr + '-' + mo + '-01' });
+    }
+    return options;
+  }
+
+  function populateMonthSelect(selectId, currentValue) {
+    var el = document.getElementById(selectId);
+    if (!el) return;
+    var options = buildMonthOptions();
+    el.innerHTML = options.map(function(o) {
+      return '<option value="' + o.value + '"' + (o.value === currentValue ? ' selected' : '') + '>' + o.label + '</option>';
+    }).join('');
+    el.classList.remove('hidden');
+  }
+
+  function hideMonthSelect(selectId) {
+    var el = document.getElementById(selectId);
+    if (el) el.classList.add('hidden');
+  }
+
+  function monthFirstDay() {
+    var parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit'
+    }).format(new Date()).split('-');
+    return parts[0] + '-' + parts[1] + '-01';
+  }
+
   return {
     fmtNum, fmtCurrency, fmtPct, fmtQty,
     fmtDate, fmtDateTime, daysFromNow, todayISO, yesterdayISO, monthStartISO, scopeLabel,
@@ -2290,14 +2371,15 @@ const Utils = (() => {
     toast,
     sortBy,
     callGAS,
-    fmtFileSize, escHTML
+    fmtFileSize, escHTML,
+    buildMonthOptions, populateMonthSelect, hideMonthSelect, monthFirstDay
   };
 })();
 
 
 /* === auth.js === */
 /* ================================================
-   auth.js â€” Passwordless Identity Capture
+   auth.js — Passwordless Identity Capture
    No authentication. Just capture name + email
    for audit tracking. Anyone can use the dashboard.
    ================================================ */
@@ -2442,7 +2524,7 @@ document.addEventListener('DOMContentLoaded', function() { Auth.init(); });
 
 /* === charts.js === */
 /* ================================================
-   charts.js â€” Lightweight Canvas Charts
+   charts.js — Lightweight Canvas Charts
    No external dependencies. Bar + Donut only.
    ================================================ */
 
@@ -2534,7 +2616,7 @@ const Charts = (() => {
       const maxLblW = gap - 2;
       let lblText = lbl;
       if (ctx.measureText(lblText).width > maxLblW) {
-        lblText = lbl.slice(0, 8) + 'â€¦';
+        lblText = lbl.slice(0, 8) + '…';
       }
       ctx.fillText(lblText, x + barW / 2, H - pad.bottom + 14);
     });
@@ -2640,14 +2722,14 @@ const Charts = (() => {
 
 /* === app.js === */
 /* ================================================
-   app.js â€” Application bootstrap, routing, API layer
+   app.js — Application bootstrap, routing, API layer
    ================================================ */
 
 const App = (() => {
 
   const PAGE_TITLES = {
-    home:       ['Home', 'FIFO Control Tower'],
-    violations: ['Violations', 'Detected FIFO Issues'],
+    home:       ['Home', 'FEFO Control Tower'],
+    violations: ['Violations', 'Detected FEFO Issues'],
     prevention: ['Prevention Dashboard', 'At-Risk Inventory'],
 
     compliance: ['User Compliance', 'Performance Analytics'],
@@ -2667,7 +2749,7 @@ const App = (() => {
 
     // Restrict admin pages
     if ((page === 'settings' || page === 'audit') && !Auth.isAdmin()) {
-      Utils.toast('Access denied â€” Admin only.', 'danger');
+      Utils.toast('Access denied — Admin only.', 'danger');
       return;
     }
 
@@ -2716,9 +2798,9 @@ const App = (() => {
 
   // ---- REFRESH ----
   async function refreshData() {
-    Utils.toast('Refreshing dataâ€¦', 'info', 1500);
+    Utils.toast('Refreshing data…', 'info', 1500);
     const btn = document.getElementById('refresh-btn');
-    if (btn) { btn.disabled = true; btn.textContent = 'âŒ›'; }
+    if (btn) { btn.disabled = true; btn.textContent = '⌛'; }
 
     try {
       await Utils.callGAS('invalidateCache', {});
@@ -2729,7 +2811,7 @@ const App = (() => {
     } catch (e) {
       Utils.toast('Refresh failed.', 'danger');
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = 'ðŸ”„'; }
+      if (btn) { btn.disabled = false; btn.textContent = '🔄'; }
     }
   }
 
@@ -2791,34 +2873,12 @@ const App = (() => {
     }
   }
 
-  async function verifyBackendBuild() {
-    try {
-      const result = await api('getBuildInfo', {});
-      var expected = (typeof FRONTEND_BUILD_ID !== 'undefined') ? FRONTEND_BUILD_ID : '';
-      if (!result || !result.success || result.buildId !== expected) {
-        var backendBuild = result && result.buildId ? result.buildId : 'old or unknown';
-        var msg = 'Backend code is not the latest copy. Expected ' + expected + ', got ' + backendBuild + '. Redeploy Backend.gs in Apps Script.';
-        console.warn('[FIFO]', msg, result);
-        Utils.toast(msg, 'danger', 9000);
-        var el = document.getElementById('last-updated-text');
-        if (el) el.textContent = 'Backend old copy';
-      }
-    } catch (err) {
-      var msg = 'Backend version check failed. Redeploy Backend.gs in Apps Script, then refresh this page.';
-      console.warn('[FIFO]', msg, err);
-      Utils.toast(msg, 'danger', 9000);
-      var el = document.getElementById('last-updated-text');
-      if (el) el.textContent = 'Backend not verified';
-    }
-  }
-
   // ---- INIT ----
   function init() {
     updateSyncIndicator();
-    verifyBackendBuild();
   }
 
-  return { navigate, refreshData, openModal, closeModal, toggleSidebar, api, init, verifyBackendBuild };
+  return { navigate, refreshData, openModal, closeModal, toggleSidebar, api, init };
 })();
 
 // ==================== GATEPASS UPLOAD MODULE ====================
@@ -2858,7 +2918,7 @@ const Gatepass = (() => {
     }
     _selectedFile = file;
     Utils.setText('gp-file-name', file.name);
-    Utils.setText('gp-file-size', Utils.fmtFileSize(file.size) + ' Â· ' + ext.toUpperCase());
+    Utils.setText('gp-file-size', Utils.fmtFileSize(file.size) + ' · ' + ext.toUpperCase());
     Utils.show('gatepass-file-info');
     Utils.hide('gatepass-result');
   }
@@ -2875,16 +2935,16 @@ const Gatepass = (() => {
 
     const btn = document.getElementById('gp-upload-btn');
     btn.disabled = true;
-    Utils.setText('gp-upload-text', 'Processingâ€¦');
+    Utils.setText('gp-upload-text', 'Processing…');
     Utils.show('gp-upload-spinner');
     Utils.show('gatepass-progress');
     Utils.hide('gatepass-result');
 
-    setProgress(5, 'Reading fileâ€¦');
+    setProgress(5, 'Reading file…');
 
     try {
       const base64 = await readFileBase64(_selectedFile);
-      setProgress(20, 'Uploading to serverâ€¦');
+      setProgress(20, 'Uploading to server…');
 
       const ext = _selectedFile.name.split('.').pop().toLowerCase();
       const dateOverride = document.getElementById('gp-date-override').value;
@@ -2935,7 +2995,7 @@ const Gatepass = (() => {
   function showResult(r) {
     const el = document.getElementById('gatepass-result');
     el.classList.remove('hidden');
-    el.innerHTML = ("\n      <div class=\"card\" style=\"background:var(--clr-ok-dim);border-color:rgba(63,185,80,0.3);\">\n        <div style=\"font-weight:700;color:var(--clr-ok);margin-bottom:8px;\">âœ… Upload Complete</div>\n        <div style=\"display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:0.82rem;\">\n          <div><div class=\"text-muted\">Total Rows</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.totalRows)) + "</div></div>\n          <div><div class=\"text-muted\">Processed</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.processedRows)) + "</div></div>\n          <div><div class=\"text-muted\">Skipped</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.skippedRows)) + "</div></div>\n          <div><div class=\"text-muted\">Violations</div><div style=\"font-weight:700;color:var(--clr-danger);\">" + (Utils.fmtNum(r.violationCount)) + "</div></div>\n          <div><div class=\"text-muted\">Partial FIFO</div><div style=\"font-weight:700;color:var(--clr-info);\">" + (Utils.fmtNum(r.partialCount)) + "</div></div>\n          <div><div class=\"text-muted\">Compliant</div><div style=\"font-weight:700;color:var(--clr-ok);\">" + (Utils.fmtNum(r.compliantCount)) + "</div></div>\n        </div>\n      </div>");
+    el.innerHTML = ("\n      <div class=\"card\" style=\"background:var(--clr-ok-dim);border-color:rgba(63,185,80,0.3);\">\n        <div style=\"font-weight:700;color:var(--clr-ok);margin-bottom:8px;\">✅ Upload Complete</div>\n        <div style=\"display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:0.82rem;\">\n          <div><div class=\"text-muted\">Total Rows</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.totalRows)) + "</div></div>\n          <div><div class=\"text-muted\">Processed</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.processedRows)) + "</div></div>\n          <div><div class=\"text-muted\">Skipped</div><div style=\"font-weight:700;\">" + (Utils.fmtNum(r.skippedRows)) + "</div></div>\n          <div><div class=\"text-muted\">Violations</div><div style=\"font-weight:700;color:var(--clr-danger);\">" + (Utils.fmtNum(r.violationCount)) + "</div></div>\n          <div><div class=\"text-muted\">Partial FEFO</div><div style=\"font-weight:700;color:var(--clr-info);\">" + (Utils.fmtNum(r.partialCount)) + "</div></div>\n          <div><div class=\"text-muted\">Compliant</div><div style=\"font-weight:700;color:var(--clr-ok);\">" + (Utils.fmtNum(r.compliantCount)) + "</div></div>\n        </div>\n      </div>");
   }
 
   async function loadHistory() {
@@ -2996,7 +3056,7 @@ const Inventory = (() => {
         '<td class="td-mono">' + Utils.fmtDateTime(r.timestamp) + '</td>' +
         '<td style="font-size:0.8rem;">' + Utils.escHTML(r.description || '') + '</td>' +
         '<td class="text-muted" style="font-size:0.75rem;">' + Utils.escHTML(r.metadata || '') + '</td>' +
-        '<td>â€”</td>' +
+        '<td>—</td>' +
         '<td class="text-muted">' + Utils.escHTML(r.user || '') + '</td>' +
         '</tr>';
     }).join('');
@@ -3141,7 +3201,7 @@ const Settings = (() => {
   async function save() {
     const btn = document.querySelector('[onclick="Settings.save()"]');
     if (btn) btn.disabled = true;
-    Utils.setText('settings-save-text', 'Savingâ€¦');
+    Utils.setText('settings-save-text', 'Saving…');
     Utils.show('settings-spinner');
 
     const settings = {
@@ -3210,7 +3270,7 @@ const Audit = (() => {
       }
 
       if (tbody) {
-        tbody.innerHTML = data.map(r => ("\n          <tr>\n            <td class=\"td-mono\">" + (Utils.fmtDateTime(r.timestamp)) + "</td>\n            <td><span class=\"badge badge-info\">" + (Utils.escHTML(r.eventType)) + "</span></td>\n            <td class=\"text-muted\">" + (Utils.escHTML(r.user || 'â€”')) + "</td>\n            <td>" + (Utils.escHTML(r.description || '')) + "</td>\n            <td><span class=\"badge " + (r.status==='ERROR'?'badge-danger':'badge-ok') + "\">" + (r.status||'OK') + "</span></td>\n          </tr>")).join('');
+        tbody.innerHTML = data.map(r => ("\n          <tr>\n            <td class=\"td-mono\">" + (Utils.fmtDateTime(r.timestamp)) + "</td>\n            <td><span class=\"badge badge-info\">" + (Utils.escHTML(r.eventType)) + "</span></td>\n            <td class=\"text-muted\">" + (Utils.escHTML(r.user || '—')) + "</td>\n            <td>" + (Utils.escHTML(r.description || '')) + "</td>\n            <td><span class=\"badge " + (r.status==='ERROR'?'badge-danger':'badge-ok') + "\">" + (r.status||'OK') + "</span></td>\n          </tr>")).join('');
       }
 
       Utils.buildPagination('audit-pagination', _page, Math.ceil(result.total / PAGE_SIZE),
@@ -3243,7 +3303,7 @@ document.addEventListener('DOMContentLoaded', () => App.init());
 
 /* === dashboard.js === */
 /* ================================================
-   dashboard.js â€” Home Page KPIs & Summaries
+   dashboard.js — Home Page KPIs & Summaries
    ================================================ */
 
 const Dashboard = (() => {
@@ -3257,11 +3317,15 @@ const Dashboard = (() => {
     syncScopeUI();
     renderKPILoading();
     try {
-      const result = await App.api('getDashboardSummary', getScopeParams());
+      const result = await App.api('getDashboardSummary', Object.assign(getScopeParams(), {_bust: Date.now()}));
+      console.log('[Dashboard] raw result:', JSON.stringify(result).slice(0, 500));
       if (!result || !result.success) {
-        renderKPIError((result && (result.message || result.error)) || 'Backend returned an empty response.');
+        var errMsg = (result && (result.message || result.error)) || 'Backend returned no data.';
+        var buildInfo = result && result.buildId ? ' (build: ' + result.buildId + ')' : '';
+        renderKPIError(errMsg + buildInfo);
         return;
       }
+      if (result.buildId) console.log('[Dashboard] backend build:', result.buildId);
       _summaryCache = result.data;
       renderKPIs(result.data);
       renderFacilityGrid(result.data.facilityCompliance || []);
@@ -3288,27 +3352,53 @@ const Dashboard = (() => {
       document.getElementById('sync-dot').classList.remove('stale');
 
     } catch(e) {
-      renderKPIError(e && (e.message || e.toString()));
+      renderKPIError(e && e.message ? e.message : String(e));
       console.error('[Dashboard] Load error:', e);
     }
   }
 
   function getScopeParams() {
-    return { scope: _scope };
+    return { scope: _scope, dateFrom: _dateFrom, dateTo: _dateTo };
   }
 
   function setScope(scope) {
     _scope = scope || 'today';
+    Utils.hideMonthSelect('dashboard-month-select');
     if (_scope === 'today') {
       _dateFrom = Utils.todayISO();
-      _dateTo = Utils.todayISO();
+      _dateTo   = Utils.todayISO();
     } else if (_scope === 'yesterday') {
       _dateFrom = Utils.yesterdayISO();
-      _dateTo = Utils.yesterdayISO();
+      _dateTo   = Utils.yesterdayISO();
     } else if (_scope === 'mtd') {
       _dateFrom = Utils.monthStartISO();
-      _dateTo = Utils.todayISO();
+      _dateTo   = Utils.todayISO();
+    } else if (_scope === 'month') {
+      var cur = _dateFrom && _dateFrom.slice(8) === '01' ? _dateFrom : Utils.monthFirstDay();
+      Utils.populateMonthSelect('dashboard-month-select', cur);
+      _dateFrom = cur;
+      _dateTo   = '';
+    } else if (_scope === 'custom') {
+      _dateFrom = document.getElementById('dashboard-date-from').value || Utils.todayISO();
+      _dateTo   = document.getElementById('dashboard-date-to').value || Utils.todayISO();
     }
+    syncScopeUI();
+    load();
+  }
+
+  function applyMonthPicker() {
+    var el = document.getElementById('dashboard-month-select');
+    if (!el) return;
+    _dateFrom = el.value;
+    _dateTo   = '';
+    _scope    = 'month';
+    load();
+  }
+
+  function applyCustomDates() {
+    _scope = 'custom';
+    _dateFrom = document.getElementById('dashboard-date-from').value || '';
+    _dateTo = document.getElementById('dashboard-date-to').value || '';
     syncScopeUI();
     load();
   }
@@ -3319,25 +3409,28 @@ const Dashboard = (() => {
       btn.classList.toggle('btn-primary', active);
       btn.classList.toggle('btn-ghost', !active);
     });
+    var custom = document.getElementById('dashboard-custom-dates');
+    if (custom) custom.classList.toggle('hidden', _scope !== 'custom');
+    var from = document.getElementById('dashboard-date-from');
+    var to = document.getElementById('dashboard-date-to');
+    if (from) from.value = _dateFrom || '';
+    if (to) to.value = _dateTo || '';
   }
 
   // ---- KPI CARDS ----
   function renderKPILoading() {
     const grid = document.getElementById('kpi-grid');
     if (!grid) return;
-    grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:32px;\">\n        <div class=\"spinner spinner-lg\" style=\"margin:0 auto 10px;\"></div>\n        <div class=\"text-muted\">Loading dashboardâ€¦</div>\n      </div>");
+    grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:32px;\">\n        <div class=\"spinner spinner-lg\" style=\"margin:0 auto 10px;\"></div>\n        <div class=\"text-muted\">Loading dashboard…</div>\n      </div>");
   }
 
-  function renderKPIError(message) {
+  function renderKPIError(msg) {
     const grid = document.getElementById('kpi-grid');
-    var detail = message ? '<div class="text-muted" style="font-size:0.78rem;margin:8px auto 12px;max-width:720px;white-space:normal;">' + Utils.escHTML(message) + '</div>' : '';
-    if (grid && detail) {
-      setTimeout(function() {
-        var host = grid.querySelector('.kpi-card');
-        if (host) host.insertAdjacentHTML('beforeend', detail);
-      }, 0);
-    }
-    if (grid) grid.innerHTML = ("\n      <div class=\"kpi-card\" style=\"grid-column:1/-1;text-align:center;padding:24px;\">\n        <div style=\"color:var(--clr-danger);margin-bottom:6px;\">âš ï¸ Failed to load dashboard data</div>\n        <button class=\"btn btn-ghost btn-sm\" onclick=\"Dashboard.load()\">Retry</button>\n      </div>");
+    var detail = msg ? '<div style="font-size:0.75rem;color:var(--clr-text-muted);margin:6px 0 10px;max-width:500px;">' + msg + '</div>' : '';
+    if (grid) grid.innerHTML = '<div class="kpi-card" style="grid-column:1/-1;text-align:center;padding:24px;">' +
+      '<div style="color:var(--clr-danger);margin-bottom:6px;">⚠️ Failed to load dashboard data</div>' +
+      detail +
+      '<button class="btn btn-ghost btn-sm" onclick="Dashboard.load()">Retry</button></div>';
   }
 
   function renderKPIs(data) {
@@ -3349,63 +3442,63 @@ const Dashboard = (() => {
 
     const kpis = [
       {
-        label: 'Total Gatepasses', icon: 'ðŸ“‹',
+        label: 'Total Gatepasses', icon: '📋',
         value: Utils.fmtNum(data.totalGatepasses),
         sub: 'All processed records',
         type: 'info'
       },
       {
-        label: 'FIFO Violations', icon: 'âš ï¸',
+        label: 'FEFO Violations', icon: '⚠️',
         value: Utils.fmtNum(data.fifoViolations),
         sub: Utils.fmtNum(data.criticalViolations) + ' critical',
         type: 'danger'
       },
       {
-        label: 'Partial FIFO Cases', icon: 'â—‘',
+        label: 'Partial FEFO Cases', icon: '◑',
         value: Utils.fmtNum(data.partialFifoCases),
         sub: 'Partial compliance',
         type: 'warn'
       },
       {
-        label: 'FIFO Compliance', icon: 'ðŸ“Š',
+        label: 'FEFO Compliance', icon: '📊',
         value: Utils.fmtPct(compliance),
         sub: 'Overall rate',
         type: compColor
       },
       {
-        label: 'Skipped Inventory', icon: 'ðŸ“¦',
+        label: 'Skipped Inventory', icon: '📦',
         value: Utils.fmtQty(data.totalSkippedQty),
         sub: 'Units bypassed',
         type: 'warn'
       },
       {
-        label: 'Loss Opportunity', icon: 'ðŸ’¸',
+        label: 'Loss Opportunity', icon: '💸',
         value: Utils.fmtCurrency(data.totalLossOpportunity),
-        sub: 'Skipped qty Ã— MRP',
+        sub: 'Skipped qty × MRP',
         type: 'danger'
       },
       {
-        label: 'High Risk Inv Value', icon: 'â°',
+        label: 'High Risk Inv Value', icon: '⏰',
         value: Utils.fmtCurrency(data.highRiskInventoryValue),
-        sub: 'Expiring â‰¤30 days',
+        sub: 'Expiring ≤30 days',
         type: 'danger'
       },
       {
-        label: 'Expiry Exposure', icon: 'ðŸ“…',
+        label: 'Expiry Exposure', icon: '📅',
         value: Utils.fmtCurrency(data.expiryExposureValue),
         sub: 'Total at-risk value',
         type: 'accent'
       },
       {
-        label: 'Repeat Offenders', icon: 'ðŸ”´',
+        label: 'Repeat Offenders', icon: '🔴',
         value: Utils.fmtNum(data.repeatOffenders),
         sub: '5+ violations / 30d',
         type: 'danger'
       },
       {
-        label: 'FIFO Champions', icon: 'ðŸ†',
+        label: 'FEFO Champions', icon: '🏆',
         value: Utils.fmtNum(data.fifoChampions),
-        sub: 'â‰¥50 GPs, >98% compliant',
+        sub: '≥50 GPs, >98% compliant',
         type: 'purple'
       },
     ];
@@ -3426,7 +3519,7 @@ const Dashboard = (() => {
     grid.innerHTML = facilities.map(f => {
       const pct = f.compliancePct || 0;
       const color = pct >= 98 ? 'var(--clr-ok)' : pct >= 90 ? 'var(--clr-warn)' : 'var(--clr-danger)';
-      return ("\n      <div class=\"facility-card\">\n        <div class=\"facility-name\">\n          ðŸ­ " + (Utils.escHTML(f.facility)) + "\n          <span class=\"badge " + (pct>=98?'badge-ok':pct>=90?'badge-warn':'badge-danger') + "\">" + (f.rank ? '#'+f.rank : '') + "</span>\n        </div>\n        <div class=\"facility-compliance\" style=\"color:" + (color) + "\">" + (Utils.fmtPct(pct)) + "</div>\n        <div style=\"margin-bottom:8px;\">\n          <div class=\"progress-bar\">\n            <div class=\"progress-fill\" style=\"background:" + (color) + ";width:" + (Math.min(pct,100)) + "%\"></div>\n          </div>\n        </div>\n        <div class=\"facility-stats\">\n          <div class=\"facility-stat\"><div class=\"fs-label\">Total GPs</div><div class=\"fs-value\">" + (Utils.fmtNum(f.totalGps)) + "</div></div>\n          <div class=\"facility-stat\"><div class=\"fs-label\">Violations</div><div class=\"fs-value\" style=\"color:var(--clr-danger);\">" + (Utils.fmtNum(f.violations)) + "</div></div>\n          <div class=\"facility-stat\"><div class=\"fs-label\">Skipped Qty</div><div class=\"fs-value\">" + (Utils.fmtQty(f.skippedQty)) + "</div></div>\n          <div class=\"facility-stat\"><div class=\"fs-label\">Loss â‚¹</div><div class=\"fs-value\">" + (Utils.fmtCurrency(f.lossOpportunity)) + "</div></div>\n        </div>\n      </div>");
+      return ("\n      <div class=\"facility-card\">\n        <div class=\"facility-name\">\n          🏭 " + (Utils.escHTML(f.facility)) + "\n          <span class=\"badge " + (pct>=98?'badge-ok':pct>=90?'badge-warn':'badge-danger') + "\">" + (f.rank ? '#'+f.rank : '') + "</span>\n        </div>\n        <div class=\"facility-compliance\" style=\"color:" + (color) + "\">" + (Utils.fmtPct(pct)) + "</div>\n        <div style=\"margin-bottom:8px;\">\n          <div class=\"progress-bar\">\n            <div class=\"progress-fill\" style=\"background:" + (color) + ";width:" + (Math.min(pct,100)) + "%\"></div>\n          </div>\n        </div>\n        <div class=\"facility-stats\">\n          <div class=\"facility-stat\"><div class=\"fs-label\">Total GPs</div><div class=\"fs-value\">" + (Utils.fmtNum(f.totalGps)) + "</div></div>\n          <div class=\"facility-stat\"><div class=\"fs-label\">Violations</div><div class=\"fs-value\" style=\"color:var(--clr-danger);\">" + (Utils.fmtNum(f.violations)) + "</div></div>\n          <div class=\"facility-stat\"><div class=\"fs-label\">Skipped Qty</div><div class=\"fs-value\">" + (Utils.fmtQty(f.skippedQty)) + "</div></div>\n          <div class=\"facility-stat\"><div class=\"fs-label\">Loss ₹</div><div class=\"fs-value\">" + (Utils.fmtCurrency(f.lossOpportunity)) + "</div></div>\n        </div>\n      </div>");
     }).join('');
   }
 
@@ -3435,7 +3528,7 @@ const Dashboard = (() => {
     const el = document.getElementById('top-violators-list');
     if (!el) return;
     if (!users.length) {
-      el.innerHTML = '<div class="empty-state" style="padding:16px;"><div class="empty-icon">ðŸŽ‰</div><div>No violations found</div></div>';
+      el.innerHTML = '<div class="empty-state" style="padding:16px;"><div class="empty-icon">🎉</div><div>No violations found</div></div>';
       return;
     }
     const max = Math.max(...users.map(u => u.violations || 0), 1);
@@ -3447,10 +3540,10 @@ const Dashboard = (() => {
     const el = document.getElementById('champions-list');
     if (!el) return;
     if (!users.length) {
-      el.innerHTML = '<div class="empty-state" style="padding:16px;"><div class="empty-icon">ðŸ“Š</div><div>No champions yet<br><small>Need 50+ GPs at >98% compliance</small></div></div>';
+      el.innerHTML = '<div class="empty-state" style="padding:16px;"><div class="empty-icon">📊</div><div>No champions yet<br><small>Need 50+ GPs at >98% compliance</small></div></div>';
       return;
     }
-    el.innerHTML = users.slice(0,7).map((u, i) => ("\n      <div class=\"user-rank-row\">\n        <div class=\"rank-num\" style=\"color:var(--clr-purple);\">" + (i===0?'ðŸ¥‡':i===1?'ðŸ¥ˆ':i===2?'ðŸ¥‰':'#'+(i+1)) + "</div>\n        <div style=\"flex:1;min-width:0;\">\n          <div class=\"truncate\" style=\"font-weight:600;font-size:0.8rem;\">" + (Utils.escHTML(u.userName||u.email)) + "</div>\n          <div style=\"font-size:0.7rem;color:var(--clr-text-muted);\">" + (Utils.fmtNum(u.totalGps)) + " GPs</div>\n        </div>\n        <div class=\"rank-value\" style=\"color:var(--clr-ok);\">" + (Utils.fmtPct(u.compliancePct)) + "</div>\n      </div>")).join('');
+    el.innerHTML = users.slice(0,7).map((u, i) => ("\n      <div class=\"user-rank-row\">\n        <div class=\"rank-num\" style=\"color:var(--clr-purple);\">" + (i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)) + "</div>\n        <div style=\"flex:1;min-width:0;\">\n          <div class=\"truncate\" style=\"font-weight:600;font-size:0.8rem;\">" + (Utils.escHTML(u.userName||u.email)) + "</div>\n          <div style=\"font-size:0.7rem;color:var(--clr-text-muted);\">" + (Utils.fmtNum(u.totalGps)) + " GPs</div>\n        </div>\n        <div class=\"rank-value\" style=\"color:var(--clr-ok);\">" + (Utils.fmtPct(u.compliancePct)) + "</div>\n      </div>")).join('');
   }
 
   // ---- EXPIRY BUCKETS ----
@@ -3459,10 +3552,10 @@ const Dashboard = (() => {
     if (!el) return;
 
     var buckets = [
-      { key: 'b0_30',   label: '0â€“30 Days',   cls: 'urgent'  },
-      { key: 'b31_60',  label: '31â€“60 Days',  cls: 'warning' },
-      { key: 'b61_90',  label: '61â€“90 Days',  cls: 'caution' },
-      { key: 'b91_180', label: '91â€“180 Days', cls: 'ok'      },
+      { key: 'b0_30',   label: '0–30 Days',   cls: 'urgent'  },
+      { key: 'b31_60',  label: '31–60 Days',  cls: 'warning' },
+      { key: 'b61_90',  label: '61–90 Days',  cls: 'caution' },
+      { key: 'b91_180', label: '91–180 Days', cls: 'ok'      },
       { key: 'b180p',   label: '180+ Days',   cls: ''        },
     ];
 
@@ -3507,14 +3600,20 @@ const Dashboard = (() => {
     Exports.facilitySummaryCSV();
   }
 
-  return { load, setScope, getScopeParams, exportFacilitySummary };
+  return { load, setScope, applyMonthPicker, applyCustomDates, getScopeParams, exportFacilitySummary };
 })();
 
 
 /* === violations.js === */
 /* ================================================
-   violations.js â€” Violations Tab
+   violations.js — Violations Tab
    ================================================ */
+
+function getBucketBadgeClass(bucket) {
+  if (bucket === 'DS')  return 'badge-info';
+  if (bucket === 'B2B') return 'badge-purple';
+  return 'badge-neutral';
+}
 
 const Violations = (() => {
 
@@ -3522,7 +3621,8 @@ const Violations = (() => {
   let _state = {
     page: 1, total: 0,
     tab: 'all',
-    search: '', facility: '', severity: '', scope: 'today', dateFrom: Utils.todayISO(), dateTo: Utils.todayISO(),
+    search: '', facility: '', severity: '', bucket: '',
+    scope: 'today', dateFrom: Utils.todayISO(), dateTo: Utils.todayISO(),
     sortCol: 'date', sortDir: 'desc'
   };
 
@@ -3547,15 +3647,16 @@ const Violations = (() => {
 
     try {
       const params = {
-        page: _state.page,
+        page:     _state.page,
         pageSize: PAGE_SIZE,
-        tab: _state.tab,
-        search: _state.search,
+        tab:      _state.tab,
+        search:   _state.search,
         facility: _state.facility,
         severity: _state.severity,
-        scope: _state.scope,
-        sortCol: _state.sortCol,
-        sortDir: _state.sortDir
+        bucket:   _state.bucket || '',
+        scope:    _state.scope,
+        sortCol:  _state.sortCol,
+        sortDir:  _state.sortDir
       };
 
       const result = await App.api('getViolations', params);
@@ -3584,7 +3685,7 @@ const Violations = (() => {
     if (!tbody) return;
 
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="13"><div class="empty-state"><div class="empty-icon">âœ…</div><div>No records found for the current filters.</div></div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="13"><div class="empty-state"><div class="empty-icon">✅</div><div>No records found for the current filters.</div></div></td></tr>';
       return;
     }
 
@@ -3599,7 +3700,7 @@ const Violations = (() => {
         '<td class="td-mono">' + Utils.fmtDate(v.date) + '</td>' +
         '<td class="td-mono">' + Utils.escHTML(v.gpNumber || v.gpCode || '') + '</td>' +
         '<td class="truncate" style="max-width:110px;" title="' + Utils.escHTML(v.user) + '">' + Utils.escHTML(v.user) + '</td>' +
-        '<td>' + Utils.escHTML(v.toParty || 'â€”') + '</td>' +
+        '<td>' + Utils.escHTML(v.toParty || '—') + '</td>' +
         '<td class="td-mono">' + Utils.escHTML(v.skuCode) + '</td>' +
         '<td class="truncate" style="max-width:130px;" title="' + Utils.escHTML(v.itemName) + '">' + Utils.escHTML(v.itemName) + '</td>' +
         '<td class="td-right">' + Utils.fmtNum(v.dispatchedQty || v.qty || 0) + '</td>' +
@@ -3608,6 +3709,8 @@ const Violations = (() => {
         '<td>' + Utils.getSeverityBadge(v.severity) + '</td>' +
         '<td>' + Utils.getStatusBadge(v.status) + '</td>' +
         '<td>' + Utils.escHTML(v.gpStatus || '') + '</td>' +
+        '<td><span class="badge ' + getBucketBadgeClass(v.bucket) + '">' + Utils.escHTML(v.bucket || '3PL') + '</span></td>' +
+        '<td class="td-right">' + (v.shelfLifePct ? parseFloat(v.shelfLifePct).toFixed(1) + '%' : '—') + '</td>' +
         '<td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();Violations.openDrilldown(\'' + Utils.escHTML(v.id||'') + '\')">Detail</button></td>' +
         '</tr>';
     }).join('');
@@ -3650,23 +3753,23 @@ const Violations = (() => {
   }
 
   function renderDrilldown(d) {
-    Utils.setText('drilldown-title', (d.gpNumber || d.gpCode || 'â€”') + ' â€” ' + (d.itemName || ''));
+    Utils.setText('drilldown-title', (d.gpNumber || d.gpCode || '—') + ' — ' + (d.itemName || ''));
 
     const fields = [
-      { label: 'Gatepass Code',        value: d.gpNumber || d.gpCode || 'â€”', mono: true },
-      { label: 'GP Status',            value: d.gpStatus || 'â€”' },
+      { label: 'Gatepass Code',        value: d.gpNumber || d.gpCode || '—', mono: true },
+      { label: 'GP Status',            value: d.gpStatus || '—' },
       { label: 'Date',                 value: Utils.fmtDate(d.date) },
       { label: 'User',                 value: d.user },
       { label: 'Facility',             value: d.facility },
       { label: 'To Party',             value: d.toParty },
       { label: 'SKU Code',             value: d.skuCode,          mono: true },
       { label: 'Item Name',            value: d.itemName },
-      { label: 'Dispatched Batch',     value: d.batchCode || 'â€”', mono: true },
-      { label: 'Vendor Batch',         value: d.vendorBatch || 'â€”', mono: true },
-      { label: 'Mfg Date (Dispatched)',value: Utils.fmtDate(d.mfgDate) || 'â€”' },
-      { label: 'Expiry (Dispatched)',  value: Utils.fmtDate(d.expiryDate) || 'â€”', color: 'var(--clr-warn)' },
+      { label: 'Dispatched Batch',     value: d.batchCode || '—', mono: true },
+      { label: 'Vendor Batch',         value: d.vendorBatch || '—', mono: true },
+      { label: 'Mfg Date (Dispatched)',value: Utils.fmtDate(d.mfgDate) || '—' },
+      { label: 'Expiry (Dispatched)',  value: Utils.fmtDate(d.expiryDate) || '—', color: 'var(--clr-warn)' },
       { label: 'Dispatch Qty',         value: Utils.fmtNum(d.dispatchedQty || d.qty || 0) },
-      { label: 'FIFO Rank',            value: d.fifoRank || 'â€”' },
+      { label: 'FEFO Rank',            value: d.fifoRank || '—' },
       { label: 'Older Batch Count',    value: Utils.fmtNum(d.olderBatchCount) },
       { label: 'Older Inv Qty',        value: Utils.fmtNum(d.olderInventoryQty), color: 'var(--clr-warn)' },
       { label: 'Severity',             html: Utils.getSeverityBadge(d.severity) },
@@ -3677,7 +3780,7 @@ const Violations = (() => {
     document.getElementById('drilldown-grid').innerHTML = fields.map(function(f) {
       return '<div class="drilldown-cell">' +
         '<div class="dc-label">' + f.label + '</div>' +
-        '<div class="dc-value ' + (f.mono?'mono':'') + '" style="' + (f.color?'color:'+f.color:'') + '">' + (f.html || Utils.escHTML(f.value||'â€”')) + '</div>' +
+        '<div class="dc-value ' + (f.mono?'mono':'') + '" style="' + (f.color?'color:'+f.color:'') + '">' + (f.html || Utils.escHTML(f.value||'—')) + '</div>' +
         '</div>';
     }).join('');
 
@@ -3691,12 +3794,12 @@ const Violations = (() => {
         return '<tr>' +
           '<td><span class="badge badge-accent">#' + b.fifoRank + '</span></td>' +
           '<td class="td-mono">' + Utils.escHTML(b.batchCode) + '</td>' +
-          '<td class="td-mono">' + Utils.escHTML(b.vendorBatch||'â€”') + '</td>' +
+          '<td class="td-mono">' + Utils.escHTML(b.vendorBatch||'—') + '</td>' +
           '<td>' + Utils.fmtDate(b.mfgDate) + '</td>' +
           '<td>' + Utils.fmtDate(b.expiryDate || '') + '</td>' +
-          '<td>' + Utils.escHTML(b.shelf||'â€”') + '</td>' +
+          '<td>' + Utils.escHTML(b.shelf||'—') + '</td>' +
           '<td class="td-right">' + Utils.fmtNum(b.quantity || 0) + '</td>' +
-          '<td class="td-right">â‚¹' + Utils.fmtNum(b.mrp,2) + '</td>' +
+          '<td class="td-right">₹' + Utils.fmtNum(b.mrp,2) + '</td>' +
           '</tr>';
       }).join('');
     }
@@ -3712,7 +3815,11 @@ const Violations = (() => {
   function applyFilters() {
     _state.facility = document.getElementById('violations-facility').value;
     _state.severity  = document.getElementById('violations-severity').value;
-    applyScopeDates();
+    var bucketEl = document.getElementById('violations-bucket');
+    _state.bucket = bucketEl ? bucketEl.value : '';
+    _state.dateFrom  = document.getElementById('violations-date-from').value;
+    _state.dateTo    = document.getElementById('violations-date-to').value;
+    if (_state.scope !== 'custom') applyScopeDates();
     _state.page = 1;
     syncScopeUI();
     fetchData();
@@ -3721,21 +3828,48 @@ const Violations = (() => {
   function applyScopeDates() {
     if (_state.scope === 'today') {
       _state.dateFrom = Utils.todayISO();
-      _state.dateTo = Utils.todayISO();
+      _state.dateTo   = Utils.todayISO();
     } else if (_state.scope === 'yesterday') {
       _state.dateFrom = Utils.yesterdayISO();
-      _state.dateTo = Utils.yesterdayISO();
+      _state.dateTo   = Utils.yesterdayISO();
     } else if (_state.scope === 'mtd') {
       _state.dateFrom = Utils.monthStartISO();
-      _state.dateTo = Utils.todayISO();
+      _state.dateTo   = Utils.todayISO();
+    } else if (_state.scope === 'month') {
+      if (!_state.dateFrom || _state.dateFrom.slice(8) !== '01') {
+        _state.dateFrom = Utils.monthFirstDay();
+      }
+      _state.dateTo = ''; // backend computes last day
     }
+    // custom: dateFrom/dateTo already set from date inputs
   }
 
   function setScope(scope) {
     _state.scope = scope || 'today';
-    applyScopeDates();
+    Utils.hideMonthSelect('violations-month-select');
+    if (_state.scope === 'month') {
+      var cur = _state.dateFrom && _state.dateFrom.slice(8) === '01' ? _state.dateFrom : Utils.monthFirstDay();
+      Utils.populateMonthSelect('violations-month-select', cur);
+      _state.dateFrom = cur;
+      _state.dateTo   = '';
+    } else if (_state.scope !== 'custom') {
+      applyScopeDates();
+    } else {
+      _state.dateFrom = document.getElementById('violations-date-from').value || _state.dateFrom || Utils.todayISO();
+      _state.dateTo   = document.getElementById('violations-date-to').value   || _state.dateTo   || Utils.todayISO();
+    }
     _state.page = 1;
     syncScopeUI();
+    fetchData();
+  }
+
+  function applyMonthPicker() {
+    var el = document.getElementById('violations-month-select');
+    if (!el) return;
+    _state.dateFrom = el.value;
+    _state.dateTo   = '';
+    _state.scope    = 'month';
+    _state.page     = 1;
     fetchData();
   }
 
@@ -3745,18 +3879,32 @@ const Violations = (() => {
       btn.classList.toggle('btn-primary', active);
       btn.classList.toggle('btn-ghost', !active);
     });
+    var from = document.getElementById('violations-date-from');
+    var to = document.getElementById('violations-date-to');
+    if (from) {
+      from.classList.toggle('hidden', _state.scope !== 'custom');
+      from.style.display = _state.scope === 'custom' ? 'inline-flex' : 'none';
+      from.value = _state.dateFrom || '';
+    }
+    if (to) {
+      to.classList.toggle('hidden', _state.scope !== 'custom');
+      to.style.display = _state.scope === 'custom' ? 'inline-flex' : 'none';
+      to.value = _state.dateTo || '';
+    }
   }
 
   function getExportParams(limit) {
     var status = '';
-    if (_state.tab === 'violations') status = 'FIFO VIOLATION';
-    if (_state.tab === 'partial') status = 'PARTIAL FIFO POSSIBLE';
+    if (_state.tab === 'violations') status = 'FEFO VIOLATION';
+    if (_state.tab === 'partial') status = 'PARTIAL FEFO POSSIBLE';
     if (_state.tab === 'compliant') status = 'COMPLIANT';
     return {
       limit: limit || 10000,
       facility: _state.facility,
       severity: _state.severity,
       scope: _state.scope,
+      dateFrom: _state.dateFrom,
+      dateTo: _state.dateTo,
       status: status
     };
   }
@@ -3774,13 +3922,13 @@ const Violations = (() => {
 
   function _setPage(p) { _state.page = p; fetchData(); }
 
-  return { load, switchTab, onSearch, applyFilters, setScope, getExportParams, sort, openDrilldown, _setPage };
+  return { load, switchTab, onSearch, applyFilters, setScope, applyMonthPicker, applyCustomRange: applyFilters, getExportParams, sort, openDrilldown, _setPage };
 })();
 
 
 /* === prevention.js === */
 /* ================================================
-   prevention.js â€” Prevention Dashboard
+   prevention.js — Prevention Dashboard
    ================================================ */
 
 const Prevention = (() => {
@@ -3823,15 +3971,15 @@ const Prevention = (() => {
     const el = document.getElementById('prevention-expiry-buckets');
     if (!el) return;
     const buckets = [
-      { key:'b0_30',   label:'0â€“30 Days',   cls:'urgent'  },
-      { key:'b31_60',  label:'31â€“60 Days',  cls:'warning' },
-      { key:'b61_90',  label:'61â€“90 Days',  cls:'caution' },
-      { key:'b91_180', label:'91â€“180 Days', cls:'ok'      },
+      { key:'b0_30',   label:'0–30 Days',   cls:'urgent'  },
+      { key:'b31_60',  label:'31–60 Days',  cls:'warning' },
+      { key:'b61_90',  label:'61–90 Days',  cls:'caution' },
+      { key:'b91_180', label:'91–180 Days', cls:'ok'      },
       { key:'b180p',   label:'180+ Days',   cls:''        },
     ];
     el.innerHTML = buckets.map(b => {
       const d = exposure[b.key] || {};
-      return ("<div class=\"expiry-bucket " + (b.cls) + "\">\n        <div class=\"bucket-label\">" + (b.label) + "</div>\n        <div class=\"bucket-qty\">" + (Utils.fmtQty(d.qty||0)) + "</div>\n        <div class=\"bucket-value\">" + (Utils.fmtCurrency(d.value||0)) + "</div>\n        <div class=\"bucket-skus\">" + (Utils.fmtNum(d.skuCount||0)) + " SKUs Â· " + (Utils.fmtNum(d.batchCount||0)) + " batches</div>\n      </div>");
+      return ("<div class=\"expiry-bucket " + (b.cls) + "\">\n        <div class=\"bucket-label\">" + (b.label) + "</div>\n        <div class=\"bucket-qty\">" + (Utils.fmtQty(d.qty||0)) + "</div>\n        <div class=\"bucket-value\">" + (Utils.fmtCurrency(d.value||0)) + "</div>\n        <div class=\"bucket-skus\">" + (Utils.fmtNum(d.skuCount||0)) + " SKUs · " + (Utils.fmtNum(d.batchCount||0)) + " batches</div>\n      </div>");
     }).join('');
   }
 
@@ -3839,13 +3987,13 @@ const Prevention = (() => {
     const tbody = document.getElementById('prevention-body');
     if (!tbody) return;
     if (!rows.length) {
-      tbody.innerHTML = ("<tr><td colspan=\"12\"><div class=\"empty-state\"><div class=\"empty-icon\">ðŸ“¦</div><div>No at-risk inventory found.</div></div></td></tr>");
+      tbody.innerHTML = ("<tr><td colspan=\"12\"><div class=\"empty-state\"><div class=\"empty-icon\">📦</div><div>No at-risk inventory found.</div></div></td></tr>");
       return;
     }
     tbody.innerHTML = rows.map(r => {
       const days = r.daysToExpiry;
       const dayColor = Utils.getDaysColor(days);
-      return ("\n      <tr>\n        <td class=\"td-center\"><span class=\"badge badge-accent\">#" + (Utils.escHTML(String(r.fifoRank||''))) + "</span></td>\n        <td class=\"td-mono\">" + (Utils.escHTML(r.skuCode)) + "</td>\n        <td class=\"truncate\" style=\"max-width:150px;\" title=\"" + (Utils.escHTML(r.itemName)) + "\">" + (Utils.escHTML(r.itemName)) + "</td>\n        <td class=\"td-mono\">" + (Utils.escHTML(r.batchCode)) + "</td>\n        <td>" + (Utils.fmtDate(r.expiryDate)) + "</td>\n        <td style=\"color:" + (dayColor) + ";font-weight:600;\">" + (days === null ? 'â€”' : days + 'd') + "</td>\n        <td>" + (Utils.fmtDate(r.mfgDate)) + "</td>\n        <td class=\"text-muted\">" + (Utils.escHTML(r.shelves||'â€”')) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(r.totalQty)) + "</td>\n        <td class=\"td-right\">â‚¹" + (Utils.fmtNum(r.mrp,2)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-warn);\">" + (Utils.fmtCurrency(r.inventoryValue)) + "</td>\n        <td>" + (Utils.getRiskBadge(r.riskLevel)) + "</td>\n      </tr>");
+      return ("\n      <tr>\n        <td class=\"td-center\"><span class=\"badge badge-accent\">#" + (Utils.escHTML(String(r.fifoRank||''))) + "</span></td>\n        <td class=\"td-mono\">" + (Utils.escHTML(r.skuCode)) + "</td>\n        <td class=\"truncate\" style=\"max-width:150px;\" title=\"" + (Utils.escHTML(r.itemName)) + "\">" + (Utils.escHTML(r.itemName)) + "</td>\n        <td class=\"td-mono\">" + (Utils.escHTML(r.batchCode)) + "</td>\n        <td>" + (Utils.fmtDate(r.expiryDate)) + "</td>\n        <td style=\"color:" + (dayColor) + ";font-weight:600;\">" + (days === null ? '—' : days + 'd') + "</td>\n        <td>" + (Utils.fmtDate(r.mfgDate)) + "</td>\n        <td class=\"text-muted\">" + (Utils.escHTML(r.shelves||'—')) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(r.totalQty)) + "</td>\n        <td class=\"td-right\">₹" + (Utils.fmtNum(r.mrp,2)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-warn);\">" + (Utils.fmtCurrency(r.inventoryValue)) + "</td>\n        <td>" + (Utils.getRiskBadge(r.riskLevel)) + "</td>\n      </tr>");
     }).join('');
   }
 
@@ -3869,7 +4017,7 @@ const Prevention = (() => {
 
 /* === compliance.js === */
 /* ================================================
-   compliance.js â€” User Compliance Analytics
+   compliance.js — User Compliance Analytics
    ================================================ */
 
 const Compliance = (() => {
@@ -3899,22 +4047,50 @@ const Compliance = (() => {
   }
 
   function getScopeParams() {
-    return { scope: _scope };
+    return { scope: _scope, dateFrom: _dateFrom, dateTo: _dateTo };
   }
 
   function setScope(scope) {
     _scope = scope || 'today';
+    Utils.hideMonthSelect('compliance-month-select');
     if (_scope === 'today') {
       _dateFrom = Utils.todayISO();
-      _dateTo = Utils.todayISO();
+      _dateTo   = Utils.todayISO();
     } else if (_scope === 'yesterday') {
       _dateFrom = Utils.yesterdayISO();
-      _dateTo = Utils.yesterdayISO();
+      _dateTo   = Utils.yesterdayISO();
     } else if (_scope === 'mtd') {
       _dateFrom = Utils.monthStartISO();
-      _dateTo = Utils.todayISO();
+      _dateTo   = Utils.todayISO();
+    } else if (_scope === 'month') {
+      var cur = _dateFrom && _dateFrom.slice(8) === '01' ? _dateFrom : Utils.monthFirstDay();
+      Utils.populateMonthSelect('compliance-month-select', cur);
+      _dateFrom = cur;
+      _dateTo   = '';
+    } else if (_scope === 'custom') {
+      _dateFrom = document.getElementById('compliance-date-from').value || Utils.todayISO();
+      _dateTo   = document.getElementById('compliance-date-to').value   || Utils.todayISO();
     }
     _rawData = null;
+    syncScopeUI();
+    fetchAll();
+  }
+
+  function applyMonthPicker() {
+    var el = document.getElementById('compliance-month-select');
+    if (!el) return;
+    _dateFrom = el.value;
+    _dateTo   = '';
+    _scope    = 'month';
+    _rawData  = null;
+    fetchAll();
+  }
+
+  function applyCustomDates() {
+    _scope = 'custom';
+    _dateFrom = document.getElementById('compliance-date-from').value || '';
+    _dateTo   = document.getElementById('compliance-date-to').value || '';
+    _rawData  = null;
     syncScopeUI();
     fetchAll();
   }
@@ -3925,6 +4101,12 @@ const Compliance = (() => {
       btn.classList.toggle('btn-primary', active);
       btn.classList.toggle('btn-ghost', !active);
     });
+    var custom = document.getElementById('compliance-custom-dates');
+    if (custom) custom.classList.toggle('hidden', _scope !== 'custom');
+    var from = document.getElementById('compliance-date-from');
+    var to = document.getElementById('compliance-date-to');
+    if (from) from.value = _dateFrom || '';
+    if (to) to.value = _dateTo || '';
   }
 
   function renderCurrentTab() {
@@ -4010,10 +4192,10 @@ const Compliance = (() => {
     const tbody = document.getElementById('champions-body');
     if (!tbody) return;
     if (!champs.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:32px;"><div class="empty-icon">ðŸ†</div><div class="text-muted" style="margin-top:8px;">No FIFO champions yet.<br><small>Need 50+ GPs with >98% compliance</small></div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:32px;"><div class="empty-icon">🏆</div><div class="text-muted" style="margin-top:8px;">No FEFO champions yet.<br><small>Need 50+ GPs with >98% compliance</small></div></td></tr>';
       return;
     }
-    tbody.innerHTML = champs.map((u,i) => ("\n      <tr>\n        <td class=\"td-center\">" + (i===0?'ðŸ¥‡':i===1?'ðŸ¥ˆ':i===2?'ðŸ¥‰':'#'+(i+1)) + "</td>\n        <td style=\"font-weight:700;color:var(--clr-purple);\">" + (Utils.escHTML(u.userName||u.email)) + "</td>\n        <td>" + (Utils.escHTML(u.facility||'')) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.totalGps)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.violations)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-ok);font-weight:700;\">" + (Utils.fmtPct(u.compliancePct)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.skippedQty)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtCurrency(u.lossOpportunity)) + "</td>\n      </tr>")).join('');
+    tbody.innerHTML = champs.map((u,i) => ("\n      <tr>\n        <td class=\"td-center\">" + (i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)) + "</td>\n        <td style=\"font-weight:700;color:var(--clr-purple);\">" + (Utils.escHTML(u.userName||u.email)) + "</td>\n        <td>" + (Utils.escHTML(u.facility||'')) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.totalGps)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.violations)) + "</td>\n        <td class=\"td-right\" style=\"color:var(--clr-ok);font-weight:700;\">" + (Utils.fmtPct(u.compliancePct)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtNum(u.skippedQty)) + "</td>\n        <td class=\"td-right\">" + (Utils.fmtCurrency(u.lossOpportunity)) + "</td>\n      </tr>")).join('');
   }
 
   function renderAllUsers() {
@@ -4049,13 +4231,13 @@ const Compliance = (() => {
   function _setOffPage(p) { _offPage = p; renderOffenders(); }
   function _setAllPage(p) { _allPage = p; renderAllUsers(); }
 
-  return { load, switchTab, setScope, getScopeParams, searchOffenders, searchAllUsers, applyAllUsersFilter, _setOffPage, _setAllPage };
+  return { load, switchTab, setScope, applyMonthPicker, applyCustomDates, getScopeParams, searchOffenders, searchAllUsers, applyAllUsersFilter, _setOffPage, _setAllPage };
 })();
 
 
 /* === exports.js === */
 /* ================================================
-   exports.js â€” CSV, Excel, PDF export handlers
+   exports.js — CSV, Excel, PDF export handlers
    Uses native browser APIs only (no heavy libs).
    Excel via SheetJS loaded on demand.
    ================================================ */
@@ -4122,7 +4304,7 @@ const Exports = (() => {
 
   // ---- PDF via PRINT ----
   function printTable(title, headers, rows, filename) {
-    const html = ("\n      <!DOCTYPE html><html>\n      <head>\n        <title>" + (title) + "</title>\n        <style>\n          body{font-family:Arial,sans-serif;font-size:11px;margin:20px;color:#111;}\n          h1{font-size:15px;margin-bottom:4px;}\n          .meta{font-size:10px;color:#666;margin-bottom:14px;}\n          table{width:100%;border-collapse:collapse;}\n          th{background:#1a1a2e;color:#fff;padding:6px 8px;text-align:left;font-size:10px;}\n          td{padding:5px 8px;border-bottom:1px solid #e0e0e0;font-size:10px;}\n          tr:nth-child(even) td{background:#f7f7f7;}\n          @media print{@page{size:A4 landscape;margin:10mm;}}\n        </style>\n      </head>\n      <body>\n        <h1>" + (title) + "</h1>\n        <div class=\"meta\">Generated: " + (new Date().toLocaleString('en-IN')) + " | FIFO Control Tower</div>\n        <table>\n          <thead><tr>" + (headers.map(h=>("<th>" + (h) + "</th>")).join('')) + "</tr></thead>\n          <tbody>" + (rows.map(r=>("<tr>" + (r.map(c=>("<td>" + (c===null||c===undefined?'â€”':c) + "</td>")).join('')) + "</tr>")).join('')) + "</tbody>\n        </table>\n      </body></html>");
+    const html = ("\n      <!DOCTYPE html><html>\n      <head>\n        <title>" + (title) + "</title>\n        <style>\n          body{font-family:Arial,sans-serif;font-size:11px;margin:20px;color:#111;}\n          h1{font-size:15px;margin-bottom:4px;}\n          .meta{font-size:10px;color:#666;margin-bottom:14px;}\n          table{width:100%;border-collapse:collapse;}\n          th{background:#1a1a2e;color:#fff;padding:6px 8px;text-align:left;font-size:10px;}\n          td{padding:5px 8px;border-bottom:1px solid #e0e0e0;font-size:10px;}\n          tr:nth-child(even) td{background:#f7f7f7;}\n          @media print{@page{size:A4 landscape;margin:10mm;}}\n        </style>\n      </head>\n      <body>\n        <h1>" + (title) + "</h1>\n        <div class=\"meta\">Generated: " + (new Date().toLocaleString('en-IN')) + " | FEFO Control Tower</div>\n        <table>\n          <thead><tr>" + (headers.map(h=>("<th>" + (h) + "</th>")).join('')) + "</tr></thead>\n          <tbody>" + (rows.map(r=>("<tr>" + (r.map(c=>("<td>" + (c===null||c===undefined?'—':c) + "</td>")).join('')) + "</tr>")).join('')) + "</tbody>\n        </table>\n      </body></html>");
     const win = window.open('', '_blank');
     if (!win) { Utils.toast('Pop-up blocked. Allow pop-ups for PDF export.', 'warn'); return; }
     win.document.write(html);
@@ -4133,51 +4315,51 @@ const Exports = (() => {
 
   // ---- VIOLATIONS EXPORTS ----
   async function violationsCSV() {
-    Utils.toast('Fetching violation data for exportâ€¦', 'info', 2000);
+    Utils.toast('Fetching violation data for export…', 'info', 2000);
     try {
       const exportParams = Object.assign({ format: 'csv' }, Violations.getExportParams());
       const result = await App.api('exportViolations', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (â‚¹)','FIFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
+      const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (₹)','FEFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
       const rows = result.rows || [];
-      downloadCSV(toCSV(rows, headers), 'FIFO_Violations_' + Utils.scopeLabel(exportParams.scope));
+      downloadCSV(toCSV(rows, headers), 'FEFO_Violations_' + Utils.scopeLabel(exportParams.scope));
       Utils.toast('Violations CSV downloaded.', 'ok');
     } catch(e) { Utils.toast('Export error.', 'danger'); console.error(e); }
   }
 
   async function violationsExcel() {
-    Utils.toast('Preparing Excel exportâ€¦', 'info', 2000);
+    Utils.toast('Preparing Excel export…', 'info', 2000);
     try {
       const exportParams = Object.assign({ format: 'excel' }, Violations.getExportParams());
       const result = await App.api('exportViolations', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (â‚¹)','FIFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
+      const headers = result.headers || ['Date','GP Number','User','User Email','Facility','SKU Code','Item Name','Batch Code','Vendor Batch','Dispatched Qty','Shelf','Status','Severity','Older Batch Count','Older Inventory Qty','Loss Opportunity (₹)','FEFO Rank','Manufacturing Date','Expiry Date','To Party','Upload ID'];
       const rows = result.rows || [];
-      await downloadExcel([].concat([headers], rows), 'Violations', 'FIFO_Violations_' + Utils.scopeLabel(exportParams.scope));
+      await downloadExcel([].concat([headers], rows), 'Violations', 'FEFO_Violations_' + Utils.scopeLabel(exportParams.scope));
       Utils.toast('Violations Excel downloaded.', 'ok');
     } catch(e) { Utils.toast('Excel export error.', 'danger'); console.error(e); }
   }
 
   async function violationsPDF() {
-    Utils.toast('Preparing PDFâ€¦', 'info', 1500);
+    Utils.toast('Preparing PDF…', 'info', 1500);
     try {
       const exportParams = Object.assign({ format: 'pdf' }, Violations.getExportParams(500));
       const result = await App.api('exportViolations', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      // Backend rows are arrays: [Date, GPNumber, User, UserEmail, Facility, SKUCode, ItemName, BatchCode, VendorBatch, DispatchedQty, Shelf, Status, Severity, OlderBatchCount, OlderInventoryQty, LossOpp, FIFORank, MfgDate, ExpiryDate, ToParty, UploadID]
-      const headers = ['Date','GP Number','User','Facility','Severity','Skipped Qty','Loss Opp (â‚¹)','Status'];
+      // Backend rows are arrays: [Date, GPNumber, User, UserEmail, Facility, SKUCode, ItemName, BatchCode, VendorBatch, DispatchedQty, Shelf, Status, Severity, OlderBatchCount, OlderInventoryQty, LossOpp, FEFORank, MfgDate, ExpiryDate, ToParty, UploadID]
+      const headers = ['Date','GP Number','User','Facility','Severity','Skipped Qty','Loss Opp (₹)','Status'];
       const rows = (result.rows||[]).map(r => [r[0], r[1], r[2], r[4], r[12], r[14], r[15], r[11]]);
-      printTable('FIFO Violations Report - ' + Utils.scopeLabel(exportParams.scope), headers, rows, 'FIFO_Violations');
+      printTable('FEFO Violations Report - ' + Utils.scopeLabel(exportParams.scope), headers, rows, 'FEFO_Violations');
     } catch(e) { Utils.toast('PDF export error.', 'danger'); console.error(e); }
   }
 
   // ---- PREVENTION EXPORTS ----
   async function preventionCSV() {
-    Utils.toast('Fetching prevention dataâ€¦', 'info', 2000);
+    Utils.toast('Fetching prevention data…', 'info', 2000);
     try {
       const result = await App.api('exportPrevention', {});
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = result.headers || ['Facility','SKU Code','Item Name','Shelf','Batch Code','Vendor Batch','Manufacturing Date','Expiry Date','Quantity','MRP (â‚¹)','Value (â‚¹)','Days to Expiry','Risk Level'];
+      const headers = result.headers || ['Facility','SKU Code','Item Name','Shelf','Batch Code','Vendor Batch','Manufacturing Date','Expiry Date','Quantity','MRP (₹)','Value (₹)','Days to Expiry','Risk Level'];
       const rows = result.rows || [];
       downloadCSV(toCSV(rows, headers), 'Prevention_Dashboard');
       Utils.toast('Prevention CSV downloaded.', 'ok');
@@ -4186,12 +4368,12 @@ const Exports = (() => {
 
   // ---- FINANCIAL EXPORTS ----
   async function financialCSV() {
-    Utils.toast('Fetching compliance data for financial exportâ€¦', 'info', 2000);
+    Utils.toast('Fetching compliance data for financial export…', 'info', 2000);
     try {
       const exportParams = Compliance.getScopeParams ? Compliance.getScopeParams() : {};
       const result = await App.api('exportCompliance', exportParams);
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FIFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (â‚¹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
+      const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FEFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (₹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
       const rows = result.rows || [];
       downloadCSV(toCSV(rows, headers), 'Financial_Impact');
       Utils.toast('Financial CSV downloaded.', 'ok');
@@ -4200,11 +4382,11 @@ const Exports = (() => {
 
   // ---- COMPLIANCE EXPORTS ----
   async function complianceCSV() {
-    Utils.toast('Fetching compliance dataâ€¦', 'info', 2000);
+    Utils.toast('Fetching compliance data…', 'info', 2000);
     try {
       const result = await App.api('exportCompliance', {});
       if (!result || !result.success) { Utils.toast('Export failed.', 'danger'); return; }
-      const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FIFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (â‚¹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
+      const headers = result.headers || ['User Name','User Email','Facility','Total GPs','Violations','Partial FEFO','Compliant','Compliance %','Skipped Qty','Loss Opportunity (₹)','Last Violation Date','Violations (Last 30 Days)','Offender Level','Is Champion'];
       const rows = result.rows || [];
       downloadCSV(toCSV(rows, headers), 'User_Compliance_' + Utils.scopeLabel(exportParams.scope));
       Utils.toast('Compliance CSV downloaded.', 'ok');
@@ -4218,7 +4400,7 @@ const Exports = (() => {
 
   // ---- FACILITY SUMMARY ----
   function facilitySummaryCSV(facilities) {
-    const headers = ['Facility','Compliance %','Total GPs','Violations','Partial FIFO','Skipped Qty','Loss â‚¹'];
+    const headers = ['Facility','Compliance %','Total GPs','Violations','Partial FEFO','Skipped Qty','Loss ₹'];
     const rows = facilities.map(f => [f.facility, f.compliancePct, f.totalGps, f.violations, f.partialFifo, f.skippedQty, f.lossOpportunity]);
     downloadCSV(toCSV(rows, headers), 'Facility_Summary');
     Utils.toast('Facility summary CSV downloaded.', 'ok');
@@ -4234,9 +4416,9 @@ const Exports = (() => {
       ['Facility', d.facility], ['SKU Code', d.skuCode], ['Item Name', d.itemName],
       ['Dispatch Qty', d.qty], ['Older Batch Count', d.olderBatchCount],
       ['Older Inventory Qty', d.olderInventoryQty], ['Severity', d.severity],
-      ['Status', d.status], ['Loss Opportunity â‚¹', d.lossOpportunity]
+      ['Status', d.status], ['Loss Opportunity ₹', d.lossOpportunity]
     ];
-    printTable('Violation Drilldown â€” ' + d.gpCode, headers, rows, 'Drilldown');
+    printTable('Violation Drilldown — ' + d.gpCode, headers, rows, 'Drilldown');
   }
 
   return {
