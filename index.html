@@ -8,7 +8,7 @@
   // Apps Script  Deploy  Manage Deployments  copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fefo-source-filter-rebuild-20260702-v16';
+  var FRONTEND_BUILD_ID = 'fefo-detail-stable-row-fix-20260703-v17';
   var MAINTENANCE_MODE = false;
   var MAINTENANCE_TITLE = 'FEFO Control Tower is under production';
   var MAINTENANCE_MESSAGE = 'We are applying amendments to the dashboard. Please check back shortly.';
@@ -3765,7 +3765,12 @@ const Violations = (() => {
       // Ignore stale response if user clicked a different row while loading
       if (_pendingDrilldownId !== id) return;
       if (!result || !result.success) {
-        document.getElementById('drilldown-grid').innerHTML = '<div class="text-danger">Failed to load detail.</div>';
+        if (result && result.error === 'NOT_FOUND') {
+          document.getElementById('drilldown-grid').innerHTML = '<div class="text-danger">Detail was refreshed. Please click the row again.</div>';
+          fetchData();
+        } else {
+          document.getElementById('drilldown-grid').innerHTML = '<div class="text-danger">Failed to load detail.</div>';
+        }
         return;
       }
       renderDrilldown(result.data);
