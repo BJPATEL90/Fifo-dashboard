@@ -8,7 +8,7 @@
   // Apps Script  Deploy  Manage Deployments  copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fefo-party-name-mapping-20260703-v19';
+  var FRONTEND_BUILD_ID = 'fefo-threshold-kpis-20260716-v20';
   var MAINTENANCE_MODE = false;
   var MAINTENANCE_TITLE = 'FEFO Control Tower is under production';
   var MAINTENANCE_MESSAGE = 'We are applying amendments to the dashboard. Please check back shortly.';
@@ -1768,7 +1768,7 @@ body:not(.maintenance-active) #maintenance-page {
       <div id="page-gatepass" class="page hidden">
         <div class="card" style="max-width:660px; margin:0 auto;">
           <h2 style="margin-bottom:6px;">Upload Gatepass File</h2>
-          <p style="margin-bottom:20px;">Upload a CSV or XLSX file. Only records from SL Ambient or SL Mother Hub will be processed. B2B to-party records are automatically excluded.</p>
+          <p style="margin-bottom:20px;">Upload a CSV or XLSX file. Only records from SL Ambient or SL Mother Hub will be processed. To Party mapping controls 3PL, DS, and B2B logic.</p>
           <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="Gatepass.onDragOver(event)" ondrop="Gatepass.onDrop(event)" ondragleave="Gatepass.onDragLeave(event)">
             <div class="upload-icon"></div>
             <div class="upload-text">Click to select file or drag & drop here</div>
@@ -1935,6 +1935,24 @@ body:not(.maintenance-active) #maintenance-page {
               </div>
               <div class="setting-control">
                 <input type="number" id="s-min-threshold" min="0" value="50">
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-name">DS Shelf Life Threshold %</div>
+                <div class="setting-desc">Only batches at or above this shelf-life % enter DS FEFO ranking</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" id="s-ds-threshold" min="0" max="100" value="45">
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-name">B2B Shelf Life Threshold %</div>
+                <div class="setting-desc">Only batches at or above this shelf-life % enter B2B FEFO ranking</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" id="s-b2b-threshold" min="0" max="100" value="85">
               </div>
             </div>
             <div class="setting-row">
@@ -3225,6 +3243,8 @@ const Settings = (() => {
       if (result && result.success) {
         const s = result.settings || {};
         setValue('s-min-threshold',          (s.minInventoryThreshold != null ? s.minInventoryThreshold : 50));
+        setValue('s-ds-threshold',           (s.dsShelfLifeThreshold != null ? s.dsShelfLifeThreshold : 45));
+        setValue('s-b2b-threshold',          (s.b2bShelfLifeThreshold != null ? s.b2bShelfLifeThreshold : 85));
         setValue('s-repeat-threshold',       (s.repeatOffenderThreshold != null ? s.repeatOffenderThreshold : 5));
         setValue('s-minor-min',              (s.minorMin != null ? s.minorMin : 50));
         setValue('s-minor-max',              (s.minorMax != null ? s.minorMax : 499));
@@ -3247,6 +3267,8 @@ const Settings = (() => {
 
     const settings = {
       minInventoryThreshold:    getNum('s-min-threshold'),
+      dsShelfLifeThreshold:     getNum('s-ds-threshold'),
+      b2bShelfLifeThreshold:    getNum('s-b2b-threshold'),
       repeatOffenderThreshold:  getNum('s-repeat-threshold'),
       minorMin:                 getNum('s-minor-min'),
       minorMax:                 getNum('s-minor-max'),
@@ -3462,8 +3484,18 @@ const Dashboard = (() => {
     var compliance   = data.FEFOCompliancePct || data.fifoCompliancePct || 0;
     var champCount   = data.FEFOChampions     || data.fifoChampions     || 0;
     const compColor = compliance >= 98 ? 'ok' : compliance >= 90 ? 'warn' : 'danger';
+    var bucketCards = (data.bucketKpis || []).map(function(b) {
+      var pct = b.compliancePct || 0;
+      return {
+        label: b.label || b.bucket,
+        icon: '',
+        value: Utils.fmtPct(pct),
+        sub: Utils.fmtNum(b.totalGps || 0) + ' GPs | ' + Utils.fmtNum(b.violations || 0) + ' viol | ' + Utils.fmtNum(b.partialFefoCases || 0) + ' partial',
+        type: pct >= 98 ? 'ok' : pct >= 90 ? 'warn' : 'danger'
+      };
+    });
 
-    const kpis = [
+    const kpis = bucketCards.concat([
       {
         label: 'Total Gatepasses', icon: '',
         value: Utils.fmtNum(data.totalGatepasses),
@@ -3518,7 +3550,7 @@ const Dashboard = (() => {
         sub: '50 GPs, >98% compliant',
         type: 'purple'
       },
-    ];
+    ]);
 
     grid.innerHTML = kpis.map(k => ("\n      <div class=\"kpi-card " + (k.type) + "\">\n        <div class=\"kpi-label\"><span>" + (k.icon) + "</span> " + (k.label) + "</div>\n        <div class=\"kpi-value\">" + (k.value) + "</div>\n        <div class=\"kpi-sub\">" + (k.sub) + "</div>\n      </div>")).join('');
   }
