@@ -8,7 +8,7 @@
   // Apps Script  Deploy  Manage Deployments  copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fefo-facility-qty-compliance-20260810-v28';
+  var FRONTEND_BUILD_ID = 'fefo-home-layout-six-kpi-20260810-v30';
   var MAINTENANCE_MODE = false;
   var MAINTENANCE_TITLE = 'FEFO Control Tower is under production';
   var MAINTENANCE_MESSAGE = 'We are applying amendments to the dashboard. Please check back shortly.';
@@ -737,7 +737,7 @@ select option { background: var(--clr-surface2); color: var(--clr-text); }
 /* ---- KPI GRID ---- */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 18px;
 }
@@ -1423,14 +1423,6 @@ body:not(.maintenance-active) #maintenance-page {
           <input type="date" id="dashboard-date-from" class="btn btn-ghost btn-sm" onchange="Dashboard.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
           <input type="date" id="dashboard-date-to" class="btn btn-ghost btn-sm" onchange="Dashboard.applyCustomDates()" style="border:1px solid var(--clr-border); padding:5px 10px; width:auto;">
         </div>
-        <div class="kpi-grid" id="kpi-grid">
-          <!-- Populated by dashboard.js -->
-          <div class="kpi-card" style="grid-column:1/-1; text-align:center; padding:32px;">
-            <div class="spinner spinner-lg" style="margin:0 auto 10px;"></div>
-            <div class="text-muted">Loading dashboard...</div>
-          </div>
-        </div>
-
         <!-- Facility Compliance -->
         <div class="section-header">
           <div class="section-title"> Facility Compliance</div>
@@ -1440,6 +1432,14 @@ body:not(.maintenance-active) #maintenance-page {
         </div>
         <div class="facility-grid" id="facility-grid" style="margin-bottom:18px;">
           <!-- Populated dynamically -->
+        </div>
+
+        <div class="kpi-grid" id="kpi-grid">
+          <!-- Populated by dashboard.js -->
+          <div class="kpi-card" style="grid-column:1/-1; text-align:center; padding:32px;">
+            <div class="spinner spinner-lg" style="margin:0 auto 10px;"></div>
+            <div class="text-muted">Loading dashboard...</div>
+          </div>
         </div>
 
         <!-- Recent Violations -->
@@ -3589,18 +3589,14 @@ const Dashboard = (() => {
     const grid = document.getElementById('kpi-grid');
     if (!grid) return;
 
-    var violations   = data.FEFOViolations    || data.fifoViolations    || 0;
-    var partialCases = data.partialFEFOCases  || data.partialFifoCases  || 0;
-    var compliance   = data.FEFOCompliancePct || data.fifoCompliancePct || 0;
-    var champCount   = data.FEFOChampions     || data.fifoChampions     || 0;
-    const compColor = compliance >= 98 ? 'ok' : compliance >= 90 ? 'warn' : 'danger';
+    var violations = data.FEFOViolations || data.fifoViolations || 0;
     var bucketCards = (data.bucketKpis || []).map(function(b) {
       var pct = b.compliancePct || 0;
       return {
         label: b.label || b.bucket,
         icon: '',
         value: Utils.fmtPct(pct),
-        sub: Utils.fmtNum(b.totalGps || 0) + ' GPs | ' + Utils.fmtNum(b.violations || 0) + ' viol | ' + Utils.fmtNum(b.partialFefoCases || 0) + ' partial',
+        sub: Utils.fmtNum(b.totalGps || 0) + ' GPs | ' + Utils.fmtNum(b.violations || 0) + ' viol',
         type: pct >= 98 ? 'ok' : pct >= 90 ? 'warn' : 'danger'
       };
     });
@@ -3619,48 +3615,12 @@ const Dashboard = (() => {
         type: 'danger'
       },
       {
-        label: 'Partial FEFO Cases', icon: '',
-        value: Utils.fmtNum(partialCases),
-        sub: 'Partial compliance',
-        type: 'warn'
-      },
-      {
-        label: 'FEFO Compliance', icon: '',
-        value: Utils.fmtPct(compliance),
-        sub: 'Overall rate',
-        type: compColor
-      },
-      {
-        label: 'Skipped Inventory', icon: '',
-        value: Utils.fmtQty(data.totalSkippedQty),
-        sub: 'Units bypassed',
-        type: 'warn'
-      },
-      {
-        label: 'Loss Opportunity', icon: '',
-        value: Utils.fmtCurrency(data.totalLossOpportunity || 0),
-        sub: 'Skipped qty  MRP',
-        type: 'danger'
-      },
-      {
-        label: 'High Risk Inv Value', icon: '',
-        value: Utils.fmtCurrency(data.highRiskInventoryValue),
-        sub: 'Expiring 30 days',
-        type: 'danger'
-      },
-      {
-        label: 'Repeat Offenders', icon: '',
-        value: Utils.fmtNum(data.repeatOffenders),
-        sub: '5+ violations / 30d',
-        type: 'danger'
-      },
-      {
-        label: 'FEFO Champions', icon: '',
-        value: Utils.fmtNum(champCount),
-        sub: '50 GPs, >98% compliant',
-        type: 'purple'
-      },
-    ]);
+        label: 'Compliant GPs', icon: '',
+        value: Utils.fmtNum(data.compliantGps || 0),
+        sub: 'Fully compliant records',
+        type: 'ok'
+      }
+    ]).slice(0, 6);
 
     grid.innerHTML = kpis.map(k => ("\n      <div class=\"kpi-card " + (k.type) + "\">\n        <div class=\"kpi-label\"><span>" + (k.icon) + "</span> " + (k.label) + "</div>\n        <div class=\"kpi-value\">" + (k.value) + "</div>\n        <div class=\"kpi-sub\">" + (k.sub) + "</div>\n      </div>")).join('');
   }
