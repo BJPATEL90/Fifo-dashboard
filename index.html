@@ -8,7 +8,7 @@
   // Apps Script  Deploy  Manage Deployments  copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fefo-home-recent-filter-20260810-v25';
+  var FRONTEND_BUILD_ID = 'fefo-config-sheet-automation-20260810-v26';
   var MAINTENANCE_MODE = false;
   var MAINTENANCE_TITLE = 'FEFO Control Tower is under production';
   var MAINTENANCE_MESSAGE = 'We are applying amendments to the dashboard. Please check back shortly.';
@@ -2019,6 +2019,66 @@ body:not(.maintenance-active) #maintenance-page {
             </div>
           </div>
 
+          <div class="card" style="margin-bottom:14px;">
+            <h3 style="margin-bottom:14px;">Automation Config</h3>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Inventory Email Sender</div><div class="setting-desc">Gmail sender for Shelfwise Inventory auto-fetch</div></div>
+              <div class="setting-control"><input type="email" id="s-inv-email" value="noreply@e.unicommerce.com"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Inventory Email Subject</div><div class="setting-desc">Subject/body keyword for inventory export email</div></div>
+              <div class="setting-control"><input type="text" id="s-inv-subject" value="Export: All facility Shelf report"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Inventory Processing Time</div><div class="setting-desc">Daily auto-fetch time in IST</div></div>
+              <div style="display:flex;gap:6px;align-items:center;"><input type="number" id="s-inv-hour" min="0" max="23" value="9" style="width:70px;"><span class="text-muted">:</span><input type="number" id="s-inv-minute" min="0" max="59" value="0" style="width:70px;"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Gatepass Email Sender</div><div class="setting-desc">Gmail sender for Gatepass All Facility auto-fetch</div></div>
+              <div class="setting-control"><input type="email" id="s-gp-email" value="noreply@e.unicommerce.com"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Gatepass Email Subject</div><div class="setting-desc">Subject/body keyword for gatepass export email</div></div>
+              <div class="setting-control"><input type="text" id="s-gp-subject" value="Export Job Complete - Gatepass All Facility"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Gatepass Processing Time</div><div class="setting-desc">Configured process time in IST</div></div>
+              <div style="display:flex;gap:6px;align-items:center;"><input type="number" id="s-gp-process-hour" min="0" max="23" value="14" style="width:70px;"><span class="text-muted">:</span><input type="number" id="s-gp-process-minute" min="0" max="59" value="30" style="width:70px;"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Stakeholder Email Time</div><div class="setting-desc">Daily stakeholder email trigger time in IST</div></div>
+              <div style="display:flex;gap:6px;align-items:center;"><input type="number" id="s-gp-email-hour" min="0" max="23" value="14" style="width:70px;"><span class="text-muted">:</span><input type="number" id="s-gp-email-minute" min="0" max="59" value="30" style="width:70px;"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Stakeholder To Emails</div><div class="setting-desc">Comma-separated recipient email IDs</div></div>
+              <div class="setting-control"><input type="text" id="s-gp-to" value="bhavesh.patel@mosaicwellness.in"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Stakeholder CC Emails</div><div class="setting-desc">Optional comma-separated CC email IDs</div></div>
+              <div class="setting-control"><input type="text" id="s-gp-cc" value=""></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Stakeholder Email Subject</div><div class="setting-desc">Use {{date}} for dd/MM/yyyy</div></div>
+              <div class="setting-control"><input type="text" id="s-gp-report-subject" value="FEFO Violation summery - Pre-ship - {{date}}"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Stakeholder Email Sender Name</div><div class="setting-desc">Display name shown on the email</div></div>
+              <div class="setting-control"><input type="text" id="s-gp-from-name" value="FEFO Control Tower"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Stakeholder Reply-To Email</div><div class="setting-desc">Optional reply-to email address</div></div>
+              <div class="setting-control"><input type="email" id="s-gp-reply-to" value=""></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Gatepass Flush and Replace</div><div class="setting-desc">true = replace Gatepass_Data before auto import</div></div>
+              <div class="setting-control"><input type="text" id="s-gp-replace-all" value="true"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info"><div class="setting-name">Gmail Search Window Days</div><div class="setting-desc">Past days to scan for inventory and gatepass export emails</div></div>
+              <div style="display:flex;gap:6px;align-items:center;"><input type="number" id="s-inv-search-days" min="1" value="2" style="width:70px;"><span class="text-muted">Inventory</span><input type="number" id="s-gp-search-days" min="1" value="2" style="width:70px;"><span class="text-muted">Gatepass</span></div>
+            </div>
+          </div>
+
           <div style="display:flex;gap:8px;">
             <button class="btn btn-primary" onclick="Settings.save()">
               <span id="settings-save-text">Save Settings</span>
@@ -3249,6 +3309,24 @@ const Settings = (() => {
         setValue('s-critical-min',           (s.criticalMin != null ? s.criticalMin : 1000));
         setValue('s-champion-gp-min',        (s.championGpMin != null ? s.championGpMin : 50));
         setValue('s-champion-compliance-min',(s.championComplianceMin != null ? s.championComplianceMin : 98));
+        setValue('s-inv-email',              s.inventoryImportEmail || 'noreply@e.unicommerce.com');
+        setValue('s-inv-subject',            s.inventoryImportSubject || 'Export: All facility Shelf report');
+        setValue('s-inv-hour',               (s.inventoryImportHour != null ? s.inventoryImportHour : 9));
+        setValue('s-inv-minute',             (s.inventoryImportMinute != null ? s.inventoryImportMinute : 0));
+        setValue('s-inv-search-days',        (s.inventoryImportSearchDays != null ? s.inventoryImportSearchDays : 2));
+        setValue('s-gp-email',               s.gatepassImportEmail || 'noreply@e.unicommerce.com');
+        setValue('s-gp-subject',             s.gatepassImportSubject || 'Export Job Complete - Gatepass All Facility');
+        setValue('s-gp-search-days',         (s.gatepassImportSearchDays != null ? s.gatepassImportSearchDays : 2));
+        setValue('s-gp-process-hour',        (s.gatepassProcessingHour != null ? s.gatepassProcessingHour : 14));
+        setValue('s-gp-process-minute',      (s.gatepassProcessingMinute != null ? s.gatepassProcessingMinute : 30));
+        setValue('s-gp-email-hour',          (s.gatepassEmailHour != null ? s.gatepassEmailHour : 14));
+        setValue('s-gp-email-minute',        (s.gatepassEmailMinute != null ? s.gatepassEmailMinute : 30));
+        setValue('s-gp-to',                  s.gatepassReportRecipients || 'bhavesh.patel@mosaicwellness.in');
+        setValue('s-gp-cc',                  s.gatepassReportCc || '');
+        setValue('s-gp-report-subject',      s.gatepassReportSubjectTemplate || 'FEFO Violation summery - Pre-ship - {{date}}');
+        setValue('s-gp-from-name',           s.gatepassReportFromName || 'FEFO Control Tower');
+        setValue('s-gp-reply-to',            s.gatepassReportReplyTo || '');
+        setValue('s-gp-replace-all',         s.gatepassAutoReplaceAll || 'true');
       }
     } catch(e) {
       console.error('[Settings] Load error:', e);
@@ -3273,6 +3351,24 @@ const Settings = (() => {
       criticalMin:              getNum('s-critical-min'),
       championGpMin:            getNum('s-champion-gp-min'),
       championComplianceMin:    getNum('s-champion-compliance-min'),
+      inventoryImportEmail:     getStr('s-inv-email'),
+      inventoryImportSubject:   getStr('s-inv-subject'),
+      inventoryImportHour:      getNum('s-inv-hour'),
+      inventoryImportMinute:    getNum('s-inv-minute'),
+      inventoryImportSearchDays:getNum('s-inv-search-days'),
+      gatepassImportEmail:      getStr('s-gp-email'),
+      gatepassImportSubject:    getStr('s-gp-subject'),
+      gatepassImportSearchDays: getNum('s-gp-search-days'),
+      gatepassProcessingHour:   getNum('s-gp-process-hour'),
+      gatepassProcessingMinute: getNum('s-gp-process-minute'),
+      gatepassEmailHour:        getNum('s-gp-email-hour'),
+      gatepassEmailMinute:      getNum('s-gp-email-minute'),
+      gatepassReportRecipients: getStr('s-gp-to'),
+      gatepassReportCc:         getStr('s-gp-cc'),
+      gatepassReportSubjectTemplate: getStr('s-gp-report-subject'),
+      gatepassReportFromName:   getStr('s-gp-from-name'),
+      gatepassReportReplyTo:    getStr('s-gp-reply-to'),
+      gatepassAutoReplaceAll:   getStr('s-gp-replace-all'),
     };
 
     try {
@@ -3293,6 +3389,7 @@ const Settings = (() => {
 
   function setValue(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
   function getNum(id) { const el = document.getElementById(id); return el ? Number(el.value) : 0; }
+  function getStr(id) { const el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; }
 
   return { load, save };
 })();
