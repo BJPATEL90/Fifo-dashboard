@@ -8,7 +8,7 @@
   // Apps Script  Deploy  Manage Deployments  copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fefo-config-sheet-automation-20260810-v26';
+  var FRONTEND_BUILD_ID = 'fefo-bin-exclusion-threshold-20260810-v27';
   var MAINTENANCE_MODE = false;
   var MAINTENANCE_TITLE = 'FEFO Control Tower is under production';
   var MAINTENANCE_MESSAGE = 'We are applying amendments to the dashboard. Please check back shortly.';
@@ -1930,7 +1930,7 @@ body:not(.maintenance-active) #maintenance-page {
                 <div class="setting-desc">Older batches below this quantity are ignored in violation checks</div>
               </div>
               <div class="setting-control">
-                <input type="number" id="s-min-threshold" min="0" value="50">
+                <input type="number" id="s-min-threshold" min="0" value="100">
               </div>
             </div>
             <div class="setting-row">
@@ -3298,7 +3298,7 @@ const Settings = (() => {
       const result = await App.api('getSettings', {});
       if (result && result.success) {
         const s = result.settings || {};
-        setValue('s-min-threshold',          (s.minInventoryThreshold != null ? s.minInventoryThreshold : 50));
+        setValue('s-min-threshold',          (s.minInventoryThreshold != null ? s.minInventoryThreshold : 100));
         setValue('s-ds-threshold',           (s.dsShelfLifeThreshold != null ? s.dsShelfLifeThreshold : 45));
         setValue('s-b2b-threshold',          (s.b2bShelfLifeThreshold != null ? s.b2bShelfLifeThreshold : 85));
         setValue('s-repeat-threshold',       (s.repeatOffenderThreshold != null ? s.repeatOffenderThreshold : 5));
