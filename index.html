@@ -8,7 +8,7 @@
   // Apps Script  Deploy  Manage Deployments  copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fefo-email-violation-summary-20260810-v24';
+  var FRONTEND_BUILD_ID = 'fefo-home-recent-filter-20260810-v25';
   var MAINTENANCE_MODE = false;
   var MAINTENANCE_TITLE = 'FEFO Control Tower is under production';
   var MAINTENANCE_MESSAGE = 'We are applying amendments to the dashboard. Please check back shortly.';
@@ -1442,6 +1442,33 @@ body:not(.maintenance-active) #maintenance-page {
           <!-- Populated dynamically -->
         </div>
 
+        <!-- Recent Violations -->
+        <div class="section-header">
+          <div class="section-title"> Recent Violations</div>
+          <div class="section-actions">
+            <button class="btn btn-primary btn-sm" data-home-recent-bucket="all" onclick="Dashboard.setRecentBucket('all')">All</button>
+            <button class="btn btn-ghost btn-sm" data-home-recent-bucket="3PL" onclick="Dashboard.setRecentBucket('3PL')">3PL</button>
+            <button class="btn btn-ghost btn-sm" data-home-recent-bucket="DS" onclick="Dashboard.setRecentBucket('DS')">DS</button>
+            <button class="btn btn-ghost btn-sm" data-home-recent-bucket="B2B" onclick="Dashboard.setRecentBucket('B2B')">B2B</button>
+            <button class="btn btn-ghost btn-sm" onclick="App.navigate('violations')">View All</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-scroll-x">
+            <table class="data-table" id="recent-violations-table">
+              <thead>
+                <tr>
+                  <th>GP Code</th><th>Date</th><th>User</th><th>Facility</th>
+                  <th>SKU Code</th><th>Item Name</th><th>Severity</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="recent-violations-body">
+                <tr><td colspan="8" class="text-center text-muted" style="padding:24px;">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- Two columns: Top violators + Champions -->
         <div class="two-col" style="margin-bottom:18px;">
           <div class="card">
@@ -1461,37 +1488,6 @@ body:not(.maintenance-active) #maintenance-page {
             <div class="user-rank-list" id="champions-list">
               <div class="text-muted text-center" style="padding:20px;">Loading...</div>
             </div>
-          </div>
-        </div>
-
-        <!-- Expiry Exposure -->
-        <div class="section-header">
-          <div class="section-title"> Expiry Exposure</div>
-        </div>
-        <div class="expiry-buckets" id="expiry-buckets" style="margin-bottom:18px;">
-          <!-- Populated dynamically -->
-        </div>
-
-        <!-- Recent Violations -->
-        <div class="section-header">
-          <div class="section-title"> Recent Violations</div>
-          <div class="section-actions">
-            <button class="btn btn-ghost btn-sm" onclick="App.navigate('violations')">View All </button>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <div class="table-scroll-x">
-            <table class="data-table" id="recent-violations-table">
-              <thead>
-                <tr>
-                  <th>GP Code</th><th>Date</th><th>User</th><th>Facility</th>
-                  <th>SKU Code</th><th>Item Name</th><th>Severity</th><th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="recent-violations-body">
-                <tr><td colspan="8" class="text-center text-muted" style="padding:24px;">Loading...</td></tr>
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
@@ -3375,6 +3371,8 @@ const Dashboard = (() => {
   let _scope = 'today';
   let _dateFrom = Utils.todayISO();
   let _dateTo = Utils.todayISO();
+  let _recentBucket = 'all';
+  let _recentViolations = [];
 
   async function load() {
     syncScopeUI();
@@ -3391,7 +3389,9 @@ const Dashboard = (() => {
       renderTopViolators(result.data.topViolators || []);
       renderChampions(result.data.champions || []);
       renderExpiryBuckets(result.data.expiryExposure || {});
-      renderRecentViolations(result.data.recentViolations || []);
+      _recentViolations = result.data.recentViolations || [];
+      syncRecentBucketUI();
+      renderRecentViolations(_recentViolations);
 
       // Update nav badge
       const badge = document.getElementById('nav-badge-violations');
@@ -3463,6 +3463,19 @@ const Dashboard = (() => {
     if (to) to.value = _dateTo || '';
   }
 
+  function setRecentBucket(bucket) {
+    _recentBucket = bucket || 'all';
+    syncRecentBucketUI();
+    renderRecentViolations(_recentViolations);
+  }
+
+  function syncRecentBucketUI() {
+    document.querySelectorAll('[data-home-recent-bucket]').forEach(function(btn) {
+      var active = btn.getAttribute('data-home-recent-bucket') === _recentBucket;
+      btn.classList.toggle('btn-primary', active);
+      btn.classList.toggle('btn-ghost', !active);
+    });
+  }
   // ---- KPI CARDS ----
   function renderKPILoading() {
     const grid = document.getElementById('kpi-grid');
@@ -3625,12 +3638,18 @@ const Dashboard = (() => {
     const tbody = document.getElementById('recent-violations-body');
     if (!tbody) return;
 
-    if (!violations || !violations.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted" style="padding:24px;">No recent violations</td></tr>';
+    var filtered = (violations || []).filter(function(v) {
+      if (!_recentBucket || _recentBucket === 'all') return true;
+      return String(v.bucket || '').toUpperCase() === _recentBucket;
+    }).slice(0, 10);
+
+    if (!filtered.length) {
+      var label = (!_recentBucket || _recentBucket === 'all') ? 'recent violations' : _recentBucket + ' recent violations';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted" style="padding:24px;">No ' + Utils.escHTML(label) + '</td></tr>';
       return;
     }
 
-    tbody.innerHTML = violations.map(function(v) {
+    tbody.innerHTML = filtered.map(function(v) {
       var sev = (v.severity||'').toLowerCase();
       return '<tr class="row-' + sev + ' clickable" onclick="Violations.openDrilldown(' + "'" + Utils.escHTML(v.id||'') + "'" + ')">' +
         '<td class="td-mono">' + Utils.escHTML(v.gpNumber || '') + '</td>' +
@@ -3649,7 +3668,7 @@ const Dashboard = (() => {
     Exports.facilitySummaryCSV();
   }
 
-  return { load, setScope, applyCustomDates, getScopeParams, exportFacilitySummary };
+  return { load, setScope, applyCustomDates, getScopeParams, setRecentBucket, exportFacilitySummary };
 })();
 
 
