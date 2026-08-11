@@ -8,7 +8,7 @@
   // Apps Script  Deploy  Manage Deployments  copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fefo-strict-excluded-bin-20260811-v35';
+  var FRONTEND_BUILD_ID = 'fefo-dashboard-status-banner-20260811-v36';
   var MAINTENANCE_MODE = false;
   var MAINTENANCE_TITLE = 'FEFO Control Tower is under production';
   var MAINTENANCE_MESSAGE = 'We are applying amendments to the dashboard. Please check back shortly.';
@@ -3482,6 +3482,9 @@ const Dashboard = (() => {
         return;
       }
       _summaryCache = result.data;
+
+      renderScopeStatus(result.data.scopeStatus || null);
+
       renderKPIs(result.data);
       renderFacilityGrid(result.data.facilityCompliance || []);
       renderTopViolators(result.data.topViolators || []);
@@ -3575,6 +3578,26 @@ const Dashboard = (() => {
     });
   }
   // ---- KPI CARDS ----
+
+  function renderScopeStatus(status) {
+    var el = document.getElementById('dashboard-scope-status');
+    if (!el) return;
+    var msg = status && status.message ? String(status.message) : '';
+    if (msg) {
+      el.classList.remove('hidden');
+      el.style.display = 'block';
+      el.innerHTML = '<div style="background:#fff8e6;border:1px solid #f1d28a;border-left:4px solid #d29922;border-radius:8px;padding:12px 14px;margin-bottom:14px;color:#1a1d23;">' +
+        '<div style="font-size:0.72rem;letter-spacing:.08em;text-transform:uppercase;color:#9a6700;font-weight:800;margin-bottom:4px;">Report Status</div>' +
+        '<div style="font-weight:800;line-height:1.35;">' + Utils.escHTML(msg) + '</div>' +
+        '<div style="font-size:0.76rem;color:var(--clr-text-muted);margin-top:5px;">Scope date: ' + Utils.escHTML(Utils.fmtDate(status.dateFrom || status.serverDate || '')) + '</div>' +
+      '</div>';
+    } else {
+      el.classList.add('hidden');
+      el.style.display = 'none';
+      el.innerHTML = '';
+    }
+  }
+
   function renderKPILoading() {
     const grid = document.getElementById('kpi-grid');
     if (!grid) return;
