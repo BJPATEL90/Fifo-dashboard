@@ -8,7 +8,7 @@
   // Apps Script  Deploy  Manage Deployments  copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fefo-dashboard-status-banner-20260811-v36';
+  var FRONTEND_BUILD_ID = 'fefo-export-dashboard-link-20260811-v38';
   var MAINTENANCE_MODE = false;
   var MAINTENANCE_TITLE = 'FEFO Control Tower is under production';
   var MAINTENANCE_MESSAGE = 'We are applying amendments to the dashboard. Please check back shortly.';
@@ -3746,7 +3746,7 @@ const Dashboard = (() => {
   }
 
   function exportFacilitySummary() {
-    Exports.facilitySummaryCSV();
+    Exports.facilitySummaryCSV(getScopeParams());
   }
 
   return { load, setScope, applyCustomDates, getScopeParams, setRecentBucket, exportFacilitySummary };
@@ -4524,11 +4524,23 @@ const Exports = (() => {
   }
 
   // ---- FACILITY SUMMARY ----
-  function facilitySummaryCSV(facilities) {
-    const headers = ['Facility','Compliance %','Total GPs','Violations','Partial FEFO','Skipped Qty','Loss Rs'];
-    const rows = facilities.map(f => [f.facility, f.compliancePct, f.totalGps, f.violations, f.partialFifo, f.skippedQty, f.lossOpportunity]);
-    downloadCSV(toCSV(rows, headers), 'Facility_Summary');
-    Utils.toast('Facility summary CSV downloaded.', 'ok');
+  async function facilitySummaryCSV(scopeParams) {
+    Utils.toast('Preparing facility summary CSV...', 'info', 1500);
+    try {
+      const exportParams = scopeParams || (Dashboard.getScopeParams ? Dashboard.getScopeParams() : {});
+      const result = await App.api('exportFacility', exportParams);
+      if (!result || !result.success) {
+        Utils.toast((result && (result.message || result.error)) || 'Facility export failed.', 'danger');
+        return;
+      }
+      const headers = result.headers || ['Facility','Total Qty','Violated Qty','Compliant Qty','Total GPs','Violations','Partial FEFO','Compliant GPs','Compliance %','Skipped Qty','Loss Rs'];
+      const rows = result.rows || [];
+      downloadCSV(toCSV(rows, headers), 'Facility_Summary_' + Utils.scopeLabel((exportParams || {}).scope));
+      Utils.toast('Facility summary CSV downloaded.', 'ok');
+    } catch(e) {
+      Utils.toast('Facility export error.', 'danger');
+      console.error(e);
+    }
   }
 
   // ---- DRILLDOWN PDF ----
