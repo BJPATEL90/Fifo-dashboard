@@ -8,7 +8,7 @@
   // Apps Script  Deploy  Manage Deployments  copy the /exec URL.
   // =====================================================================
   var GAS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwJRWUQS9aWtJZ4VG9yS-Uxj1IR0XZi-vCoJgxBmytHeq6ocjUI24CKCMSa62T_pDG_JQ/exec';
-  var FRONTEND_BUILD_ID = 'fefo-dashboard-cache-testmail-20260812-v39';
+  var FRONTEND_BUILD_ID = 'fefo-home-export-all-sample-exclusion-20260812-v41';
   var MAINTENANCE_MODE = false;
   var MAINTENANCE_TITLE = 'FEFO Control Tower is under production';
   var MAINTENANCE_MESSAGE = 'We are applying amendments to the dashboard. Please check back shortly.';
@@ -1428,7 +1428,7 @@ body:not(.maintenance-active) #maintenance-page {
         <div class="section-header">
           <div class="section-title"> Facility Compliance</div>
           <div class="section-actions">
-            <button class="btn btn-ghost btn-sm" onclick="Dashboard.exportFacilitySummary()">Export</button>
+            <button class="btn btn-ghost btn-sm" onclick="Dashboard.exportTransactions()">Export Transactions</button>
           </div>
         </div>
         <div class="facility-grid" id="facility-grid" style="margin-bottom:18px;">
@@ -1506,7 +1506,8 @@ body:not(.maintenance-active) #maintenance-page {
           </div>
         </div>
         <div class="tab-bar" style="margin-bottom:12px;">
-          <button class="tab-btn active" data-vbucket="3PL" onclick="Violations.switchBucket('3PL')">3PL</button>
+          <button class="tab-btn active" data-vbucket="all" onclick="Violations.switchBucket('all')">All</button>
+          <button class="tab-btn" data-vbucket="3PL" onclick="Violations.switchBucket('3PL')">3PL</button>
           <button class="tab-btn" data-vbucket="DS" onclick="Violations.switchBucket('DS')">DS</button>
           <button class="tab-btn" data-vbucket="B2B" onclick="Violations.switchBucket('B2B')">B2B</button>
         </div>
@@ -3745,11 +3746,11 @@ const Dashboard = (() => {
     }).join('');
   }
 
-  function exportFacilitySummary() {
-    Exports.facilitySummaryCSV(getScopeParams());
+  function exportTransactions() {
+    Exports.transactionsCSV(getScopeParams());
   }
 
-  return { load, setScope, applyCustomDates, getScopeParams, setRecentBucket, exportFacilitySummary };
+  return { load, setScope, applyCustomDates, getScopeParams, setRecentBucket, exportTransactions };
 })();
 
 
@@ -3763,7 +3764,7 @@ const Violations = (() => {
   const PAGE_SIZE = 50;
   let _state = {
     page: 1, total: 0,
-    tab: 'all', bucket: '3PL',
+    tab: 'all', bucket: 'all',
     search: '', facility: '', severity: '', scope: 'today', dateFrom: Utils.todayISO(), dateTo: Utils.todayISO(),
     sortCol: 'date', sortDir: 'desc'
   };
@@ -3785,7 +3786,7 @@ const Violations = (() => {
   }
 
   function switchBucket(bucket) {
-    _state.bucket = bucket || '3PL';
+    _state.bucket = bucket || 'all';
     _state.page = 1;
     syncBucketUI();
     fetchData();
@@ -4543,6 +4544,26 @@ const Exports = (() => {
     }
   }
 
+  // ---- HOME TRANSACTION EXPORT ----
+  async function transactionsCSV(scopeParams) {
+    Utils.toast('Preparing transaction-level CSV...', 'info', 1500);
+    try {
+      const exportParams = scopeParams || (Dashboard.getScopeParams ? Dashboard.getScopeParams() : {});
+      const result = await App.api('exportTransactions', exportParams);
+      if (!result || !result.success) {
+        Utils.toast((result && (result.message || result.error)) || 'Transaction export failed.', 'danger');
+        return;
+      }
+      const headers = result.headers || [];
+      const rows = result.rows || [];
+      downloadCSV(toCSV(rows, headers), 'FEFO_Transactions_' + Utils.scopeLabel((exportParams || {}).scope));
+      Utils.toast(rows.length + ' transaction rows downloaded.', 'ok');
+    } catch(e) {
+      Utils.toast('Transaction export error.', 'danger');
+      console.error(e);
+    }
+  }
+
   // ---- DRILLDOWN PDF ----
   function drilldownPDF() {
     const d = window._currentDrilldownData;
@@ -4561,7 +4582,7 @@ const Exports = (() => {
   return {
     violationsCSV, violationsExcel, violationsPDF,
     preventionCSV, financialCSV, complianceCSV, offendersCSV,
-    facilitySummaryCSV, drilldownPDF
+    facilitySummaryCSV, transactionsCSV, drilldownPDF
   };
 })();
 
